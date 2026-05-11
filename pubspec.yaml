@@ -1,0 +1,38 @@
+name: ember_spark
+description: EmberSpark — Lightning wallet
+publish_to: 'none'
+
+environment:
+  sdk: '^3.11.0'
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  flutter_secure_storage: ^10.0.0
+  mobile_scanner: ^7.2.0
+  qr_flutter: ^4.1.0
+  bech32: ^0.2.2
+  app_links: ^7.0.0
+  pointycastle: ^4.0.0
+  local_auth: ^3.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/Logo_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "images/Logo_icon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "images/Logo_icon.png"
