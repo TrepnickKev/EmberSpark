@@ -99,7 +99,15 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.all(12),
-                  child: QrImageView(data: invoice!, size: 240),
+                  child: QrImageView(
+                    data: invoice!,
+                    size: 240,
+                    backgroundColor: Colors.white,
+                    embeddedImage: const AssetImage('images/Logo_icon.png'),
+                    embeddedImageStyle: const QrEmbeddedImageStyle(
+                      size: Size(48, 48),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(

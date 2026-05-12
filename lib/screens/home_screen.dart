@@ -175,6 +175,24 @@ class _HomeScreenState extends State<HomeScreen>
     if (mounted) _load();
   }
 
+  PopupMenuItem<String> _menuItem(
+    String value,
+    IconData icon,
+    String label,
+  ) {
+    return PopupMenuItem<String>(
+      value: value,
+      height: 52,
+      child: Row(
+        children: [
+          Icon(icon, size: 22),
+          const SizedBox(width: 16),
+          Text(label, style: const TextStyle(fontSize: 15)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,10 +231,10 @@ class _HomeScreenState extends State<HomeScreen>
                 _logout();
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'contacts', child: Text('Contacts')),
-              PopupMenuItem(value: 'settings', child: Text('Settings')),
-              PopupMenuItem(value: 'logout', child: Text('Log out')),
+            itemBuilder: (_) => [
+              _menuItem('contacts', Icons.person_outline, 'Contacts'),
+              _menuItem('settings', Icons.settings_outlined, 'Settings'),
+              _menuItem('logout', Icons.logout, 'Log out'),
             ],
           ),
         ],
