@@ -60,7 +60,10 @@ jobs:
         run: flutter analyze
 
       - name: Build release APKs (split per ABI)
-        run: flutter build apk --release --split-per-abi
+        run: |
+          flutter build apk --release --split-per-abi \
+            --build-name=${{ inputs.version }} \
+            --build-number=${{ github.run_number }}
 
       - name: Rename APKs with version + brand
         run: |
