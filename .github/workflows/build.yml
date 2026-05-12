@@ -1,8 +1,9 @@
 name: Build & release Android APKs
 
 # Manual only. Click "Run workflow" in the Actions tab, fill in the version,
-# and the workflow tags the commit, builds, and publishes a GitHub Release
-# with the three ABI-split APKs attached.
+# and the workflow builds the APKs and publishes a GitHub Release on the
+# PUBLIC TrepnickKev/EmberSpark repo (cross-repo write authenticated via a
+# short-lived GitHub App installation token).
 on:
   workflow_dispatch:
     inputs:
@@ -10,9 +11,6 @@ on:
         description: "Version (semver, e.g. 1.0.0 — no leading 'v')"
         required: true
         type: string
-
-permissions:
-  contents: write  # needed to create the tag + release
 
 env:
   # Forces remaining v2 JS actions (e.g. subosito/flutter-action@v2) onto
@@ -72,9 +70,20 @@ jobs:
           mv app-x86_64-release.apk      "EmberSpark-v${{ inputs.version }}-x86_64.apk"
           ls -lh
 
-      - name: Publish release
+      - name: Generate App installation token
+        id: app_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: TrepnickKev
+          repositories: EmberSpark
+
+      - name: Publish release in PUBLIC repo
         uses: softprops/action-gh-release@v3
         with:
+          repository: TrepnickKev/EmberSpark
+          token: ${{ steps.app_token.outputs.token }}
           tag_name: v${{ inputs.version }}
           name: EmberSpark v${{ inputs.version }}
           generate_release_notes: true
