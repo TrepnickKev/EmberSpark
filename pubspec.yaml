@@ -1,6 +1,7 @@
 name: ember_spark
 description: EmberSpark — Lightning wallet
 publish_to: 'none'
+version: 1.0.0+1
 
 environment:
   sdk: '^3.11.0'
@@ -17,6 +18,8 @@ dependencies:
   app_links: ^7.0.0
   pointycastle: ^4.0.0
   local_auth: ^3.0.1
+  package_info_plus: ^10.1.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
