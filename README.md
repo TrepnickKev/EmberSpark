@@ -1,149 +1,111 @@
-# EmberSpark — Lightning wallet
+# EmberSpark
 
 ![EmberSpark logo](images/Logo.png)
 
-A small Flutter wallet that talks to your own [LNbits](https://lnbits.com) server. Built primarily for Android; also runs on Windows desktop and Chrome for development.
+A small Lightning wallet for your own [LNbits](https://lnbits.com) server.
+Built for everyday personal and family use — send, receive, scan a QR, and
+move on.
+
+[![Latest release](https://img.shields.io/github/v/release/TrepnickKev/EmberSpark?label=latest&color=ff8c42)](https://github.com/TrepnickKev/EmberSpark/releases/latest)
 
 ## Features
 
-- Balance, send, and receive — directly against your LNbits wallet
-- QR scanner that auto-detects what you scanned and routes to the right flow:
-  - **BOLT11** invoice → pre-filled Send screen
-  - **LNURL-pay** → amount prompt → invoice → pay
-  - **LNURL-withdraw** → amount prompt → invoice → submit
-  - **LNURL-auth** → cryptographic site login (secp256k1 ECDSA)
-  - **Lightning address** (`name@host`) → resolves and treats as LNURL-pay
-- Registered as a system Lightning handler — `lightning:` and `lnurl:` deep links from other apps open EmberSpark
-- Transaction history with pull-to-refresh
-- Two-key setup (admin + invoice) — invoice key is used for read operations, admin key only for outgoing payments
-- Settings toggle to allow self-signed / incomplete-chain HTTPS for hobbyist or `.onion` LNbits servers
+- Lightning **send & receive** through your LNbits wallet
+- **QR scanner** that auto-detects BOLT11, LNURL, or Lightning addresses and
+  routes to the right flow
+- **LNURL** support — pay, withdraw, and cryptographic auth (LUD-04)
+- **Lightning addresses** (`user@host`)
+- Acts as a **system handler for `lightning:` deep links** — tap a Lightning
+  link in any app and EmberSpark opens
+- **Live transaction history** — incoming and outgoing payments surface within
+  a few seconds, no manual refresh
+- **Fiat balance** display (USD / EUR / GBP / CHF / CAD / AUD / JPY) via
+  mempool.space
+- **Contacts** — save destinations you pay regularly, scan-to-add, pick from a
+  list in the Send screen
+- **Biometric or device-PIN lock** on app launch
+- API key stored in Android KeyStore via `flutter_secure_storage`
+- "Allow unverified HTTPS" toggle for self-signed certificates or `.onion`
+  LNbits servers
+
+## Install
+
+Grab the latest APK from
+**[Releases](https://github.com/TrepnickKev/EmberSpark/releases/latest)**.
+
+| File | For |
+|---|---|
+| `EmberSpark-v*.*.*-arm64-v8a.apk` | Modern phones (most users) |
+| `EmberSpark-v*.*.*-armeabi-v7a.apk` | Older 32-bit Android phones |
+| `EmberSpark-v*.*.*-x86_64.apk` | Emulators / Chromebooks |
+
+1. On your phone, enable "Install unknown apps" for your file manager or
+   browser
+2. Tap the APK → **Install**
+3. Open EmberSpark, paste your LNbits URL and admin API key, or scan their
+   QR codes from **LNbits → wallet → API Info**
 
 ## Requirements
 
-- An **LNbits server** with a real Lightning funding source (LND / CLN / Phoenixd / NWC / etc.) — VoidWallet won't work, it can't move sats
-- For Android builds: Android SDK (platform `android-36`, build-tools, platform-tools) and JDK 17+
-- Flutter SDK (3.27 or newer)
+- **Android 6.0** (API 23) or newer
+- A self-hosted **[LNbits](https://lnbits.com)** server with a real Lightning
+  funding source (LND / CLN / Phoenixd / NWC). VoidWallet won't work — it
+  can't move sats.
+- Network reachability from your phone to your LNbits server
 
-## How to build
+## Configure the wallet
 
-### One-time setup
-
-1. Install Flutter — https://docs.flutter.dev/install
-2. Clone or copy this repo
-3. From the project root:
-
-```powershell
-flutter pub get
-```
-
-If you ever change the icon or rebrand, regenerate launcher icons:
-
-```powershell
-dart run flutter_launcher_icons
-```
-
-### Android APK (sideload to phone)
-
-```powershell
-flutter build apk --debug --split-per-abi
-```
-
-Output: `build\app\outputs\flutter-apk\app-arm64-v8a-debug.apk` (use this one for any modern phone). For a smaller, faster build:
-
-```powershell
-flutter build apk --release --split-per-abi
-```
-
-Transfer the APK to your phone (USB, Drive, Telegram-to-self, etc.). On the phone, allow installs from your file manager / browser, tap the APK, install.
-
-### Run on Windows desktop (no emulator needed)
-
-```powershell
-flutter run -d windows
-```
-
-The wallet works fully on Windows except QR scanning (no camera).
-
-### Run directly on a USB-tethered phone (best dev loop)
-
-Enable Developer Options + USB debugging on the phone, plug it in, then:
-
-```powershell
-flutter devices    # confirm phone shows up
-flutter run        # builds, installs, hot-reloads
-```
-
-While running: `r` = hot reload, `R` = hot restart, `q` = quit.
-
-### Reset to a clean build (when things get weird)
-
-```powershell
-flutter clean
-flutter pub get
-flutter build apk --debug --split-per-abi
-```
-
-## How to configure
-
-After installing, on first launch you see the Setup screen with three fields. The QR-scan icon next to each field reads the corresponding QR from LNbits' "API Info" panel.
+On first launch, the Setup screen asks for two fields. Use the QR icon next
+to each to scan from LNbits' API Info panel.
 
 | Field | What to enter |
-| --- | --- |
-| **LNbits URL** | Base URL of your LNbits server, e.g. `https://lnbits.example.com` or `http://abcd.onion`. Leading `https://` is optional — the app fills it in. |
-| **Admin key** | Used only for sending payments. Find it in LNbits → wallet → **API Info → Admin key**. |
-| **Invoice / read key** | Used for balance, creating invoices, and reading payments. LNbits → wallet → **API Info → Invoice/read key**. |
-
-Find all three QR codes in your LNbits wallet's "API Info" panel — each field's scan button accepts its QR.
+|---|---|
+| **LNbits URL** | Base URL of your LNbits, e.g. `https://lnbits.example.com` or `http://abcd.onion`. The `https://` prefix is added automatically if missing. |
+| **Admin API key** | LNbits → wallet → **API Info → Admin key**. Full-access key — used for every operation. |
 
 ### Settings → Allow unverified HTTPS
 
-Off by default. Turn on if your LNbits sits behind a self-signed cert, an incomplete certificate chain, or a `.onion` address. Bypasses TLS validation for **all** outgoing requests, so only enable for servers you trust.
-
-## How to use
-
-- **Receive sats** — Receive → enter amount + optional memo → screen shows a QR for the BOLT11 invoice, plus Copy button.
-- **Send sats** — Send → paste a BOLT11 invoice → Pay. Or, easier: tap **Scan QR** on the home screen, the wallet detects the format and routes you to the right flow.
-- **History** — clock icon in the top bar. Pull down to refresh.
-- **Lightning deep link from another app** — when an app like a Bitcoin game offers "Open with…", pick EmberSpark; the wallet handles the BOLT11/LNURL/Lightning-address automatically.
+Off by default. Turn on if your LNbits sits behind a self-signed certificate,
+an incomplete certificate chain, or a `.onion` address. Bypasses TLS
+validation for all outgoing requests, so only enable for servers you actually
+trust.
 
 ## Troubleshooting
 
 | Symptom | Cause / fix |
-| --- | --- |
-| `VoidWallet cannot create invoices` (520) | LNbits has no real funding source. Configure LND/CLN/Phoenixd/NWC in LNbits → Server → Funding. |
-| `CERTIFICATE_VERIFY_FAILED` | Self-signed or incomplete chain on the LNbits / LNURL server. Settings → Allow unverified HTTPS. |
-| `403 Forbidden` from an LNURL endpoint | Most often the voucher is already redeemed or expired. Confirm by pasting the URL (use the "Copy URL" button on the error screen) into a browser — same 403 means it's the server, not the app. |
-| LNURL withdraw says success but balance doesn't change | LNURL-withdraw is fire-and-forget; the server has to actually pay your invoice. Pull-to-refresh History after a few seconds. |
-| Build fails with Kotlin "different roots" / `relativeTo` errors | Pub cache is on a different drive than the project. Set `PUB_CACHE` to a folder on the same drive as the project, then `flutter clean` + `flutter pub get`. |
+|---|---|
+| `VoidWallet cannot create invoices` (520) | LNbits has no real Lightning backend. Configure LND / CLN / Phoenixd / NWC in LNbits → Server → Funding. |
+| `Couldn't verify the server's TLS certificate` | Self-signed or incomplete chain. Enable **Settings → Allow unverified HTTPS** if you trust the server. |
+| `403 Forbidden` from an LNURL endpoint | Voucher likely already redeemed or expired. Use the "Copy URL" button on the error screen and try the URL in a browser to confirm. |
+| LNURL-withdraw says "Withdrawing…" but the balance doesn't move | LNURL-withdraw is fire-and-forget. The server has to actually pay your invoice — pull-to-refresh History after a few seconds. |
 
-## Project layout
+## Issues & feature requests
 
-```
-lib/
-  main.dart                          # MaterialApp + deep-link listener
-  screens/
-    login_screen.dart                # URL + admin/invoice key setup, QR scan per field
-    home_screen.dart                 # balance, scan, send, receive, history, settings
-    send_screen.dart                 # BOLT11 paste + pay
-    receive_screen.dart              # amount + memo → invoice + QR
-    qr_scan_screen.dart              # full-screen scanner with torch / camera switch
-    lnurl_action_screen.dart         # LNURL-pay/withdraw/auth UI
-    history_screen.dart              # transaction list, pull-to-refresh
-    settings_screen.dart             # TLS-trust toggle
-  services/
-    lnbits_service.dart              # /api/v1/wallet, /payments, list payments
-    lnurl.dart                       # bech32 decode, fetch, payRequest/withdrawRequest/login parse
-    lnurl_auth.dart                  # secp256k1 ECDSA signing of the LNURL-auth k1
-    lightning_router.dart            # classify scanned/deep-linked code → push the right screen
-    http_client_factory.dart         # IOClient with custom UA + optional cert bypass
-android/                             # Manifest (lightning:/lnurl: intent filters), Kotlin
-ios/                                 # Info.plist (camera permission, display name)
-images/                              # source artwork (Logo.png, Logo_icon.png)
-```
+Bug reports, ideas, and feedback all go in the
+**[issue tracker](https://github.com/TrepnickKev/EmberSpark/issues)**.
 
 ## Caveats
 
-- **Debug APKs are large** (~88 MB) because they bundle the Dart VM, debug symbols, and JIT. Release builds are 25–35 MB.
-- **APKs are signed with the auto-generated debug key** — fine for sideloading; not Play-Store-ready.
-- **LNURL-auth** uses a simplified HMAC derivation, not BIP-32. This means your identity doesn't roam to other LNURL-auth wallets. Each install generates a fresh master seed; sites you've logged into will see you as a new user after a reinstall.
-- The **invoice key alone** is enough for receive + history; the **admin key** is required only for send. If you only paste the invoice key, paying will fail with a 401 until you add the admin key.
+- **APKs are signed with the auto-generated debug key.** Fine for sideloading
+  on your own phone; not Play-Store-ready.
+- **LNURL-auth identity is per install.** It uses a simplified HMAC derivation
+  rather than BIP-32, so a reinstall generates a new identity — sites you've
+  authed against will see a new user.
+- **Android only.** iOS / desktop builds aren't published here.
+- **No backup / restore yet.** Contacts and the LNURL-auth seed live in
+  Android KeyStore on the device and don't survive an uninstall.
+
+## Support development
+
+EmberSpark is built and maintained in spare time. If it makes your sats
+easier to manage, the on-chain BTC donate address is shown inside the app at
+**Settings → About**. Every bit keeps the project alive — thank you.
+
+## License
+
+All rights reserved by **Trepnick Solutions** until a `LICENSE` file is
+added to this repo.
+
+---
+
+© 2026 Trepnick Solutions
