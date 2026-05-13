@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/http_client_factory.dart';
+import '../services/language_service.dart';
 import '../services/lock_service.dart';
 import '../services/price_service.dart';
 import 'about_screen.dart';
@@ -16,6 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? currency;
   bool? lockEnabled;
   bool deviceSupportsLock = false;
+  String? language;
 
   @override
   void initState() {
@@ -29,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       getSelectedCurrency(),
       isLockEnabled(),
       isDeviceSecuritySupported(),
+      getSelectedLanguageCode(),
     ]);
     if (!mounted) return;
     setState(() {
@@ -36,23 +40,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       currency = results[1] as String;
       lockEnabled = results[2] as bool;
       deviceSupportsLock = results[3] as bool;
+      language = results[4] as String;
     });
   }
 
   Future<void> _toggleLock(bool next) async {
+    final l10n = AppLocalizations.of(context)!;
     if (next) {
       if (!deviceSupportsLock) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Set up a screen lock or biometric on your phone first.',
-            ),
-          ),
+          SnackBar(content: Text(l10n.settingsLockNeedSetup)),
         );
         return;
       }
       // Verify the user can actually authenticate before locking themselves out.
-      final ok = await tryAuthenticate(reason: 'Confirm to enable app lock');
+      final ok = await tryAuthenticate(reason: l10n.settingsLockConfirmReason);
       if (!ok) return;
     }
     await setLockEnabled(next);
@@ -61,22 +63,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final tls = trustUnverified;
     final cur = currency;
     final lock = lockEnabled;
-    if (tls == null || cur == null || lock == null) {
+    final lang = language;
+    if (tls == null || cur == null || lock == null || lang == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Settings')),
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
           ListTile(
-            title: const Text('Display currency'),
-            subtitle: const Text('Used for the fiat amount under the balance'),
+            title: Text(l10n.settingsLanguage),
+            subtitle: Text(l10n.settingsLanguageSubtitle),
+            trailing: DropdownButton<String>(
+              value: lang,
+              items: [
+                DropdownMenuItem(
+                  value: 'system',
+                  child: Text(l10n.languageSystemDefault),
+                ),
+                const DropdownMenuItem(value: 'en', child: Text('English')),
+                const DropdownMenuItem(value: 'de', child: Text('Deutsch')),
+              ],
+              onChanged: (next) async {
+                if (next == null) return;
+                await setSelectedLanguage(next);
+                if (mounted) setState(() => language = next);
+              },
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: Text(l10n.settingsDisplayCurrency),
+            subtitle: Text(l10n.settingsDisplayCurrencySubtitle),
             trailing: DropdownButton<String>(
               value: cur,
               items: [
@@ -92,24 +117,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Divider(),
           SwitchListTile(
-            title: const Text('Lock app on launch'),
+            title: Text(l10n.settingsLockOnLaunch),
             subtitle: Text(
               deviceSupportsLock
-                  ? 'Require biometric or device PIN/pattern to open EmberSpark.'
-                  : 'No screen lock is set up on this device. '
-                      'Configure one in system settings to enable this option.',
+                  ? l10n.settingsLockSubtitleEnabled
+                  : l10n.settingsLockSubtitleUnavailable,
             ),
             value: lock,
             onChanged: deviceSupportsLock ? _toggleLock : null,
           ),
           const Divider(),
           SwitchListTile(
-            title: const Text('Allow unverified HTTPS'),
-            subtitle: const Text(
-              'Trust self-signed and incomplete-chain certificates. '
-              'Required for some hobbyist Lightning servers and '
-              '.onion services. Only enable for servers you trust.',
-            ),
+            title: Text(l10n.settingsTrustTls),
+            subtitle: Text(l10n.settingsTrustTlsSubtitle),
             value: tls,
             onChanged: (next) async {
               await setUnverifiedTlsAllowed(next);
@@ -119,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: const Text('About'),
+            title: Text(l10n.settingsAbout),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
 import 'contacts_screen.dart' show contactAvatar;
@@ -44,10 +45,11 @@ class _SendToScreenState extends State<SendToScreen> {
   }
 
   Future<void> _scan() async {
+    final l10n = AppLocalizations.of(context)!;
     final code = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder: (_) => const QrScanScreen(title: 'Scan to send'),
+        builder: (_) => QrScanScreen(title: l10n.sendToScanTitle),
       ),
     );
     if (code == null || !mounted) return;
@@ -56,9 +58,10 @@ class _SendToScreenState extends State<SendToScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final list = contacts;
     return Scaffold(
-      appBar: AppBar(title: const Text('Send to…')),
+      appBar: AppBar(title: Text(l10n.sendToTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -71,10 +74,10 @@ class _SendToScreenState extends State<SendToScreen> {
                   child: TextField(
                     controller: inputCtrl,
                     decoration: InputDecoration(
-                      labelText: 'Address or payment data',
-                      hintText: 'BOLT11, LNURL, or user@host',
+                      labelText: l10n.sendToInputLabel,
+                      hintText: l10n.sendToInputHint,
                       suffixIcon: IconButton(
-                        tooltip: 'Scan QR',
+                        tooltip: l10n.commonScanQr,
                         icon: const Icon(Icons.qr_code_scanner),
                         onPressed: _scan,
                       ),
@@ -84,16 +87,16 @@ class _SendToScreenState extends State<SendToScreen> {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _continue,
-                  child: const Text('Continue'),
+                  child: Text(l10n.commonContinue),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Contacts',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                l10n.sendToContacts,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ),
             const Divider(height: 16),
@@ -101,10 +104,10 @@ class _SendToScreenState extends State<SendToScreen> {
               child: list == null
                   ? const Center(child: CircularProgressIndicator())
                   : list.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
-                            'No contacts yet',
-                            style: TextStyle(color: Colors.grey),
+                            l10n.sendToNoContacts,
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         )
                       : ListView.separated(

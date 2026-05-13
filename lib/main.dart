@@ -2,15 +2,19 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/lock_screen.dart';
 import 'screens/login_screen.dart';
+import 'services/language_service.dart';
 import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await loadInitialLocale();
   runApp(const MyApp());
 }
 
@@ -39,7 +43,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _handle(Uri uri) async {
     if (!await haveCredentials()) {
-      _toast('Set up the wallet first');
+      _toast();
       return;
     }
     final nav = navigatorKey.currentState;
@@ -47,9 +51,11 @@ class _MyAppState extends State<MyApp> {
     await routeLightningCode(nav, uri.toString());
   }
 
-  void _toast(String msg) {
+  void _toast() {
     final ctx = navigatorKey.currentContext;
     if (ctx == null) return;
+    final l10n = AppLocalizations.of(ctx);
+    final msg = l10n?.appSetupFirstToast ?? 'Set up the wallet first';
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(msg)));
   }
 
@@ -61,11 +67,19 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EmberSpark',
-      navigatorKey: navigatorKey,
-      theme: ThemeData.dark(useMaterial3: true),
-      home: const _LockGate(),
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: appLocale,
+      builder: (context, locale, _) {
+        return MaterialApp(
+          onGenerateTitle: (ctx) => AppLocalizations.of(ctx)!.appTitle,
+          navigatorKey: navigatorKey,
+          theme: ThemeData.dark(useMaterial3: true),
+          locale: locale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const _LockGate(),
+        );
+      },
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
@@ -93,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen>
   void _showPaymentNotification(int delta) {
     if (!mounted) return;
     if (ModalRoute.of(context)?.isCurrent != true) return;
+    final l10n = AppLocalizations.of(context)!;
     final received = delta > 0;
     final amount = formatThousands(delta.abs());
     ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +108,11 @@ class _HomeScreenState extends State<HomeScreen>
               color: received ? Colors.greenAccent : Colors.redAccent,
             ),
             const SizedBox(width: 8),
-            Text(received ? 'Received $amount sats' : 'Sent $amount sats'),
+            Text(
+              received
+                  ? l10n.homeSatsReceived(amount)
+                  : l10n.homeSatsSent(amount),
+            ),
           ],
         ),
       ),
@@ -136,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => error = friendlyError(e));
+      setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -195,13 +201,14 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset('images/Logo_icon.png'),
         ),
-        title: const Text('EmberSpark'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -232,9 +239,9 @@ class _HomeScreenState extends State<HomeScreen>
               }
             },
             itemBuilder: (_) => [
-              _menuItem('contacts', Icons.person_outline, 'Contacts'),
-              _menuItem('settings', Icons.settings_outlined, 'Settings'),
-              _menuItem('logout', Icons.logout, 'Log out'),
+              _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
+              _menuItem('settings', Icons.settings_outlined, l10n.homeSettings),
+              _menuItem('logout', Icons.logout, l10n.homeLogout),
             ],
           ),
         ],
@@ -256,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen>
               Column(
                 children: [
                   Text(
-                    '${formatThousands(balance ?? 0)} sats',
+                    '${formatThousands(balance ?? 0)} ${l10n.homeSatsUnit}',
                     style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -282,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen>
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Scan QR'),
+                label: Text(l10n.homeScan),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
@@ -295,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.upload),
-                    label: const Text('Send'),
+                    label: Text(l10n.homeSend),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -314,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.download),
-                    label: const Text('Receive'),
+                    label: Text(l10n.homeReceive),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),

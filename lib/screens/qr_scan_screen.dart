@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../l10n/app_localizations.dart';
 
 class QrScanScreen extends StatefulWidget {
-  const QrScanScreen({super.key, this.title = 'Scan QR'});
+  const QrScanScreen({super.key, this.title});
 
-  final String title;
+  /// Custom title; if null, falls back to the localized "Scan QR".
+  final String? title;
 
   @override
   State<QrScanScreen> createState() => _QrScanScreenState();
@@ -34,9 +36,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title ?? l10n.commonScanQr),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),

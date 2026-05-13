@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
@@ -48,9 +49,10 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Future<void> _pay() async {
+    final l10n = AppLocalizations.of(context)!;
     final bolt11 = bolt11Ctrl.text.trim();
     if (bolt11.isEmpty) {
-      setState(() => error = 'Paste an invoice first');
+      setState(() => error = l10n.sendPasteFirst);
       return;
     }
     setState(() {
@@ -62,10 +64,10 @@ class _SendScreenState extends State<SendScreen> {
       final svc = await LNbitsService.fromStorage();
       await svc.payInvoice(bolt11);
       if (!mounted) return;
-      setState(() => success = 'Payment sent');
+      setState(() => success = l10n.sendPaymentSent);
     } catch (e) {
       if (!mounted) return;
-      setState(() => error = friendlyError(e));
+      setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -73,8 +75,9 @@ class _SendScreenState extends State<SendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Send')),
+      appBar: AppBar(title: Text(l10n.sendTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -84,9 +87,9 @@ class _SendScreenState extends State<SendScreen> {
               TextField(
                 controller: bolt11Ctrl,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'BOLT11 invoice',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.sendBolt11Label,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               if (decoded != null) ...[
@@ -102,7 +105,7 @@ class _SendScreenState extends State<SendScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Pay'),
+                    : Text(l10n.sendPay),
               ),
               if (error != null) ...[
                 const SizedBox(height: 16),
@@ -130,9 +133,10 @@ class _DecodedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final amountText = decoded.amountSats == 0
-        ? 'Any amount'
-        : '${formatThousands(decoded.amountSats)} sats';
+        ? l10n.sendAnyAmount
+        : l10n.sendAmountWithSats(formatThousands(decoded.amountSats));
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(

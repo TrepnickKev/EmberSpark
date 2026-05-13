@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lnurl.dart';
@@ -66,13 +67,14 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        error = friendlyError(e);
+        error = friendlyError(AppLocalizations.of(context)!, e);
         busy = false;
       });
     }
   }
 
   Future<void> _submitAuth(LnurlAuthInfo i) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       busy = true;
       error = null;
@@ -81,29 +83,32 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       await performLnurlAuth(i);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Authenticated with ${i.host}')),
+        SnackBar(content: Text(l10n.lnurlAuthSuccess(i.host))),
       );
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        error = friendlyError(e);
+        error = friendlyError(AppLocalizations.of(context)!, e);
         busy = false;
       });
     }
   }
 
   Future<void> _submitPay(LnurlPayInfo i) async {
+    final l10n = AppLocalizations.of(context)!;
     final sats = int.tryParse(amountCtrl.text.trim());
     if (sats == null || sats <= 0) {
-      setState(() => error = 'Enter a positive amount');
+      setState(() => error = l10n.lnurlAmountPositive);
       return;
     }
     final msat = sats * 1000;
     if (msat < i.minSendableMsat || msat > i.maxSendableMsat) {
       setState(
-        () => error =
-            'Amount must be between ${i.minSendableMsat ~/ 1000} and ${i.maxSendableMsat ~/ 1000} sats',
+        () => error = l10n.lnurlAmountOutOfRange(
+          i.minSendableMsat ~/ 1000,
+          i.maxSendableMsat ~/ 1000,
+        ),
       );
       return;
     }
@@ -121,23 +126,26 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        error = friendlyError(e);
+        error = friendlyError(AppLocalizations.of(context)!, e);
         busy = false;
       });
     }
   }
 
   Future<void> _submitWithdraw(LnurlWithdrawInfo i) async {
+    final l10n = AppLocalizations.of(context)!;
     final sats = int.tryParse(amountCtrl.text.trim());
     if (sats == null || sats <= 0) {
-      setState(() => error = 'Enter a positive amount');
+      setState(() => error = l10n.lnurlAmountPositive);
       return;
     }
     final msat = sats * 1000;
     if (msat < i.minWithdrawableMsat || msat > i.maxWithdrawableMsat) {
       setState(
-        () => error =
-            'Amount must be between ${i.minWithdrawableMsat ~/ 1000} and ${i.maxWithdrawableMsat ~/ 1000} sats',
+        () => error = l10n.lnurlAmountOutOfRange(
+          i.minWithdrawableMsat ~/ 1000,
+          i.maxWithdrawableMsat ~/ 1000,
+        ),
       );
       return;
     }
@@ -149,18 +157,20 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       final svc = await LNbitsService.fromStorage();
       final bolt11 = await svc.createInvoice(
         amountSats: sats,
-        memo: i.description.isEmpty ? 'LNURL-withdraw' : i.description,
+        memo: i.description.isEmpty
+            ? l10n.lnurlWithdrawDefaultMemo
+            : i.description,
       );
       await submitWithdrawInvoice(i, bolt11);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Withdrawing $sats sats…')),
+        SnackBar(content: Text(l10n.lnurlWithdrawing(sats))),
       );
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        error = friendlyError(e);
+        error = friendlyError(AppLocalizations.of(context)!, e);
         busy = false;
       });
     }
@@ -168,12 +178,13 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final i = info;
     final title = switch (i) {
-      LnurlWithdrawInfo() => 'Receive (LNURL)',
-      LnurlPayInfo() => 'Send (LNURL)',
-      LnurlAuthInfo() => 'Authenticate',
-      null => 'LNURL',
+      LnurlWithdrawInfo() => l10n.lnurlTitleWithdraw,
+      LnurlPayInfo() => l10n.lnurlTitlePay,
+      LnurlAuthInfo() => l10n.lnurlTitleAuthenticate,
+      null => l10n.lnurlTitleGeneric,
     };
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -182,26 +193,25 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
         child: busy && i == null
             ? const Center(child: CircularProgressIndicator())
             : i == null
-                ? _buildError()
-                : _buildForm(i),
+                ? _buildError(l10n)
+                : _buildForm(l10n, i),
       ),
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          error ?? 'Unknown error',
+          error ?? l10n.commonUnknownError,
           style: const TextStyle(color: Colors.redAccent),
         ),
         if (resolvedUrl != null) ...[
           const SizedBox(height: 24),
-          const Text(
-            'Resolved URL — paste this in a browser to see if the server '
-            'will respond outside the wallet:',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+          Text(
+            l10n.lnurlResolvedExplain,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
           const SizedBox(height: 8),
           SelectableText(
@@ -213,12 +223,12 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             alignment: Alignment.centerLeft,
             child: ElevatedButton.icon(
               icon: const Icon(Icons.copy),
-              label: const Text('Copy URL'),
+              label: Text(l10n.lnurlCopyUrl),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: resolvedUrl!));
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('URL copied')),
+                  SnackBar(content: Text(l10n.lnurlUrlCopied)),
                 );
               },
             ),
@@ -228,33 +238,31 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     );
   }
 
-  Widget _buildForm(LnurlInfo i) {
+  Widget _buildForm(AppLocalizations l10n, LnurlInfo i) {
     return switch (i) {
-      LnurlAuthInfo() => _buildAuthForm(i),
-      LnurlPayInfo() || LnurlWithdrawInfo() => _buildAmountForm(i),
+      LnurlAuthInfo() => _buildAuthForm(l10n, i),
+      LnurlPayInfo() || LnurlWithdrawInfo() => _buildAmountForm(l10n, i),
     };
   }
 
-  Widget _buildAuthForm(LnurlAuthInfo i) {
-    final verb = switch (i.action) {
-      'register' => 'Register at',
-      'link' => 'Link account at',
-      'auth' => 'Authenticate at',
-      _ => 'Log in to',
+  Widget _buildAuthForm(AppLocalizations l10n, LnurlAuthInfo i) {
+    final header = switch (i.action) {
+      'register' => l10n.lnurlAuthRegisterAt(i.host),
+      'link' => l10n.lnurlAuthLinkAt(i.host),
+      'auth' => l10n.lnurlAuthAuthenticateAt(i.host),
+      _ => l10n.lnurlAuthLoginAt(i.host),
     };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '$verb ${i.host}',
+          header,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'A unique signing key for this site will be derived from your '
-          'wallet seed. The site sees only your public key — your wallet '
-          'and balance stay private.',
-          style: TextStyle(fontSize: 12, color: Colors.grey),
+        Text(
+          l10n.lnurlAuthExplain,
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 24),
         ElevatedButton(
@@ -265,7 +273,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Confirm'),
+              : Text(l10n.lnurlAuthConfirm),
         ),
         if (error != null) ...[
           const SizedBox(height: 16),
@@ -275,7 +283,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     );
   }
 
-  Widget _buildAmountForm(LnurlInfo i) {
+  Widget _buildAmountForm(AppLocalizations l10n, LnurlInfo i) {
     final desc = switch (i) {
       LnurlPayInfo(:final description) => description,
       LnurlWithdrawInfo(:final description) => description,
@@ -302,14 +310,14 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             const SizedBox(height: 12),
           ],
           Text(
-            'Range: $minSats – $maxSats sats',
+            l10n.lnurlAmountRange(minSats, maxSats),
             style: const TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: amountCtrl,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Amount (sats)'),
+            decoration: InputDecoration(labelText: l10n.commonAmount),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -326,7 +334,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
                     width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(i is LnurlPayInfo ? 'Get invoice & pay' : 'Withdraw'),
+                : Text(
+                    i is LnurlPayInfo ? l10n.lnurlGetAndPay : l10n.lnurlWithdraw,
+                  ),
           ),
           if (error != null) ...[
             const SizedBox(height: 16),

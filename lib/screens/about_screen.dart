@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/update_service.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -40,19 +41,21 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
   Future<void> _copyBtc(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(
       const ClipboardData(text: AboutScreen._btcAddress),
     );
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Address copied')),
+      SnackBar(content: Text(l10n.aboutAddressCopied)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+      appBar: AppBar(title: Text(l10n.aboutTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -61,38 +64,38 @@ class _AboutScreenState extends State<AboutScreen> {
               children: [
                 Image.asset('images/Logo_icon.png', width: 96),
                 const SizedBox(height: 12),
-                const Text(
-                  'EmberSpark',
-                  style: TextStyle(
+                Text(
+                  l10n.appTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'A small Lightning wallet for LNbits',
-                  style: TextStyle(color: Colors.grey),
+                Text(
+                  l10n.aboutTagline,
+                  style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '© 2026 Trepnick Solutions',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                Text(
+                  l10n.aboutCopyright,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          _buildVersionCard(),
+          _buildVersionCard(l10n),
           const SizedBox(height: 16),
-          _buildDonateCard(context),
+          _buildDonateCard(context, l10n),
           const SizedBox(height: 16),
-          _buildLicensesCard(context),
+          _buildLicensesCard(context, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildVersionCard() {
+  Widget _buildVersionCard(AppLocalizations l10n) {
     final i = info;
     return Card(
       child: Padding(
@@ -105,7 +108,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 const Icon(Icons.info_outline),
                 const SizedBox(width: 8),
                 Text(
-                  i == null ? 'Version' : 'v${i.current}',
+                  i == null ? l10n.aboutVersionLabel : 'v${i.current}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -115,40 +118,40 @@ class _AboutScreenState extends State<AboutScreen> {
                 if (!checking)
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Check again',
+                    tooltip: l10n.aboutCheckAgain,
                     onPressed: _check,
                   ),
               ],
             ),
             const SizedBox(height: 8),
-            _buildVersionStatus(i),
+            _buildVersionStatus(l10n, i),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildVersionStatus(VersionInfo? i) {
+  Widget _buildVersionStatus(AppLocalizations l10n, VersionInfo? i) {
     if (checking || i == null) {
-      return const Row(
+      return Row(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 14,
             width: 14,
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Text(
-            'Checking for updates…',
-            style: TextStyle(color: Colors.grey),
+            l10n.aboutCheckingForUpdates,
+            style: const TextStyle(color: Colors.grey),
           ),
         ],
       );
     }
     if (i.checkFailed) {
-      return const Text(
-        "Couldn't check for updates",
-        style: TextStyle(color: Colors.grey),
+      return Text(
+        l10n.aboutCheckFailed,
+        style: const TextStyle(color: Colors.grey),
       );
     }
     if (i.updateAvailable && i.latest != null) {
@@ -156,7 +159,7 @@ class _AboutScreenState extends State<AboutScreen> {
         children: [
           Expanded(
             child: Text(
-              'Update available: v${i.latest}',
+              l10n.aboutUpdateAvailable(i.latest!),
               style: const TextStyle(
                 color: Colors.orangeAccent,
                 fontWeight: FontWeight.w600,
@@ -166,35 +169,38 @@ class _AboutScreenState extends State<AboutScreen> {
           const SizedBox(width: 12),
           TextButton.icon(
             icon: const Icon(Icons.open_in_new, size: 18),
-            label: const Text('Open release'),
+            label: Text(l10n.aboutOpenRelease),
             onPressed: _openRelease,
           ),
         ],
       );
     }
-    return const Row(
+    return Row(
       children: [
-        Icon(Icons.check_circle, color: Colors.greenAccent, size: 18),
-        SizedBox(width: 8),
-        Text('Up to date', style: TextStyle(color: Colors.greenAccent)),
+        const Icon(Icons.check_circle, color: Colors.greenAccent, size: 18),
+        const SizedBox(width: 8),
+        Text(
+          l10n.aboutUpToDate,
+          style: const TextStyle(color: Colors.greenAccent),
+        ),
       ],
     );
   }
 
-  Widget _buildDonateCard(BuildContext context) {
+  Widget _buildDonateCard(BuildContext context, AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.favorite, color: Colors.orangeAccent),
-                SizedBox(width: 8),
+                const Icon(Icons.favorite, color: Colors.orangeAccent),
+                const SizedBox(width: 8),
                 Text(
-                  'Support development',
-                  style: TextStyle(
+                  l10n.aboutSupportDevelopment,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -202,12 +208,7 @@ class _AboutScreenState extends State<AboutScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            const Text(
-              'EmberSpark is built and maintained in spare time. '
-              "If it makes your sats easier to manage, consider tossing "
-              'a few on-chain BTC at the address below — every bit keeps '
-              'the project alive. Thank you!',
-            ),
+            Text(l10n.aboutSupportBody),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -222,7 +223,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.copy),
-                  tooltip: 'Copy address',
+                  tooltip: l10n.aboutCopyAddress,
                   onPressed: () => _copyBtc(context),
                 ),
               ],
@@ -233,18 +234,18 @@ class _AboutScreenState extends State<AboutScreen> {
     );
   }
 
-  Widget _buildLicensesCard(BuildContext context) {
+  Widget _buildLicensesCard(BuildContext context, AppLocalizations l10n) {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.description_outlined),
-        title: const Text('Open-source licenses'),
-        subtitle: const Text('Flutter SDK and third-party packages'),
+        title: Text(l10n.aboutLicensesTitle),
+        subtitle: Text(l10n.aboutLicensesSubtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => showLicensePage(
           context: context,
           applicationName: 'EmberSpark',
           applicationVersion: info?.current,
-          applicationLegalese: '© 2026 Trepnick Solutions',
+          applicationLegalese: l10n.aboutCopyright,
           applicationIcon: Padding(
             padding: const EdgeInsets.all(8),
             child: Image.asset('images/Logo_icon.png', width: 64),

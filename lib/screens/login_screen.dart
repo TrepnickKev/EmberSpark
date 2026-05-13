@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../l10n/app_localizations.dart';
 import '../services/lnbits_service.dart';
 import 'home_screen.dart';
 import 'qr_scan_screen.dart';
@@ -34,9 +35,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     final admin = adminKeyController.text.trim();
     if (admin.isEmpty) {
-      setState(() => error = 'Admin key is required');
+      setState(() => error = l10n.loginAdminKeyRequired);
       return;
     }
     final String url;
@@ -56,9 +58,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _scanButton(TextEditingController target, String title) {
+  Widget _scanButton(
+    TextEditingController target,
+    String tooltip,
+    String title,
+  ) {
     return IconButton(
-      tooltip: 'Scan QR',
+      tooltip: tooltip,
       icon: const Icon(Icons.qr_code_scanner),
       onPressed: () => _scanInto(target, title),
     );
@@ -66,8 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Setup wallet')),
+      appBar: AppBar(title: Text(l10n.loginTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -78,30 +85,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: urlController,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
-                  labelText: 'LNbits URL',
-                  hintText: 'https://your.node',
-                  suffixIcon: _scanButton(urlController, 'Scan LNbits URL'),
+                  labelText: l10n.loginUrlLabel,
+                  hintText: l10n.loginUrlHint,
+                  suffixIcon: _scanButton(
+                    urlController,
+                    l10n.commonScanQr,
+                    l10n.loginScanUrlTitle,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: adminKeyController,
                 decoration: InputDecoration(
-                  labelText: 'Admin API key',
-                  helperText: 'Full-access key — used for all operations',
-                  suffixIcon: _scanButton(adminKeyController, 'Scan admin key'),
+                  labelText: l10n.loginAdminKeyLabel,
+                  helperText: l10n.loginAdminKeyHelper,
+                  suffixIcon: _scanButton(
+                    adminKeyController,
+                    l10n.commonScanQr,
+                    l10n.loginScanAdminTitle,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(onPressed: _save, child: const Text('Save')),
+              ElevatedButton(
+                onPressed: _save,
+                child: Text(l10n.commonSave),
+              ),
               if (error != null) ...[
                 const SizedBox(height: 12),
                 Text(error!, style: const TextStyle(color: Colors.redAccent)),
               ],
               const SizedBox(height: 16),
-              const Text(
-                'Find the QR code in LNbits → wallet → "API info" → Admin key.',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                l10n.loginHint,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
 import 'qr_scan_screen.dart';
 
@@ -35,18 +36,19 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Future<void> _confirmDelete(int index, String name) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Delete $name?'),
+        title: Text(l10n.contactsDeleteTitle(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -58,9 +60,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final list = contacts;
     return Scaffold(
-      appBar: AppBar(title: const Text('Contacts')),
+      appBar: AppBar(title: Text(l10n.contactsTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
         child: const Icon(Icons.add),
@@ -68,10 +71,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: list == null
           ? const Center(child: CircularProgressIndicator())
           : list.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'No contacts yet — tap + to add one',
-                    style: TextStyle(color: Colors.grey),
+                    l10n.contactsEmpty,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 )
               : ListView.separated(
@@ -134,20 +137,22 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context)!;
     final name = nameCtrl.text.trim();
     final dest = destCtrl.text.trim();
     if (name.isEmpty || dest.isEmpty) {
-      setState(() => error = 'Name and destination are required');
+      setState(() => error = l10n.contactsRequired);
       return;
     }
     Navigator.pop(context, Contact(name: name, destination: dest));
   }
 
   Future<void> _scan() async {
+    final l10n = AppLocalizations.of(context)!;
     final code = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder: (_) => const QrScanScreen(title: 'Scan destination'),
+        builder: (_) => QrScanScreen(title: l10n.contactsScanTitle),
       ),
     );
     if (code != null && mounted) {
@@ -157,23 +162,24 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('New contact'),
+      title: Text(l10n.contactsNew),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: l10n.contactsName),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: destCtrl,
               decoration: InputDecoration(
-                labelText: 'Lightning address, LNURL, or BOLT11',
+                labelText: l10n.contactsDestinationLabel,
                 suffixIcon: IconButton(
-                  tooltip: 'Scan QR',
+                  tooltip: l10n.commonScanQr,
                   icon: const Icon(Icons.qr_code_scanner),
                   onPressed: _scan,
                 ),
@@ -192,9 +198,12 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
-        ElevatedButton(onPressed: _save, child: const Text('Save')),
+        ElevatedButton(
+          onPressed: _save,
+          child: Text(l10n.commonSave),
+        ),
       ],
     );
   }

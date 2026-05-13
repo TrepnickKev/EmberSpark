@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 
@@ -26,9 +27,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Future<void> _create() async {
+    final l10n = AppLocalizations.of(context)!;
     final amount = int.tryParse(amountCtrl.text.trim());
     if (amount == null || amount <= 0) {
-      setState(() => error = 'Enter a positive amount');
+      setState(() => error = l10n.receiveAmountError);
       return;
     }
     setState(() {
@@ -46,7 +48,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       setState(() => invoice = bolt11);
     } catch (e) {
       if (!mounted) return;
-      setState(() => error = friendlyError(e));
+      setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -54,17 +56,19 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Future<void> _copy() async {
     if (invoice == null) return;
+    final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(ClipboardData(text: invoice!));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Invoice copied')),
+      SnackBar(content: Text(l10n.receiveInvoiceCopied)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Receive')),
+      appBar: AppBar(title: Text(l10n.receiveTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -73,11 +77,11 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               TextField(
                 controller: amountCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Amount (sats)'),
+                decoration: InputDecoration(labelText: l10n.receiveAmount),
               ),
               TextField(
                 controller: memoCtrl,
-                decoration: const InputDecoration(labelText: 'Memo'),
+                decoration: InputDecoration(labelText: l10n.receiveMemo),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -88,7 +92,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Create invoice'),
+                    : Text(l10n.receiveCreateInvoice),
               ),
               if (error != null) ...[
                 const SizedBox(height: 16),
@@ -113,7 +117,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 ElevatedButton.icon(
                   onPressed: _copy,
                   icon: const Icon(Icons.copy),
-                  label: const Text('Copy'),
+                  label: Text(l10n.commonCopy),
                 ),
                 const SizedBox(height: 8),
                 SelectableText(

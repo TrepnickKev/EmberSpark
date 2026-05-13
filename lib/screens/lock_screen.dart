@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/lock_service.dart';
 
 class LockScreen extends StatefulWidget {
@@ -40,6 +41,7 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -49,19 +51,27 @@ class _LockScreenState extends State<LockScreen> {
             children: [
               Image.asset('images/Logo_icon.png', width: 160),
               const SizedBox(height: 32),
-              const Text(
-                'EmberSpark',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              Text(
+                l10n.appTitle,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
-              const Text('Locked', style: TextStyle(color: Colors.grey)),
+              Text(
+                l10n.lockedLabel,
+                style: const TextStyle(color: Colors.grey),
+              ),
               const SizedBox(height: 48),
               if (_attempting)
                 const CircularProgressIndicator()
               else
                 ElevatedButton.icon(
                   icon: const Icon(Icons.lock_open),
-                  label: Text(_retryAvailable ? 'Try again' : 'Unlock'),
+                  label: Text(
+                    _retryAvailable ? l10n.lockTryAgain : l10n.lockUnlock,
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
