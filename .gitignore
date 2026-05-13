@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release signing — never check these into source control.
+# Provided by CI from GitHub Secrets, or by you locally.
+/android/key.properties
+/android/app/release.keystore
