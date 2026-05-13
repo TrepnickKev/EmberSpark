@@ -59,6 +59,24 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
+      - name: Set up release signing
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+        if: ${{ env.KEYSTORE_B64 != '' }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > android/app/release.keystore
+          cat > android/key.properties <<EOF
+          storeFile=release.keystore
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+          # Sanity check: decoded keystore must not be empty.
+          test -s android/app/release.keystore || (echo "::error::Decoded keystore is empty"; exit 1)
+
       - name: Build release APKs (split per ABI)
         run: |
           flutter build apk --release --split-per-abi \
