@@ -154,7 +154,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receiveTitle => 'Receive';
 
   @override
-  String get receiveAmount => 'Amount (sats)';
+  String get receiveAmount => 'Amount';
 
   @override
   String get receiveMemo => 'Memo';
@@ -167,6 +167,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get receiveAmountError => 'Enter a positive amount';
+
+  @override
+  String receiveSatsApprox(String amount) {
+    return '≈ $amount sats';
+  }
+
+  @override
+  String get receiveRatesUnavailable => 'Live rates unavailable — sats only';
+
+  @override
+  String get receiveCurrencySats => 'sats';
 
   @override
   String get contactsTitle => 'Contacts';

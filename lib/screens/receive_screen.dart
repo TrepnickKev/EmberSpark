@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../services/price_service.dart';
 
 class ReceiveScreen extends StatefulWidget {
   const ReceiveScreen({super.key});
@@ -19,17 +20,77 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   String? error;
   bool busy = false;
 
+  // Currency selection: 'sats' or one of supportedCurrencies (USD/EUR/...).
+  String currency = 'sats';
+  // The user's preferred fiat from Settings — used for the sats→fiat preview.
+  String displayCurrency = 'USD';
+  Map<String, double>? rates;
+  bool ratesLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    amountCtrl.addListener(_onInputChanged);
+    _loadInitial();
+  }
+
   @override
   void dispose() {
+    amountCtrl.removeListener(_onInputChanged);
     amountCtrl.dispose();
     memoCtrl.dispose();
     super.dispose();
   }
 
+  Future<void> _loadInitial() async {
+    final results = await Future.wait([
+      getBtcRates(),
+      getSelectedCurrency(),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      rates = results[0] as Map<String, double>?;
+      displayCurrency = results[1] as String;
+      ratesLoading = false;
+    });
+  }
+
+  void _onInputChanged() {
+    // Re-render the preview as the user types (both directions).
+    setState(() {});
+  }
+
+  /// Converts the current input to sats, or null if invalid / unparseable.
+  int? _resolveSats() {
+    final text = amountCtrl.text.trim().replaceAll(',', '.');
+    if (text.isEmpty) return null;
+    if (currency == 'sats') {
+      final n = int.tryParse(text);
+      return (n != null && n > 0) ? n : null;
+    }
+    final value = double.tryParse(text);
+    final rate = rates?[currency];
+    if (value == null || value <= 0 || rate == null || rate <= 0) return null;
+    final sats = (value / rate * 100000000).round();
+    return sats > 0 ? sats : null;
+  }
+
+  /// Computes the fiat (in [displayCurrency]) equivalent of the sat amount
+  /// the user is typing, or null if not in sats mode / invalid input / no
+  /// rate available.
+  double? _resolveFiatPreview() {
+    if (currency != 'sats') return null;
+    final sats = int.tryParse(amountCtrl.text.trim());
+    if (sats == null || sats <= 0) return null;
+    final rate = rates?[displayCurrency];
+    if (rate == null || rate <= 0) return null;
+    return sats / 100000000 * rate;
+  }
+
   Future<void> _create() async {
     final l10n = AppLocalizations.of(context)!;
-    final amount = int.tryParse(amountCtrl.text.trim());
-    if (amount == null || amount <= 0) {
+    final sats = _resolveSats();
+    if (sats == null) {
       setState(() => error = l10n.receiveAmountError);
       return;
     }
@@ -41,7 +102,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     try {
       final svc = await LNbitsService.fromStorage();
       final bolt11 = await svc.createInvoice(
-        amountSats: amount,
+        amountSats: sats,
         memo: memoCtrl.text.trim(),
       );
       if (!mounted) return;
@@ -67,25 +128,58 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isSats = currency == 'sats';
+    final fiatUnavailable =
+        !isSats && (rates == null || rates![currency] == null);
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.receiveTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
-                controller: amountCtrl,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: l10n.receiveAmount),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: amountCtrl,
+                      keyboardType: isSats
+                          ? TextInputType.number
+                          : const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                      decoration: InputDecoration(labelText: l10n.receiveAmount),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  DropdownButton<String>(
+                    value: currency,
+                    items: [
+                      DropdownMenuItem(
+                        value: 'sats',
+                        child: Text(l10n.receiveCurrencySats),
+                      ),
+                      for (final c in supportedCurrencies)
+                        DropdownMenuItem(value: c, child: Text(c)),
+                    ],
+                    onChanged: (next) {
+                      if (next == null) return;
+                      setState(() => currency = next);
+                    },
+                  ),
+                ],
               ),
+              _buildPreview(l10n, isSats, fiatUnavailable),
               TextField(
                 controller: memoCtrl,
                 decoration: InputDecoration(labelText: l10n.receiveMemo),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: busy ? null : _create,
+                onPressed: busy || fiatUnavailable ? null : _create,
                 child: busy
                     ? const SizedBox(
                         height: 20,
@@ -128,6 +222,55 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPreview(
+    AppLocalizations l10n,
+    bool isSats,
+    bool fiatUnavailable,
+  ) {
+    if (ratesLoading && !isSats) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 6),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            height: 14,
+            width: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    if (fiatUnavailable) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Text(
+          l10n.receiveRatesUnavailable,
+          style: const TextStyle(color: Colors.orangeAccent, fontSize: 12),
+        ),
+      );
+    }
+    if (isSats) {
+      final fiat = _resolveFiatPreview();
+      if (fiat == null) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Text(
+          '≈ ${formatFiat(fiat, displayCurrency)}',
+          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        ),
+      );
+    }
+    final sats = _resolveSats();
+    if (sats == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Text(
+        l10n.receiveSatsApprox(formatThousands(sats)),
+        style: const TextStyle(color: Colors.grey, fontSize: 12),
       ),
     );
   }

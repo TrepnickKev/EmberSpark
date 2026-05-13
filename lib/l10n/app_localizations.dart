@@ -377,7 +377,7 @@ abstract class AppLocalizations {
   /// No description provided for @receiveAmount.
   ///
   /// In en, this message translates to:
-  /// **'Amount (sats)'**
+  /// **'Amount'**
   String get receiveAmount;
 
   /// No description provided for @receiveMemo.
@@ -403,6 +403,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a positive amount'**
   String get receiveAmountError;
+
+  /// No description provided for @receiveSatsApprox.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount} sats'**
+  String receiveSatsApprox(String amount);
+
+  /// No description provided for @receiveRatesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Live rates unavailable — sats only'**
+  String get receiveRatesUnavailable;
+
+  /// No description provided for @receiveCurrencySats.
+  ///
+  /// In en, this message translates to:
+  /// **'sats'**
+  String get receiveCurrencySats;
 
   /// No description provided for @contactsTitle.
   ///

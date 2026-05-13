@@ -56,11 +56,15 @@
   "sendToNoContacts": "No contacts yet",
 
   "receiveTitle": "Receive",
-  "receiveAmount": "Amount (sats)",
+  "receiveAmount": "Amount",
   "receiveMemo": "Memo",
   "receiveCreateInvoice": "Create invoice",
   "receiveInvoiceCopied": "Invoice copied",
   "receiveAmountError": "Enter a positive amount",
+  "receiveSatsApprox": "≈ {amount} sats",
+  "@receiveSatsApprox": { "placeholders": { "amount": { "type": "String" } } },
+  "receiveRatesUnavailable": "Live rates unavailable — sats only",
+  "receiveCurrencySats": "sats",
 
   "contactsTitle": "Contacts",
   "contactsEmpty": "No contacts yet — tap + to add one",

@@ -53,11 +53,14 @@
   "sendToNoContacts": "Noch keine Kontakte",
 
   "receiveTitle": "Empfangen",
-  "receiveAmount": "Betrag (Sats)",
+  "receiveAmount": "Betrag",
   "receiveMemo": "Notiz",
   "receiveCreateInvoice": "Rechnung erstellen",
   "receiveInvoiceCopied": "Rechnung kopiert",
   "receiveAmountError": "Gib einen positiven Betrag ein",
+  "receiveSatsApprox": "≈ {amount} Sats",
+  "receiveRatesUnavailable": "Wechselkurs nicht verfügbar — nur Sats",
+  "receiveCurrencySats": "Sats",
 
   "contactsTitle": "Kontakte",
   "contactsEmpty": "Noch keine Kontakte — tippe + zum Hinzufügen",

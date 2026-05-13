@@ -155,7 +155,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get receiveTitle => 'Empfangen';
 
   @override
-  String get receiveAmount => 'Betrag (Sats)';
+  String get receiveAmount => 'Betrag';
 
   @override
   String get receiveMemo => 'Notiz';
@@ -168,6 +168,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get receiveAmountError => 'Gib einen positiven Betrag ein';
+
+  @override
+  String receiveSatsApprox(String amount) {
+    return '≈ $amount Sats';
+  }
+
+  @override
+  String get receiveRatesUnavailable =>
+      'Wechselkurs nicht verfügbar — nur Sats';
+
+  @override
+  String get receiveCurrencySats => 'Sats';
 
   @override
   String get contactsTitle => 'Kontakte';
