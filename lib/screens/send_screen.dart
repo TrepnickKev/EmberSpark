@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../services/nfc_service.dart';
 import '../services/price_service.dart';
+import 'lnurl_action_screen.dart';
+import 'qr_scan_screen.dart';
 
 class SendScreen extends StatefulWidget {
   const SendScreen({super.key, this.initialInvoice});
@@ -48,6 +54,141 @@ class _SendScreenState extends State<SendScreen> {
     }
   }
 
+  /// Decides what to do with a scanned/pasted/tapped Lightning code.
+  /// BOLT11 → fill the field in place. LNURL / Lightning address → replace
+  /// the current Send screen with [LnurlActionScreen]. Anything else → just
+  /// dump it in the field and let the user retry.
+  Future<void> _handleIncomingCode(String code) async {
+    final clean = code.trim().replaceFirst(
+      RegExp(r'^(lightning|lnurl):', caseSensitive: false),
+      '',
+    );
+    if (clean.isEmpty) return;
+    final lower = clean.toLowerCase();
+    if (lower.startsWith('lnbc')) {
+      bolt11Ctrl.text = clean;
+      return;
+    }
+    if (lower.startsWith('lnurl') ||
+        (clean.contains('@') && clean.contains('.'))) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LnurlActionScreen(code: clean)),
+      );
+      return;
+    }
+    bolt11Ctrl.text = clean;
+  }
+
+  Future<void> _paste() async {
+    final l10n = AppLocalizations.of(context)!;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (text.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.clipboardEmpty)),
+      );
+      return;
+    }
+    await _handleIncomingCode(text);
+  }
+
+  Future<void> _readNfc() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    NfcSession? session;
+    try {
+      session = await readNdefText(
+        onRead: (payload) async {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          await _handleIncomingCode(payload);
+        },
+        onError: (_) {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
+        },
+      );
+    } on NfcUnavailable {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
+      return;
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
+      return;
+    }
+    if (!mounted) {
+      await session.stop();
+      return;
+    }
+    await _showNfcDialog(session);
+  }
+
+  Future<void> _showNfcDialog(NfcSession session) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Text(l10n.nfcHoldTag)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+        ],
+      ),
+    );
+    await session.stop();
+  }
+
+  Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final controller = MobileScannerController();
+    try {
+      final result = await controller.analyzeImage(picked.path);
+      final code = (result?.barcodes.isNotEmpty ?? false)
+          ? result!.barcodes.first.rawValue
+          : null;
+      if (code == null || code.isEmpty) {
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
+        return;
+      }
+      if (!mounted) return;
+      await _handleIncomingCode(code);
+    } finally {
+      await controller.dispose();
+    }
+  }
+
+  Future<void> _scanQr() async {
+    final l10n = AppLocalizations.of(context)!;
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => QrScanScreen(title: l10n.commonScanQr)),
+    );
+    if (code == null || code.isEmpty) return;
+    if (!mounted) return;
+    await _handleIncomingCode(code);
+  }
+
   Future<void> _pay() async {
     final l10n = AppLocalizations.of(context)!;
     final bolt11 = bolt11Ctrl.text.trim();
@@ -73,6 +214,27 @@ class _SendScreenState extends State<SendScreen> {
     }
   }
 
+  Widget _actionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Expanded(
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 13),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -84,6 +246,34 @@ class _SendScreenState extends State<SendScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Row(
+                children: [
+                  _actionButton(
+                    icon: Icons.content_paste,
+                    label: l10n.commonPaste,
+                    onPressed: _paste,
+                  ),
+                  const SizedBox(width: 8),
+                  _actionButton(
+                    icon: Icons.nfc,
+                    label: l10n.commonNfc,
+                    onPressed: _readNfc,
+                  ),
+                  const SizedBox(width: 8),
+                  _actionButton(
+                    icon: Icons.image_outlined,
+                    label: l10n.commonImage,
+                    onPressed: _pickImage,
+                  ),
+                  const SizedBox(width: 8),
+                  _actionButton(
+                    icon: Icons.qr_code_scanner,
+                    label: l10n.commonScan,
+                    onPressed: _scanQr,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               TextField(
                 controller: bolt11Ctrl,
                 maxLines: 4,

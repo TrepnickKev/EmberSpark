@@ -42,6 +42,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonScanQr => 'Scan QR';
 
   @override
+  String get commonScan => 'Scan';
+
+  @override
+  String get commonShare => 'Share';
+
+  @override
+  String get commonNfc => 'NFC';
+
+  @override
+  String get commonPaste => 'Paste';
+
+  @override
+  String get commonImage => 'Image';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override
@@ -49,6 +64,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonUnknownError => 'Unknown error';
+
+  @override
+  String get receiveShareSubject => 'Lightning invoice';
+
+  @override
+  String get nfcHoldTag => 'Hold an NFC tag near the phone…';
+
+  @override
+  String get nfcWriteSuccess => 'Invoice written to tag';
+
+  @override
+  String get nfcWriteFailed => 'Couldn\'t write to tag';
+
+  @override
+  String get nfcReadFailed => 'Couldn\'t read tag';
+
+  @override
+  String get nfcUnavailable => 'NFC unavailable on this device';
+
+  @override
+  String get imageNoQr => 'No QR code found in the image';
+
+  @override
+  String get clipboardEmpty => 'Clipboard is empty';
 
   @override
   String get homeScan => 'Scan QR';

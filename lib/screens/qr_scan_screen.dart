@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 
@@ -34,6 +35,22 @@ class _QrScanScreenState extends State<QrScanScreen> {
     Navigator.pop(context, code);
   }
 
+  Future<void> _paste() async {
+    if (_handled) return;
+    final l10n = AppLocalizations.of(context)!;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (!mounted) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.clipboardEmpty)),
+      );
+      return;
+    }
+    _handled = true;
+    Navigator.pop(context, text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -41,6 +58,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
       appBar: AppBar(
         title: Text(widget.title ?? l10n.commonScanQr),
         actions: [
+          IconButton(
+            tooltip: l10n.commonPaste,
+            icon: const Icon(Icons.content_paste),
+            onPressed: _paste,
+          ),
           IconButton(
             icon: const Icon(Icons.flash_on),
             onPressed: () => controller.toggleTorch(),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../services/nfc_service.dart';
 import '../services/price_service.dart';
 
 class ReceiveScreen extends StatefulWidget {
@@ -125,6 +127,77 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
+  Future<void> _share() async {
+    if (invoice == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    await SharePlus.instance.share(
+      ShareParams(text: invoice!, subject: l10n.receiveShareSubject),
+    );
+  }
+
+  Future<void> _writeNfc() async {
+    if (invoice == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    NfcSession? session;
+    try {
+      session = await writeNdefUri(
+        'lightning:${invoice!}',
+        onSuccess: () {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteSuccess)));
+        },
+        onError: (_) {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
+        },
+      );
+    } on NfcUnavailable {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
+      return;
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
+      return;
+    }
+    if (!mounted) {
+      await session.stop();
+      return;
+    }
+    await _showNfcDialog(session);
+  }
+
+  Future<void> _showNfcDialog(NfcSession session) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Text(l10n.nfcHoldTag)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+        ],
+      ),
+    );
+    // Dialog was popped one way or another — make sure no NFC session is left
+    // running.
+    await session.stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -194,24 +267,48 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               ],
               if (invoice != null) ...[
                 const SizedBox(height: 24),
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(12),
-                  child: QrImageView(
-                    data: invoice!,
-                    size: 240,
-                    backgroundColor: Colors.white,
-                    embeddedImage: const AssetImage('images/Logo_icon.png'),
-                    embeddedImageStyle: const QrEmbeddedImageStyle(
-                      size: Size(48, 48),
+                Center(
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(12),
+                    child: QrImageView(
+                      data: invoice!,
+                      size: 240,
+                      backgroundColor: Colors.white,
+                      embeddedImage: const AssetImage('images/Logo_icon.png'),
+                      embeddedImageStyle: const QrEmbeddedImageStyle(
+                        size: Size(48, 48),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: _copy,
-                  icon: const Icon(Icons.copy),
-                  label: Text(l10n.commonCopy),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _copy,
+                        icon: const Icon(Icons.copy, size: 18),
+                        label: Text(l10n.commonCopy),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _share,
+                        icon: const Icon(Icons.ios_share, size: 18),
+                        label: Text(l10n.commonShare),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _writeNfc,
+                        icon: const Icon(Icons.nfc, size: 18),
+                        label: Text(l10n.commonNfc),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 SelectableText(

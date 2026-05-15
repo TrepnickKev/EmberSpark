@@ -164,6 +164,36 @@ abstract class AppLocalizations {
   /// **'Scan QR'**
   String get commonScanQr;
 
+  /// No description provided for @commonScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get commonScan;
+
+  /// No description provided for @commonShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get commonShare;
+
+  /// No description provided for @commonNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC'**
+  String get commonNfc;
+
+  /// No description provided for @commonPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get commonPaste;
+
+  /// No description provided for @commonImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get commonImage;
+
   /// No description provided for @commonRetry.
   ///
   /// In en, this message translates to:
@@ -181,6 +211,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown error'**
   String get commonUnknownError;
+
+  /// No description provided for @receiveShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning invoice'**
+  String get receiveShareSubject;
+
+  /// No description provided for @nfcHoldTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold an NFC tag near the phone…'**
+  String get nfcHoldTag;
+
+  /// No description provided for @nfcWriteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice written to tag'**
+  String get nfcWriteSuccess;
+
+  /// No description provided for @nfcWriteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t write to tag'**
+  String get nfcWriteFailed;
+
+  /// No description provided for @nfcReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read tag'**
+  String get nfcReadFailed;
+
+  /// No description provided for @nfcUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC unavailable on this device'**
+  String get nfcUnavailable;
+
+  /// No description provided for @imageNoQr.
+  ///
+  /// In en, this message translates to:
+  /// **'No QR code found in the image'**
+  String get imageNoQr;
+
+  /// No description provided for @clipboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard is empty'**
+  String get clipboardEmpty;
 
   /// No description provided for @homeScan.
   ///
