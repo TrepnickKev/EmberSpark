@@ -10,6 +10,7 @@ import '../services/price_service.dart';
 import 'contacts_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
+import 'my_contact_screen.dart';
 import 'qr_scan_screen.dart';
 import 'receive_screen.dart';
 import 'send_to_screen.dart';
@@ -234,12 +235,18 @@ class _HomeScreenState extends State<HomeScreen>
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 );
                 if (mounted) _refreshFiat();
+              } else if (v == 'mycontact') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MyContactScreen()),
+                );
               } else if (v == 'logout') {
                 _logout();
               }
             },
             itemBuilder: (_) => [
               _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
+              _menuItem('mycontact', Icons.badge_outlined, l10n.homeMyContact),
               _menuItem('settings', Icons.settings_outlined, l10n.homeSettings),
               _menuItem('logout', Icons.logout, l10n.homeLogout),
             ],

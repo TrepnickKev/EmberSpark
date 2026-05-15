@@ -72,7 +72,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcHoldTag => 'Hold an NFC tag near the phone…';
 
   @override
-  String get nfcWriteSuccess => 'Invoice written to tag';
+  String get nfcWriteSuccess => 'Written to tag';
 
   @override
   String get nfcWriteFailed => 'Couldn\'t write to tag';
@@ -106,6 +106,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeLogout => 'Log out';
+
+  @override
+  String get homeMyContact => 'My contact';
 
   @override
   String homeSatsReceived(String amount) {
@@ -243,6 +246,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactsRequired => 'Name and destination are required';
+
+  @override
+  String get contactsInvalidDestination =>
+      'Not a valid Lightning destination. Use a Lightning address (user@host.tld), BOLT11 invoice, BOLT12 offer/invoice (lno1…/lni1…), or LNURL.';
 
   @override
   String get historyTitle => 'History';
@@ -527,4 +534,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String errorServerGeneric(String code) {
     return 'Server error ($code).';
   }
+
+  @override
+  String get bolt12TitlePayOffer => 'Pay BOLT12 offer';
+
+  @override
+  String get bolt12TitlePayInvoice => 'Pay BOLT12 invoice';
+
+  @override
+  String get bolt12AmountLabel => 'Amount (sats)';
+
+  @override
+  String get bolt12MemoLabel => 'Payer note (optional)';
+
+  @override
+  String get bolt12RawStringLabel => 'BOLT12 string';
+
+  @override
+  String get bolt12NotSupported =>
+      'BOLT12 isn\'t supported by this LNbits server. Your Lightning node may not understand BOLT12, or the LNbits BOLT12 extension isn\'t installed.';
+
+  @override
+  String get myContactTitle => 'My contact';
+
+  @override
+  String get myContactLnAddressSection => 'Lightning Address';
+
+  @override
+  String get myContactBolt12Section => 'BOLT12 offer';
+
+  @override
+  String get myContactAddLnAddress => 'Add your Lightning address';
+
+  @override
+  String get myContactAddBolt12 => 'Add your BOLT12 offer';
+
+  @override
+  String get myContactLnAddressHint =>
+      'user@your.domain — must already exist on a server you control.';
+
+  @override
+  String get myContactBolt12Hint =>
+      'lno1… — paste the offer your Lightning node generated.';
+
+  @override
+  String get myContactInvalidLnAddress => 'Not a valid Lightning address.';
+
+  @override
+  String get myContactInvalidBolt12 => 'Not a valid BOLT12 offer.';
+
+  @override
+  String get myContactCopied => 'Copied';
+
+  @override
+  String get myContactShareSubject => 'My Lightning contact';
+
+  @override
+  String get myContactRemoveConfirm => 'Remove this entry?';
+
+  @override
+  String get myContactAutoGenerate => 'Auto-generate';
+
+  @override
+  String get myContactLnurlpSection => 'LNURL-pay link';
+
+  @override
+  String get myContactAddLnurlp => 'Add your LNURL-pay link';
+
+  @override
+  String get myContactLnurlpHint =>
+      'lnurl1… — paste your link or auto-generate one from your LNbits server.';
+
+  @override
+  String get myContactInvalidLnurlp => 'Not a valid LNURL-pay link.';
+
+  @override
+  String get myContactGenerating => 'Generating…';
+
+  @override
+  String get myContactLnurlpExtensionMissing =>
+      'LNbits doesn\'t have the LNURL-pay extension installed.';
+
+  @override
+  String get myContactBolt12ExtensionMissing =>
+      'LNbits doesn\'t have a BOLT12 extension installed, or your Lightning node doesn\'t support BOLT12.';
 }

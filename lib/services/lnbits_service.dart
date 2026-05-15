@@ -109,6 +109,108 @@ class LNbitsService {
     return data['payment_request'] as String;
   }
 
+  /// Creates an LNURL-pay link on the LNbits `lnurlp` extension and returns
+  /// the bech32 `lnurl1…` string. Throws [LnurlpExtensionDisabled] if the
+  /// extension isn't installed (404 from the endpoint).
+  Future<String> createLnurlpLink({
+    String description = 'EmberSpark',
+    int minSats = 1,
+    int maxSats = 1000000,
+    int commentChars = 100,
+  }) async {
+    final res = await _client
+        .post(
+          _uri('/lnurlp/api/v1/links'),
+          headers: _headers(adminKey),
+          body: jsonEncode({
+            'description': description,
+            'min': minSats,
+            'max': maxSats,
+            'comment_chars': commentChars,
+          }),
+        )
+        .timeout(_readTimeout);
+    if (res.statusCode == 404) {
+      throw const LnurlpExtensionDisabled();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final lnurl = data['lnurl'] as String?;
+    if (lnurl == null || lnurl.isEmpty) {
+      throw const FormatException('Empty lnurl from createLnurlpLink');
+    }
+    return lnurl;
+  }
+
+  /// Creates a BOLT12 offer on the LNbits BOLT12 community extension and
+  /// returns the bech32 `lno1…` string. Throws [Bolt12NotSupported] if the
+  /// extension isn't installed (404) or the backend doesn't support
+  /// BOLT12.
+  Future<String> createBolt12Offer({
+    String description = 'EmberSpark',
+    int? amountSats,
+  }) async {
+    final res = await _client
+        .post(
+          _uri('/bolt12/api/v1/offers'),
+          headers: _headers(adminKey),
+          body: jsonEncode({
+            'description': description,
+            if (amountSats != null) 'amount_msat': amountSats * 1000,
+          }),
+        )
+        .timeout(_readTimeout);
+    if (res.statusCode == 404) {
+      throw const Bolt12NotSupported();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final offer = (data['offer'] ?? data['bolt12']) as String?;
+    if (offer == null || offer.isEmpty) {
+      throw const FormatException('Empty offer from createBolt12Offer');
+    }
+    return offer;
+  }
+
+  /// Asks the LNbits BOLT12 community extension to fetch a BOLT12 invoice
+  /// (`lni1...`) from an offer (`lno1...`). Returns the invoice string on
+  /// success; throws [Bolt12NotSupported] if the extension isn't installed
+  /// (404), or a generic Exception for other failures.
+  Future<String> fetchBolt12Invoice({
+    required String offer,
+    required int amountSats,
+    String? memo,
+  }) async {
+    final res = await _client
+        .post(
+          _uri('/bolt12/api/v1/fetchinvoice'),
+          headers: _headers(adminKey),
+          body: jsonEncode({
+            'offer': offer,
+            'amount_msat': amountSats * 1000,
+            if (memo != null && memo.isNotEmpty) 'payer_note': memo,
+          }),
+        )
+        .timeout(_readTimeout);
+    if (res.statusCode == 404) {
+      throw const Bolt12NotSupported();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final invoice =
+        (data['invoice'] ?? data['bolt12'] ?? data['bolt11']) as String?;
+    if (invoice == null || invoice.isEmpty) {
+      throw const FormatException('Empty invoice from fetchinvoice');
+    }
+    return invoice;
+  }
+
   Future<List<Payment>> listPayments({int limit = 50}) async {
     final res = await _client
         .get(
@@ -188,4 +290,23 @@ class Payment {
     if (v is String) return int.tryParse(v) ?? 0;
     return 0;
   }
+}
+
+/// Thrown by [LNbitsService.fetchBolt12Invoice] / [createBolt12Offer] when
+/// the BOLT12 community extension isn't installed on the LNbits server
+/// (404). The caller maps this to a friendly localized message rather than
+/// the generic HTTP error.
+class Bolt12NotSupported implements Exception {
+  const Bolt12NotSupported();
+  @override
+  String toString() => 'BOLT12 not supported by this LNbits server';
+}
+
+/// Thrown by [LNbitsService.createLnurlpLink] when the `lnurlp` extension
+/// isn't installed on the LNbits server (404). The caller maps this to a
+/// friendly localized message rather than the generic HTTP error.
+class LnurlpExtensionDisabled implements Exception {
+  const LnurlpExtensionDisabled();
+  @override
+  String toString() => 'LNURLp extension not installed';
 }

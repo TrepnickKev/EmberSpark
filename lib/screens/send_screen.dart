@@ -9,6 +9,7 @@ import '../services/lnbits_service.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
 import '../widgets/stacked_action_button.dart';
+import 'bolt12_action_screen.dart';
 import 'lnurl_action_screen.dart';
 import 'qr_scan_screen.dart';
 
@@ -68,6 +69,14 @@ class _SendScreenState extends State<SendScreen> {
     final lower = clean.toLowerCase();
     if (lower.startsWith('lnbc')) {
       bolt11Ctrl.text = clean;
+      return;
+    }
+    if (lower.startsWith('lno1') || lower.startsWith('lni1')) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Bolt12ActionScreen(code: clean)),
+      );
       return;
     }
     if (lower.startsWith('lnurl') ||
@@ -255,6 +264,8 @@ class _SendScreenState extends State<SendScreen> {
               TextField(
                 controller: bolt11Ctrl,
                 maxLines: 4,
+                autocorrect: false,
+                enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: l10n.sendBolt11Label,
                   border: const OutlineInputBorder(),

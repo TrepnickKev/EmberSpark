@@ -225,6 +225,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                           : const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
+                      autocorrect: false,
+                      enableSuggestions: false,
                       decoration: InputDecoration(labelText: l10n.receiveAmount),
                     ),
                   ),

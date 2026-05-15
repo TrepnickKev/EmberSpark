@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
+import '../services/lightning_router.dart';
+import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'qr_scan_screen.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -84,7 +86,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     final c = list[i];
                     return ListTile(
                       leading: contactAvatar(c.name),
-                      title: Text(c.name),
+                      title: Row(
+                        children: [
+                          Flexible(child: Text(c.name)),
+                          contactTypeBadge(c.destination),
+                        ],
+                      ),
                       subtitle: Text(
                         c.destination,
                         maxLines: 1,
@@ -100,6 +107,39 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
     );
   }
+}
+
+/// Small outlined badge showing the destination type (BOLT12 / LNURL) so
+/// contacts list rows hint at how a payment will resolve. Returns an empty
+/// widget for BOLT11 / unknown destinations (no badge needed).
+Widget contactTypeBadge(String destination) {
+  final cleaned = destination
+      .toLowerCase()
+      .replaceFirst(RegExp(r'^(lightning|lnurl):', caseSensitive: false), '');
+  String? label;
+  if (cleaned.startsWith('lno1') || cleaned.startsWith('lni1')) {
+    label = 'BOLT12';
+  } else if (cleaned.startsWith('lnurl') ||
+      (cleaned.contains('@') && cleaned.contains('.'))) {
+    label = 'LNURL';
+  }
+  if (label == null) return const SizedBox.shrink();
+  return Container(
+    margin: const EdgeInsets.only(left: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      border: Border.all(color: bitcoinOrange, width: 1),
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(
+        fontSize: 10,
+        color: bitcoinOrange,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
 }
 
 /// Letter-on-coloured-circle avatar derived from the contact's name.
@@ -144,6 +184,10 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
       setState(() => error = l10n.contactsRequired);
       return;
     }
+    if (!isLikelyLightningDestination(dest)) {
+      setState(() => error = l10n.contactsInvalidDestination);
+      return;
+    }
     Navigator.pop(context, Contact(name: name, destination: dest));
   }
 
@@ -176,6 +220,8 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
             const SizedBox(height: 12),
             TextField(
               controller: destCtrl,
+              autocorrect: false,
+              enableSuggestions: false,
               decoration: InputDecoration(
                 labelText: l10n.contactsDestinationLabel,
                 suffixIcon: IconButton(

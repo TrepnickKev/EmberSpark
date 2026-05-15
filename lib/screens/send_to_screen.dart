@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
-import 'contacts_screen.dart' show contactAvatar;
+import 'contacts_screen.dart' show contactAvatar, contactTypeBadge;
 import 'qr_scan_screen.dart';
 
 class SendToScreen extends StatefulWidget {
@@ -73,6 +73,8 @@ class _SendToScreenState extends State<SendToScreen> {
                 Expanded(
                   child: TextField(
                     controller: inputCtrl,
+                    autocorrect: false,
+                    enableSuggestions: false,
                     decoration: InputDecoration(
                       labelText: l10n.sendToInputLabel,
                       hintText: l10n.sendToInputHint,
@@ -118,7 +120,12 @@ class _SendToScreenState extends State<SendToScreen> {
                             final c = list[i];
                             return ListTile(
                               leading: contactAvatar(c.name),
-                              title: Text(c.name),
+                              title: Row(
+                                children: [
+                                  Flexible(child: Text(c.name)),
+                                  contactTypeBadge(c.destination),
+                                ],
+                              ),
                               subtitle: Text(
                                 c.destination,
                                 maxLines: 1,

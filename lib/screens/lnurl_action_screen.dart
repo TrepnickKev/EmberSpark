@@ -317,6 +317,8 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
           TextField(
             controller: amountCtrl,
             keyboardType: TextInputType.number,
+            autocorrect: false,
+            enableSuggestions: false,
             decoration: InputDecoration(labelText: l10n.commonAmount),
           ),
           const SizedBox(height: 20),

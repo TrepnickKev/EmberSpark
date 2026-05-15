@@ -227,7 +227,7 @@ abstract class AppLocalizations {
   /// No description provided for @nfcWriteSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Invoice written to tag'**
+  /// **'Written to tag'**
   String get nfcWriteSuccess;
 
   /// No description provided for @nfcWriteFailed.
@@ -295,6 +295,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log out'**
   String get homeLogout;
+
+  /// No description provided for @homeMyContact.
+  ///
+  /// In en, this message translates to:
+  /// **'My contact'**
+  String get homeMyContact;
 
   /// No description provided for @homeSatsReceived.
   ///
@@ -547,6 +553,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name and destination are required'**
   String get contactsRequired;
+
+  /// No description provided for @contactsInvalidDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a valid Lightning destination. Use a Lightning address (user@host.tld), BOLT11 invoice, BOLT12 offer/invoice (lno1…/lni1…), or LNURL.'**
+  String get contactsInvalidDestination;
 
   /// No description provided for @historyTitle.
   ///
@@ -1021,6 +1033,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Server error ({code}).'**
   String errorServerGeneric(String code);
+
+  /// No description provided for @bolt12TitlePayOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay BOLT12 offer'**
+  String get bolt12TitlePayOffer;
+
+  /// No description provided for @bolt12TitlePayInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay BOLT12 invoice'**
+  String get bolt12TitlePayInvoice;
+
+  /// No description provided for @bolt12AmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (sats)'**
+  String get bolt12AmountLabel;
+
+  /// No description provided for @bolt12MemoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payer note (optional)'**
+  String get bolt12MemoLabel;
+
+  /// No description provided for @bolt12RawStringLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'BOLT12 string'**
+  String get bolt12RawStringLabel;
+
+  /// No description provided for @bolt12NotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'BOLT12 isn\'t supported by this LNbits server. Your Lightning node may not understand BOLT12, or the LNbits BOLT12 extension isn\'t installed.'**
+  String get bolt12NotSupported;
+
+  /// No description provided for @myContactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My contact'**
+  String get myContactTitle;
+
+  /// No description provided for @myContactLnAddressSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning Address'**
+  String get myContactLnAddressSection;
+
+  /// No description provided for @myContactBolt12Section.
+  ///
+  /// In en, this message translates to:
+  /// **'BOLT12 offer'**
+  String get myContactBolt12Section;
+
+  /// No description provided for @myContactAddLnAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Lightning address'**
+  String get myContactAddLnAddress;
+
+  /// No description provided for @myContactAddBolt12.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your BOLT12 offer'**
+  String get myContactAddBolt12;
+
+  /// No description provided for @myContactLnAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'user@your.domain — must already exist on a server you control.'**
+  String get myContactLnAddressHint;
+
+  /// No description provided for @myContactBolt12Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'lno1… — paste the offer your Lightning node generated.'**
+  String get myContactBolt12Hint;
+
+  /// No description provided for @myContactInvalidLnAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a valid Lightning address.'**
+  String get myContactInvalidLnAddress;
+
+  /// No description provided for @myContactInvalidBolt12.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a valid BOLT12 offer.'**
+  String get myContactInvalidBolt12;
+
+  /// No description provided for @myContactCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get myContactCopied;
+
+  /// No description provided for @myContactShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'My Lightning contact'**
+  String get myContactShareSubject;
+
+  /// No description provided for @myContactRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this entry?'**
+  String get myContactRemoveConfirm;
+
+  /// No description provided for @myContactAutoGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-generate'**
+  String get myContactAutoGenerate;
+
+  /// No description provided for @myContactLnurlpSection.
+  ///
+  /// In en, this message translates to:
+  /// **'LNURL-pay link'**
+  String get myContactLnurlpSection;
+
+  /// No description provided for @myContactAddLnurlp.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your LNURL-pay link'**
+  String get myContactAddLnurlp;
+
+  /// No description provided for @myContactLnurlpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'lnurl1… — paste your link or auto-generate one from your LNbits server.'**
+  String get myContactLnurlpHint;
+
+  /// No description provided for @myContactInvalidLnurlp.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a valid LNURL-pay link.'**
+  String get myContactInvalidLnurlp;
+
+  /// No description provided for @myContactGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating…'**
+  String get myContactGenerating;
+
+  /// No description provided for @myContactLnurlpExtensionMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'LNbits doesn\'t have the LNURL-pay extension installed.'**
+  String get myContactLnurlpExtensionMissing;
+
+  /// No description provided for @myContactBolt12ExtensionMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'LNbits doesn\'t have a BOLT12 extension installed, or your Lightning node doesn\'t support BOLT12.'**
+  String get myContactBolt12ExtensionMissing;
 }
 
 class _AppLocalizationsDelegate

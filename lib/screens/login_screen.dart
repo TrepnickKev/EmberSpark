@@ -84,6 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: urlController,
                 keyboardType: TextInputType.url,
+                autocorrect: false,
+                enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: l10n.loginUrlLabel,
                   hintText: l10n.loginUrlHint,
@@ -97,6 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 12),
               TextField(
                 controller: adminKeyController,
+                autocorrect: false,
+                enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: l10n.loginAdminKeyLabel,
                   helperText: l10n.loginAdminKeyHelper,
