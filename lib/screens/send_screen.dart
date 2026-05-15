@@ -8,6 +8,7 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
+import '../widgets/stacked_action_button.dart';
 import 'lnurl_action_screen.dart';
 import 'qr_scan_screen.dart';
 
@@ -214,27 +215,6 @@ class _SendScreenState extends State<SendScreen> {
     }
   }
 
-  Widget _actionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onPressed,
-  }) {
-    return Expanded(
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 18),
-        label: Text(
-          label,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -247,26 +227,24 @@ class _SendScreenState extends State<SendScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _actionButton(
+                  StackedActionButton(
                     icon: Icons.content_paste,
                     label: l10n.commonPaste,
                     onPressed: _paste,
                   ),
-                  const SizedBox(width: 8),
-                  _actionButton(
+                  StackedActionButton(
                     icon: Icons.nfc,
                     label: l10n.commonNfc,
                     onPressed: _readNfc,
                   ),
-                  const SizedBox(width: 8),
-                  _actionButton(
+                  StackedActionButton(
                     icon: Icons.image_outlined,
                     label: l10n.commonImage,
                     onPressed: _pickImage,
                   ),
-                  const SizedBox(width: 8),
-                  _actionButton(
+                  StackedActionButton(
                     icon: Icons.qr_code_scanner,
                     label: l10n.commonScan,
                     onPressed: _scanQr,

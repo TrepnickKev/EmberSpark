@@ -4,6 +4,7 @@ import '../services/http_client_factory.dart';
 import '../services/language_service.dart';
 import '../services/lock_service.dart';
 import '../services/price_service.dart';
+import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'about_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -61,6 +62,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) setState(() => lockEnabled = next);
   }
 
+  /// Settings-tile title in Bitcoin orange.
+  Text _title(String text) => Text(
+        text,
+        style: const TextStyle(
+          color: bitcoinOrange,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -79,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           ListTile(
-            title: Text(l10n.settingsLanguage),
+            title: _title(l10n.settingsLanguage),
             subtitle: Text(l10n.settingsLanguageSubtitle),
             trailing: DropdownButton<String>(
               value: lang,
@@ -100,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Divider(),
           ListTile(
-            title: Text(l10n.settingsDisplayCurrency),
+            title: _title(l10n.settingsDisplayCurrency),
             subtitle: Text(l10n.settingsDisplayCurrencySubtitle),
             trailing: DropdownButton<String>(
               value: cur,
@@ -117,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Divider(),
           SwitchListTile(
-            title: Text(l10n.settingsLockOnLaunch),
+            title: _title(l10n.settingsLockOnLaunch),
             subtitle: Text(
               deviceSupportsLock
                   ? l10n.settingsLockSubtitleEnabled
@@ -128,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const Divider(),
           SwitchListTile(
-            title: Text(l10n.settingsTrustTls),
+            title: _title(l10n.settingsTrustTls),
             subtitle: Text(l10n.settingsTrustTlsSubtitle),
             value: tls,
             onChanged: (next) async {
@@ -139,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: Text(l10n.settingsAbout),
+            title: _title(l10n.settingsAbout),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,

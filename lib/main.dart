@@ -9,6 +9,7 @@ import 'screens/login_screen.dart';
 import 'services/language_service.dart';
 import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
+import 'widgets/stacked_action_button.dart' show bitcoinOrange;
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -73,7 +74,14 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           onGenerateTitle: (ctx) => AppLocalizations.of(ctx)!.appTitle,
           navigatorKey: navigatorKey,
-          theme: ThemeData.dark(useMaterial3: true),
+          theme: ThemeData.dark(useMaterial3: true).copyWith(
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(foregroundColor: bitcoinOrange),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: bitcoinOrange),
+            ),
+          ),
           locale: locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

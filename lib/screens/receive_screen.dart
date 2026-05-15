@@ -7,6 +7,7 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
+import '../widgets/stacked_action_button.dart';
 
 class ReceiveScreen extends StatefulWidget {
   const ReceiveScreen({super.key});
@@ -282,31 +283,24 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _copy,
-                        icon: const Icon(Icons.copy, size: 18),
-                        label: Text(l10n.commonCopy),
-                      ),
+                    StackedActionButton(
+                      icon: Icons.copy,
+                      label: l10n.commonCopy,
+                      onPressed: _copy,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _share,
-                        icon: const Icon(Icons.ios_share, size: 18),
-                        label: Text(l10n.commonShare),
-                      ),
+                    StackedActionButton(
+                      icon: Icons.ios_share,
+                      label: l10n.commonShare,
+                      onPressed: _share,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _writeNfc,
-                        icon: const Icon(Icons.nfc, size: 18),
-                        label: Text(l10n.commonNfc),
-                      ),
+                    StackedActionButton(
+                      icon: Icons.nfc,
+                      label: l10n.commonNfc,
+                      onPressed: _writeNfc,
                     ),
                   ],
                 ),
