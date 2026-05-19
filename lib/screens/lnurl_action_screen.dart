@@ -5,6 +5,7 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
+import '../services/price_service.dart';
 import 'send_screen.dart';
 
 /// Resolves a scanned LNURL or Lightning address and runs the appropriate
@@ -25,16 +26,38 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   String? resolvedUrl;
   bool busy = true;
 
+  Map<String, double>? rates;
+  String displayCurrency = 'USD';
+  bool ratesLoading = true;
+
   @override
   void initState() {
     super.initState();
+    amountCtrl.addListener(_onAmountChanged);
     _resolve();
+    _loadRates();
   }
 
   @override
   void dispose() {
+    amountCtrl.removeListener(_onAmountChanged);
     amountCtrl.dispose();
     super.dispose();
+  }
+
+  void _onAmountChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadRates() async {
+    final results =
+        await Future.wait([getBtcRates(), getSelectedCurrency()]);
+    if (!mounted) return;
+    setState(() {
+      rates = results[0] as Map<String, double>?;
+      displayCurrency = results[1] as String;
+      ratesLoading = false;
+    });
   }
 
   Future<void> _resolve() async {
@@ -321,6 +344,15 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             enableSuggestions: false,
             decoration: InputDecoration(labelText: l10n.commonAmount),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: _FiatPreview(
+              sats: int.tryParse(amountCtrl.text.trim()) ?? 0,
+              rates: rates,
+              currency: displayCurrency,
+              loading: ratesLoading,
+            ),
+          ),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: busy
@@ -346,6 +378,45 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _FiatPreview extends StatelessWidget {
+  const _FiatPreview({
+    required this.sats,
+    required this.rates,
+    required this.currency,
+    required this.loading,
+  });
+
+  final int sats;
+  final Map<String, double>? rates;
+  final String currency;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    if (sats <= 0) return const SizedBox.shrink();
+    if (loading) {
+      return const SizedBox(
+        height: 14,
+        width: 14,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    final rate = rates?[currency];
+    if (rate == null) {
+      final l10n = AppLocalizations.of(context)!;
+      return Text(
+        l10n.receiveRatesUnavailable,
+        style: const TextStyle(color: Colors.grey),
+      );
+    }
+    final fiat = sats / 1e8 * rate;
+    return Text(
+      '≈ ${formatFiat(fiat, currency)}',
+      style: const TextStyle(color: Colors.grey),
     );
   }
 }
