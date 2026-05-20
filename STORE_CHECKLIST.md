@@ -4,21 +4,26 @@ The in-repo work for Play Store readiness is complete (AAB build in CI, backup-e
 
 ## One-time setup
 
-- [ ] **Enable GitHub Pages** on `TrepnickKev/EmberSpark` → Settings → Pages → Source: deploy from branch → `main` / `/docs`. After ~1 min the privacy policy is live at:
-  `https://trepnickkev.github.io/EmberSpark/privacy`
-- [ ] **Register Play Console developer account** ($25 one-time). Verify identity (gov ID + address; ~3 day wait).
-- [ ] **Create the app in Play Console**:
+- [ ] **Enable GitHub Pages** at <https://github.com/TrepnickKev/EmberSpark/settings/pages> → Source: deploy from branch → `main` / `/docs`. After ~1 min the privacy policy is live at:
+  <https://trepnickkev.github.io/EmberSpark/privacy>
+- [ ] **Register Play Console developer account** at <https://play.google.com/console/signup> ($25 one-time). Verify identity (gov ID + address; ~1–3 day wait). After verification, the dashboard lives at <https://play.google.com/console>.
+- [ ] **Create the app** in Play Console (<https://play.google.com/console>) → All apps → Create app:
   - Package name: `com.emberspark.wallet` *(IRREVERSIBLE — already matches `applicationId`)*
   - App name: `EmberSpark`
   - Category: `Finance`
   - Free / no in-app purchases / no ads
-- [ ] **Enroll in Play App Signing** when prompted on first upload. Your `release.keystore` becomes the upload key; Google holds the actual app signing key and can re-issue your upload key if it's ever lost.
+- [ ] **Enroll in Play App Signing** when prompted on first upload (inside the new app's setup wizard in <https://play.google.com/console>). Your `release.keystore` becomes the upload key; Google holds the actual app signing key and can re-issue your upload key if it's ever lost.
 
 ## Per-release workflow
 
-1. **Trigger CI**: Actions → "Build & release Android APKs + AAB" → Run workflow → enter version (e.g. `1.1.0`).
-2. **Download the AAB** from the resulting GitHub Release: `EmberSpark-v{version}.aab`.
-3. **Play Console** → Internal testing → Create new release → upload the AAB.
+### Phase 1 — Build (on GitHub)
+
+1. **Trigger CI** at <https://github.com/TrepnickKev/EmberSpark/actions> → "Build & release Android APKs + AAB" → Run workflow → enter version (e.g. `1.1.0`).
+2. **Download the AAB** from the resulting release at <https://github.com/TrepnickKev/EmberSpark/releases>: `EmberSpark-v{version}.aab`.
+
+### Phase 2 — Upload (in Play Console)
+
+3. **Play Console** (<https://play.google.com/console>) → your app → Testing → Internal testing → Create new release → upload the AAB.
 4. **Release notes**: paste the relevant changelog (Play Console allows per-locale notes; English + Deutsch).
 
 ### App-content forms (required, fill once and update on changes)
