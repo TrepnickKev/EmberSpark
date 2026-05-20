@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../services/price_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -14,6 +15,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<Payment>? payments;
   String? error;
   bool loading = true;
+  String fiatCurrency = 'USD';
+  double? fiatRate;
 
   @override
   void initState() {
@@ -28,9 +31,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
     try {
       final svc = await LNbitsService.fromStorage();
-      final list = await svc.listPayments();
+      final results = await Future.wait([
+        svc.listPayments(),
+        getSelectedCurrency(),
+        getBtcRates(),
+      ]);
       if (!mounted) return;
-      setState(() => payments = list);
+      final list = results[0] as List<Payment>;
+      final cur = results[1] as String;
+      final rates = results[2] as Map<String, double>?;
+      setState(() {
+        payments = list;
+        fiatCurrency = cur;
+        fiatRate = rates?[cur];
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
@@ -95,15 +109,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return ListView.separated(
       itemCount: list.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (_, i) => _PaymentTile(payment: list[i]),
+      itemBuilder: (_, i) => _PaymentTile(
+        payment: list[i],
+        fiatCurrency: fiatCurrency,
+        fiatRate: fiatRate,
+      ),
     );
   }
 }
 
 class _PaymentTile extends StatelessWidget {
-  const _PaymentTile({required this.payment});
+  const _PaymentTile({
+    required this.payment,
+    required this.fiatCurrency,
+    required this.fiatRate,
+  });
 
   final Payment payment;
+  final String fiatCurrency;
+  final double? fiatRate;
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +143,11 @@ class _PaymentTile extends StatelessWidget {
     final feePart = !incoming && payment.feeSats > 0
         ? ' (${l10n.historyFee(payment.feeSats.toString())})'
         : '';
+    final satsText = '$sign$abs ${l10n.homeSatsUnit}$feePart';
+    final rate = fiatRate;
+    final fiatText = rate == null
+        ? null
+        : '$sign${formatFiat((abs / 100000000) * rate, fiatCurrency)}';
     return ListTile(
       leading: Icon(
         incoming ? Icons.arrow_downward : Icons.arrow_upward,
@@ -134,9 +163,23 @@ class _PaymentTile extends StatelessWidget {
         '${payment.pending ? ' · ${l10n.historyPending}' : ''}',
         style: const TextStyle(fontSize: 12),
       ),
-      trailing: Text(
-        '$sign$abs ${l10n.homeSatsUnit}$feePart',
-        style: TextStyle(color: color, fontWeight: FontWeight.bold),
+      trailing: ValueListenableBuilder<AmountDisplayMode>(
+        valueListenable: amountDisplayMode,
+        builder: (context, mode, _) {
+          final showFiat =
+              mode == AmountDisplayMode.fiat && fiatText != null;
+          return InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: fiatText == null ? null : () => toggleAmountDisplayMode(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(
+                showFiat ? fiatText : satsText,
+                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

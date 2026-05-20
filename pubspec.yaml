@@ -26,6 +26,7 @@ dependencies:
   share_plus: ^13.1.0
   nfc_manager: ^4.0.2
   image_picker: ^1.1.2
+  random_avatar: ^0.0.8
 
 dev_dependencies:
   flutter_test:

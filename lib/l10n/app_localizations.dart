@@ -1189,6 +1189,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LNbits doesn\'t have a BOLT12 extension installed, or your Lightning node doesn\'t support BOLT12.'**
   String get myContactBolt12ExtensionMissing;
+
+  /// No description provided for @walletsMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsMenu;
+
+  /// No description provided for @walletsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsTitle;
+
+  /// No description provided for @walletsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallets yet — add your first one.'**
+  String get walletsEmpty;
+
+  /// No description provided for @walletsAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add wallet'**
+  String get walletsAdd;
+
+  /// No description provided for @walletsActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get walletsActive;
+
+  /// No description provided for @walletsRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get walletsRename;
+
+  /// No description provided for @walletsRenameDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename wallet'**
+  String get walletsRenameDialogTitle;
+
+  /// No description provided for @walletsLabelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get walletsLabelLabel;
+
+  /// No description provided for @walletsRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove wallet'**
+  String get walletsRemove;
+
+  /// No description provided for @walletsRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this wallet from this device? Its My Contact entries will be cleared. The wallet on the server is not affected.'**
+  String get walletsRemoveConfirm;
+
+  /// No description provided for @walletsDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet is already added.'**
+  String get walletsDuplicate;
+
+  /// No description provided for @walletsActiveLabelTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to switch wallet'**
+  String get walletsActiveLabelTooltip;
 }
 
 class _AppLocalizationsDelegate

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../screens/bolt12_action_screen.dart';
 import '../screens/lnurl_action_screen.dart';
 import '../screens/send_screen.dart';
+import 'wallet_account_service.dart';
 
 /// Classifies a Lightning string (BOLT11 / LNURL / Lightning address) and
 /// pushes the appropriate flow on [navigator]. Used by both the in-app QR
@@ -72,10 +72,5 @@ bool isLikelyLightningDestination(String input) {
   return false;
 }
 
-/// Whether the user has the credentials needed to handle a deep link.
-Future<bool> haveCredentials() async {
-  const storage = FlutterSecureStorage();
-  final url = await storage.read(key: 'url');
-  final admin = await storage.read(key: 'admin_key');
-  return url != null && url.isNotEmpty && admin != null && admin.isNotEmpty;
-}
+/// Whether the user has an active wallet to handle a deep link.
+Future<bool> haveCredentials() async => (await getCurrentWallet()) != null;

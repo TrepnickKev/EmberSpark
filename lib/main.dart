@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/lock_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/wallets_screen.dart';
 import 'services/language_service.dart';
 import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
+import 'services/price_service.dart';
+import 'services/wallet_account_service.dart';
 import 'widgets/stacked_action_button.dart' show bitcoinOrange;
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -16,6 +18,8 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadInitialLocale();
+  await loadAmountDisplayMode();
+  await migrateLegacyStorageIfNeeded();
   runApp(const MyApp());
 }
 
@@ -124,25 +128,30 @@ class _LockGateState extends State<_LockGate> {
   }
 }
 
+enum _BootRoute { home, wallets, login }
+
 class _Bootstrap extends StatelessWidget {
   const _Bootstrap();
 
-  Future<bool> _hasCreds() async {
-    const storage = FlutterSecureStorage();
-    final url = await storage.read(key: 'url');
-    final admin = await storage.read(key: 'admin_key');
-    return url != null && url.isNotEmpty && admin != null && admin.isNotEmpty;
+  Future<_BootRoute> _route() async {
+    if (await getCurrentWallet() != null) return _BootRoute.home;
+    final list = await listWallets();
+    return list.isEmpty ? _BootRoute.login : _BootRoute.wallets;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _hasCreds(),
+    return FutureBuilder<_BootRoute>(
+      future: _route(),
       builder: (context, snap) {
         if (!snap.hasData) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
-        return snap.data! ? const HomeScreen() : const LoginScreen();
+        return switch (snap.data!) {
+          _BootRoute.home => const HomeScreen(),
+          _BootRoute.wallets => const WalletsScreen(),
+          _BootRoute.login => const LoginScreen(),
+        };
       },
     );
   }

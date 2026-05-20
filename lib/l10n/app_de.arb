@@ -197,5 +197,18 @@
   "myContactInvalidLnurlp": "Kein gültiger LNURL-Pay-Link.",
   "myContactGenerating": "Wird erstellt …",
   "myContactLnurlpExtensionMissing": "Auf deinem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.",
-  "myContactBolt12ExtensionMissing": "Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht."
+  "myContactBolt12ExtensionMissing": "Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.",
+
+  "walletsMenu": "Wallets",
+  "walletsTitle": "Wallets",
+  "walletsEmpty": "Noch keine Wallets — füge die erste hinzu.",
+  "walletsAdd": "Wallet hinzufügen",
+  "walletsActive": "Aktiv",
+  "walletsRename": "Umbenennen",
+  "walletsRenameDialogTitle": "Wallet umbenennen",
+  "walletsLabelLabel": "Bezeichnung",
+  "walletsRemove": "Wallet entfernen",
+  "walletsRemoveConfirm": "Diese Wallet vom Gerät entfernen? Die zugehörigen My-Contact-Einträge werden gelöscht. Die Wallet auf dem Server ist nicht betroffen.",
+  "walletsDuplicate": "Diese Wallet ist bereits hinzugefügt.",
+  "walletsActiveLabelTooltip": "Tippen, um die Wallet zu wechseln"
 }

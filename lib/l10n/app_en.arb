@@ -216,5 +216,18 @@
   "myContactInvalidLnurlp": "Not a valid LNURL-pay link.",
   "myContactGenerating": "Generating…",
   "myContactLnurlpExtensionMissing": "LNbits doesn't have the LNURL-pay extension installed.",
-  "myContactBolt12ExtensionMissing": "LNbits doesn't have a BOLT12 extension installed, or your Lightning node doesn't support BOLT12."
+  "myContactBolt12ExtensionMissing": "LNbits doesn't have a BOLT12 extension installed, or your Lightning node doesn't support BOLT12.",
+
+  "walletsMenu": "Wallets",
+  "walletsTitle": "Wallets",
+  "walletsEmpty": "No wallets yet — add your first one.",
+  "walletsAdd": "Add wallet",
+  "walletsActive": "Active",
+  "walletsRename": "Rename",
+  "walletsRenameDialogTitle": "Rename wallet",
+  "walletsLabelLabel": "Label",
+  "walletsRemove": "Remove wallet",
+  "walletsRemoveConfirm": "Remove this wallet from this device? Its My Contact entries will be cleared. The wallet on the server is not affected.",
+  "walletsDuplicate": "This wallet is already added.",
+  "walletsActiveLabelTooltip": "Tap to switch wallet"
 }

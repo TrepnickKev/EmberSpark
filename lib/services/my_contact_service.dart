@@ -1,65 +1,51 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'wallet_account_service.dart';
 
-/// Storage + validators for the user's own static destinations — a
-/// Lightning address (`user@host.tld`) and/or a BOLT12 offer (`lno1…`)
-/// that the user can share with others. Both are persisted under
-/// `flutter_secure_storage` (same place as wallet credentials and other
-/// per-user state). Either may be unset.
+/// Storage + validators for the active wallet's static destinations — a
+/// Lightning address, a BOLT12 offer, and/or an LNURL-pay link that the
+/// user can share with others. Each value is keyed by the active wallet's
+/// id (`my_ln_address__<walletId>` and friends) so switching wallets shows
+/// that wallet's identities, not the previous one's.
+///
+/// When no wallet is active (`current_wallet_id` unset), getters return
+/// null and setters are no-ops — the My-Contact screen isn't reachable in
+/// that state anyway.
 
-const _myAddressKey = 'my_ln_address';
-const _myOfferKey = 'my_bolt12_offer';
-const _myLnurlpKey = 'my_lnurlp_link';
-
-Future<String?> getMyLightningAddress() async {
+Future<String?> _readScoped(String Function(String walletId) keyFor) async {
+  final id = await getCurrentWalletId();
+  if (id == null) return null;
   const storage = FlutterSecureStorage();
-  final v = await storage.read(key: _myAddressKey);
+  final v = await storage.read(key: keyFor(id));
   if (v == null) return null;
   final t = v.trim();
   return t.isEmpty ? null : t;
 }
 
-Future<void> setMyLightningAddress(String? value) async {
+Future<void> _writeScoped(
+  String Function(String walletId) keyFor,
+  String? value,
+) async {
+  final id = await getCurrentWalletId();
+  if (id == null) return;
   const storage = FlutterSecureStorage();
   if (value == null || value.trim().isEmpty) {
-    await storage.delete(key: _myAddressKey);
+    await storage.delete(key: keyFor(id));
   } else {
-    await storage.write(key: _myAddressKey, value: value.trim());
+    await storage.write(key: keyFor(id), value: value.trim());
   }
 }
 
-Future<String?> getMyBolt12Offer() async {
-  const storage = FlutterSecureStorage();
-  final v = await storage.read(key: _myOfferKey);
-  if (v == null) return null;
-  final t = v.trim();
-  return t.isEmpty ? null : t;
-}
+Future<String?> getMyLightningAddress() => _readScoped(myLnAddressKey);
+Future<void> setMyLightningAddress(String? value) =>
+    _writeScoped(myLnAddressKey, value);
 
-Future<void> setMyBolt12Offer(String? value) async {
-  const storage = FlutterSecureStorage();
-  if (value == null || value.trim().isEmpty) {
-    await storage.delete(key: _myOfferKey);
-  } else {
-    await storage.write(key: _myOfferKey, value: value.trim());
-  }
-}
+Future<String?> getMyBolt12Offer() => _readScoped(myBolt12OfferKey);
+Future<void> setMyBolt12Offer(String? value) =>
+    _writeScoped(myBolt12OfferKey, value);
 
-Future<String?> getMyLnurlpLink() async {
-  const storage = FlutterSecureStorage();
-  final v = await storage.read(key: _myLnurlpKey);
-  if (v == null) return null;
-  final t = v.trim();
-  return t.isEmpty ? null : t;
-}
-
-Future<void> setMyLnurlpLink(String? value) async {
-  const storage = FlutterSecureStorage();
-  if (value == null || value.trim().isEmpty) {
-    await storage.delete(key: _myLnurlpKey);
-  } else {
-    await storage.write(key: _myLnurlpKey, value: value.trim());
-  }
-}
+Future<String?> getMyLnurlpLink() => _readScoped(myLnurlpLinkKey);
+Future<void> setMyLnurlpLink(String? value) =>
+    _writeScoped(myLnurlpLinkKey, value);
 
 /// True for strings shaped like a Lightning address (`name@host.tld`):
 /// exactly one `@`, no whitespace, host contains a `.` and doesn't start

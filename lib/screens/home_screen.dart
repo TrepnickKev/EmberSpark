@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:random_avatar/random_avatar.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
 import '../services/price_service.dart';
+import '../services/wallet_account_service.dart';
+import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'contacts_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
@@ -15,6 +17,7 @@ import 'qr_scan_screen.dart';
 import 'receive_screen.dart';
 import 'send_to_screen.dart';
 import 'settings_screen.dart';
+import 'wallets_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool loading = false;
   String fiatCurrency = 'USD';
   double? fiatRate;
+  WalletAccount? currentWallet;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -131,15 +135,18 @@ class _HomeScreenState extends State<HomeScreen>
         svc.getBalanceSats(),
         getSelectedCurrency(),
         getBtcRates(),
+        getCurrentWallet(),
       ]);
       if (!mounted) return;
       final b = results[0] as int;
       final cur = results[1] as String;
       final rates = results[2] as Map<String, double>?;
+      final w = results[3] as WalletAccount?;
       setState(() {
         balance = b;
         fiatCurrency = cur;
         fiatRate = rates?[cur];
+        currentWallet = w;
       });
     } catch (e) {
       if (!mounted) return;
@@ -160,16 +167,28 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _logout() async {
-    // Wallet credentials only — keep contacts, LNURL-auth seed, lock /
-    // currency / TLS settings across logouts.
-    const storage = FlutterSecureStorage();
-    await storage.delete(key: 'url');
-    await storage.delete(key: 'admin_key');
+    // Clear the active-wallet pointer only; saved wallets stay in the
+    // list. Route to Wallets if any remain, otherwise Login.
+    await setCurrentWalletId(null);
+    if (!mounted) return;
+    final wallets = await listWallets();
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      MaterialPageRoute(
+        builder: (_) => wallets.isEmpty
+            ? const LoginScreen()
+            : const WalletsScreen(),
+      ),
     );
+  }
+
+  Future<void> _openWallets() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const WalletsScreen()),
+    );
+    if (mounted) _load();
   }
 
   Future<void> _scanAndRoute() async {
@@ -240,6 +259,8 @@ class _HomeScreenState extends State<HomeScreen>
                   context,
                   MaterialPageRoute(builder: (_) => const MyContactScreen()),
                 );
+              } else if (v == 'wallets') {
+                _openWallets();
               } else if (v == 'logout') {
                 _logout();
               }
@@ -247,6 +268,11 @@ class _HomeScreenState extends State<HomeScreen>
             itemBuilder: (_) => [
               _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
               _menuItem('mycontact', Icons.badge_outlined, l10n.homeMyContact),
+              _menuItem(
+                'wallets',
+                Icons.account_balance_wallet_outlined,
+                l10n.walletsMenu,
+              ),
               _menuItem('settings', Icons.settings_outlined, l10n.homeSettings),
               _menuItem('logout', Icons.logout, l10n.homeLogout),
             ],
@@ -258,6 +284,70 @@ class _HomeScreenState extends State<HomeScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Material(
+              color: currentWallet == null ? bitcoinOrange : Colors.transparent,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MyContactScreen()),
+                ),
+                child: SizedBox(
+                  width: 88,
+                  height: 88,
+                  child: currentWallet == null
+                      ? const Icon(
+                          Icons.person,
+                          size: 48,
+                          color: Colors.white,
+                        )
+                      : RandomAvatar(
+                          currentWallet!.id,
+                          height: 88,
+                          width: 88,
+                        ),
+                ),
+              ),
+            ),
+            if (currentWallet != null) ...[
+              const SizedBox(height: 8),
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: _openWallets,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.account_balance_wallet_outlined,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        currentWallet!.label,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.unfold_more,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
             if (loading)
               const CircularProgressIndicator()
             else if (error != null)
@@ -267,29 +357,54 @@ class _HomeScreenState extends State<HomeScreen>
                 textAlign: TextAlign.center,
               )
             else
-              Column(
-                children: [
-                  Text(
-                    '${formatThousands(balance ?? 0)} ${l10n.homeSatsUnit}',
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (balance != null && fiatRate != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      formatFiat(
-                        (balance! / 100000000) * fiatRate!,
-                        fiatCurrency,
+              ValueListenableBuilder<AmountDisplayMode>(
+                valueListenable: amountDisplayMode,
+                builder: (context, mode, _) {
+                  final fiatAvailable = balance != null && fiatRate != null;
+                  final showFiat =
+                      mode == AmountDisplayMode.fiat && fiatAvailable;
+                  final satsText =
+                      '${formatThousands(balance ?? 0)} ${l10n.homeSatsUnit}';
+                  final fiatText = fiatAvailable
+                      ? formatFiat(
+                          (balance! / 100000000) * fiatRate!,
+                          fiatCurrency,
+                        )
+                      : null;
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: fiatAvailable
+                        ? () => toggleAmountDisplayMode()
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                      child: Column(
+                        children: [
+                          Text(
+                            showFiat ? fiatText! : satsText,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (fiatAvailable) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              showFiat ? satsText : fiatText!,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                  ],
-                ],
+                  );
+                },
               ),
             const SizedBox(height: 40),
             SizedBox(

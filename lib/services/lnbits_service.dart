@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'http_client_factory.dart';
+import 'wallet_account_service.dart';
 
 class LNbitsService {
   final String baseUrl;
@@ -15,12 +15,10 @@ class LNbitsService {
   }) : _client = client;
 
   static Future<LNbitsService> fromStorage() async {
-    const storage = FlutterSecureStorage();
-    final url = await storage.read(key: 'url') ?? '';
-    final admin = await storage.read(key: 'admin_key') ?? '';
+    final w = await getCurrentWallet();
     return LNbitsService(
-      baseUrl: url,
-      adminKey: admin,
+      baseUrl: w?.url ?? '',
+      adminKey: w?.adminKey ?? '',
       client: await getHttpClient(),
     );
   }

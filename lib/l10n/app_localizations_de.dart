@@ -622,4 +622,41 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get myContactBolt12ExtensionMissing =>
       'Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.';
+
+  @override
+  String get walletsMenu => 'Wallets';
+
+  @override
+  String get walletsTitle => 'Wallets';
+
+  @override
+  String get walletsEmpty => 'Noch keine Wallets — füge die erste hinzu.';
+
+  @override
+  String get walletsAdd => 'Wallet hinzufügen';
+
+  @override
+  String get walletsActive => 'Aktiv';
+
+  @override
+  String get walletsRename => 'Umbenennen';
+
+  @override
+  String get walletsRenameDialogTitle => 'Wallet umbenennen';
+
+  @override
+  String get walletsLabelLabel => 'Bezeichnung';
+
+  @override
+  String get walletsRemove => 'Wallet entfernen';
+
+  @override
+  String get walletsRemoveConfirm =>
+      'Diese Wallet vom Gerät entfernen? Die zugehörigen My-Contact-Einträge werden gelöscht. Die Wallet auf dem Server ist nicht betroffen.';
+
+  @override
+  String get walletsDuplicate => 'Diese Wallet ist bereits hinzugefügt.';
+
+  @override
+  String get walletsActiveLabelTooltip => 'Tippen, um die Wallet zu wechseln';
 }

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../l10n/app_localizations.dart';
 import '../services/lnbits_service.dart';
+import '../services/wallet_account_service.dart';
 import 'home_screen.dart';
 import 'qr_scan_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.addFlow = false});
+
+  /// True when launched from the Wallets screen to add another wallet.
+  /// On save, pops back to the caller (Wallets) instead of replacing to
+  /// Home, so the new wallet shows up in the list immediately.
+  final bool addFlow;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -48,14 +53,17 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => error = e.message);
       return;
     }
-    const storage = FlutterSecureStorage();
-    await storage.write(key: 'url', value: url);
-    await storage.write(key: 'admin_key', value: admin);
+    final account = await addWallet(url: url, adminKey: admin);
+    await setCurrentWalletId(account.id);
     if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    if (widget.addFlow) {
+      Navigator.pop(context, true);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   Widget _scanButton(

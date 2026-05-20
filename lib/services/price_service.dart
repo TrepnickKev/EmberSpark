@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'http_client_factory.dart';
 
@@ -6,6 +7,34 @@ const supportedCurrencies = ['USD', 'EUR', 'GBP', 'CHF', 'CAD', 'AUD', 'JPY'];
 const _currencyKey = 'fiat_currency';
 const _defaultCurrency = 'USD';
 const _cacheDuration = Duration(minutes: 5);
+
+/// Which unit the user wants amounts displayed in across Home and History.
+/// Toggled by tapping any amount; persisted to `amount_display_mode`.
+enum AmountDisplayMode { sats, fiat }
+
+final amountDisplayMode =
+    ValueNotifier<AmountDisplayMode>(AmountDisplayMode.sats);
+
+const _amountDisplayKey = 'amount_display_mode';
+
+Future<void> loadAmountDisplayMode() async {
+  const storage = FlutterSecureStorage();
+  final v = await storage.read(key: _amountDisplayKey);
+  amountDisplayMode.value =
+      v == 'fiat' ? AmountDisplayMode.fiat : AmountDisplayMode.sats;
+}
+
+Future<void> toggleAmountDisplayMode() async {
+  const storage = FlutterSecureStorage();
+  final next = amountDisplayMode.value == AmountDisplayMode.sats
+      ? AmountDisplayMode.fiat
+      : AmountDisplayMode.sats;
+  await storage.write(
+    key: _amountDisplayKey,
+    value: next == AmountDisplayMode.fiat ? 'fiat' : 'sats',
+  );
+  amountDisplayMode.value = next;
+}
 
 class _RateCache {
   final Map<String, double> rates;

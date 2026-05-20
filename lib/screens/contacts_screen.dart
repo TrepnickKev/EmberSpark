@@ -68,6 +68,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       appBar: AppBar(title: Text(l10n.contactsTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
+        backgroundColor: bitcoinOrange,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
       body: list == null
