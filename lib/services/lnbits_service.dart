@@ -60,6 +60,25 @@ class LNbitsService {
   Uri _uri(String path) =>
       Uri.parse('${baseUrl.replaceAll(RegExp(r'/+$'), '')}$path');
 
+  /// Returns the LNbits server-side wallet UUID. Stable across devices —
+  /// the same LNbits wallet (URL + admin key) on a new phone returns the
+  /// same id. Used as a cross-device avatar seed fallback when the user
+  /// hasn't set a public identifier under My Contact yet.
+  Future<String> getServerWalletId() async {
+    final res = await _client
+        .get(_uri('/api/v1/wallet'), headers: _headers(adminKey))
+        .timeout(_readTimeout);
+    if (res.statusCode != 200) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final id = data['id'];
+    if (id is! String || id.isEmpty) {
+      throw const FormatException('Empty wallet id from LNbits');
+    }
+    return id;
+  }
+
   Future<int> getBalanceSats() async {
     final res = await _client
         .get(_uri('/api/v1/wallet'), headers: _headers(adminKey))

@@ -229,5 +229,8 @@
   "walletsRemove": "Remove wallet",
   "walletsRemoveConfirm": "Remove this wallet from this device? Its My Contact entries will be cleared. The wallet on the server is not affected.",
   "walletsDuplicate": "This wallet is already added.",
-  "walletsActiveLabelTooltip": "Tap to switch wallet"
+  "walletsActiveLabelTooltip": "Tap to switch wallet",
+
+  "loginWalletNameLabel": "Wallet name (optional)",
+  "loginWalletNameHint": "Defaults to the server hostname"
 }

@@ -210,5 +210,8 @@
   "walletsRemove": "Wallet entfernen",
   "walletsRemoveConfirm": "Diese Wallet vom Gerät entfernen? Die zugehörigen My-Contact-Einträge werden gelöscht. Die Wallet auf dem Server ist nicht betroffen.",
   "walletsDuplicate": "Diese Wallet ist bereits hinzugefügt.",
-  "walletsActiveLabelTooltip": "Tippen, um die Wallet zu wechseln"
+  "walletsActiveLabelTooltip": "Tippen, um die Wallet zu wechseln",
+
+  "loginWalletNameLabel": "Wallet-Name (optional)",
+  "loginWalletNameHint": "Standardmäßig der Server-Hostname"
 }

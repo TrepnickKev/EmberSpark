@@ -14,18 +14,28 @@ class WalletAccount {
   final String url;
   final String adminKey;
 
+  /// LNbits server-side wallet UUID. Populated lazily on first successful
+  /// `_load` after add. Stable across devices — used as a cross-device
+  /// avatar seed fallback when no public identifier is set under My
+  /// Contact yet. Null when never fetched (older LNbits server, network
+  /// error, or fresh wallet).
+  final String? serverWalletId;
+
   const WalletAccount({
     required this.id,
     required this.label,
     required this.url,
     required this.adminKey,
+    this.serverWalletId,
   });
 
-  WalletAccount copyWith({String? label}) => WalletAccount(
+  WalletAccount copyWith({String? label, String? serverWalletId}) =>
+      WalletAccount(
         id: id,
         label: label ?? this.label,
         url: url,
         adminKey: adminKey,
+        serverWalletId: serverWalletId ?? this.serverWalletId,
       );
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +43,7 @@ class WalletAccount {
         'label': label,
         'url': url,
         'adminKey': adminKey,
+        if (serverWalletId != null) 'serverWalletId': serverWalletId,
       };
 
   factory WalletAccount.fromJson(Map<String, dynamic> j) => WalletAccount(
@@ -40,6 +51,7 @@ class WalletAccount {
         label: j['label'] as String,
         url: j['url'] as String,
         adminKey: j['adminKey'] as String,
+        serverWalletId: j['serverWalletId'] as String?,
       );
 }
 
@@ -122,6 +134,19 @@ Future<WalletAccount> addWallet({
   );
   await _writeWallets([...wallets, w]);
   return w;
+}
+
+/// Caches the LNbits server-side wallet UUID on the local record. Called
+/// lazily from Home on first successful `_load` so the avatar can seed
+/// from a cross-device-stable id even without a public identifier.
+Future<void> setServerWalletId(String id, String serverWalletId) async {
+  if (serverWalletId.trim().isEmpty) return;
+  final wallets = await listWallets();
+  final next = [
+    for (final w in wallets)
+      w.id == id ? w.copyWith(serverWalletId: serverWalletId) : w,
+  ];
+  await _writeWallets(next);
 }
 
 Future<void> updateWalletLabel(String id, String label) async {

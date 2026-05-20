@@ -1261,6 +1261,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap to switch wallet'**
   String get walletsActiveLabelTooltip;
+
+  /// No description provided for @loginWalletNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name (optional)'**
+  String get loginWalletNameLabel;
+
+  /// No description provided for @loginWalletNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults to the server hostname'**
+  String get loginWalletNameHint;
 }
 
 class _AppLocalizationsDelegate

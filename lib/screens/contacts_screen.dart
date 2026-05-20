@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:random_avatar/random_avatar.dart';
 import '../l10n/app_localizations.dart';
+import '../services/avatar_seed.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -87,7 +89,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   itemBuilder: (_, i) {
                     final c = list[i];
                     return ListTile(
-                      leading: contactAvatar(c.name),
+                      leading: contactAvatar(c.destination),
                       title: Row(
                         children: [
                           Flexible(child: Text(c.name)),
@@ -144,17 +146,19 @@ Widget contactTypeBadge(String destination) {
   );
 }
 
-/// Letter-on-coloured-circle avatar derived from the contact's name.
-Widget contactAvatar(String name) {
-  final letter = name.isEmpty ? '?' : name.characters.first.toUpperCase();
-  final hash = name.codeUnits.fold<int>(0, (h, c) => h * 31 + c);
-  final hue = (hash.abs() % 360).toDouble();
-  final color = HSLColor.fromAHSL(1.0, hue, 0.5, 0.4).toColor();
-  return CircleAvatar(
-    backgroundColor: color,
-    child: Text(
-      letter,
-      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+/// Deterministic avatar seeded from the contact's normalised Lightning
+/// destination. Matches the contact's own Home bubble when the same
+/// destination is their primary identity, giving "same person, same
+/// avatar everywhere" recognisability.
+Widget contactAvatar(String destination) {
+  final seed = normalizeDestination(destination);
+  return SizedBox(
+    width: 40,
+    height: 40,
+    child: RandomAvatar(
+      seed.isEmpty ? '?' : seed,
+      height: 40,
+      width: 40,
     ),
   );
 }

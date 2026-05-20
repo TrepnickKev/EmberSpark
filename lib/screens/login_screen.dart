@@ -18,12 +18,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final nameController = TextEditingController();
   final urlController = TextEditingController();
   final adminKeyController = TextEditingController();
   String? error;
 
   @override
   void dispose() {
+    nameController.dispose();
     urlController.dispose();
     adminKeyController.dispose();
     super.dispose();
@@ -53,7 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => error = e.message);
       return;
     }
-    final account = await addWallet(url: url, adminKey: admin);
+    final name = nameController.text.trim();
+    final account = await addWallet(
+      url: url,
+      adminKey: admin,
+      label: name.isEmpty ? null : name,
+    );
     await setCurrentWalletId(account.id);
     if (!mounted) return;
     if (widget.addFlow) {
@@ -89,6 +96,15 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              TextField(
+                controller: nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: l10n.loginWalletNameLabel,
+                  helperText: l10n.loginWalletNameHint,
+                ),
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: urlController,
                 keyboardType: TextInputType.url,

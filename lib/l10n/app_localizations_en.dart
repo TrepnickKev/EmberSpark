@@ -655,4 +655,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walletsActiveLabelTooltip => 'Tap to switch wallet';
+
+  @override
+  String get loginWalletNameLabel => 'Wallet name (optional)';
+
+  @override
+  String get loginWalletNameHint => 'Defaults to the server hostname';
 }

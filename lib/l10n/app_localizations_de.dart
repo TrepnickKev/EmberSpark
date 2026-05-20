@@ -659,4 +659,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get walletsActiveLabelTooltip => 'Tippen, um die Wallet zu wechseln';
+
+  @override
+  String get loginWalletNameLabel => 'Wallet-Name (optional)';
+
+  @override
+  String get loginWalletNameHint => 'Standardmäßig der Server-Hostname';
 }

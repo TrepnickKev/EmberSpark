@@ -7,6 +7,8 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
 import '../services/price_service.dart';
+import '../services/avatar_seed.dart';
+import '../services/my_contact_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'contacts_screen.dart';
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen>
   String fiatCurrency = 'USD';
   double? fiatRate;
   WalletAccount? currentWallet;
+  String? avatarSeed;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -136,17 +139,48 @@ class _HomeScreenState extends State<HomeScreen>
         getSelectedCurrency(),
         getBtcRates(),
         getCurrentWallet(),
+        getMyLightningAddress(),
+        getMyBolt12Offer(),
+        getMyLnurlpLink(),
       ]);
       if (!mounted) return;
       final b = results[0] as int;
       final cur = results[1] as String;
       final rates = results[2] as Map<String, double>?;
-      final w = results[3] as WalletAccount?;
+      var w = results[3] as WalletAccount?;
+      final myLnAddress = results[4] as String?;
+      final myBolt12 = results[5] as String?;
+      final myLnurlp = results[6] as String?;
+
+      // Lazy-fetch the LNbits server-side wallet UUID on the first
+      // successful load. Best-effort: any failure (404 on older servers,
+      // wrong shape) is swallowed; avatar falls through to lower-priority
+      // seeds.
+      if (w != null && (w.serverWalletId == null || w.serverWalletId!.isEmpty)) {
+        try {
+          final sid = await svc.getServerWalletId();
+          await setServerWalletId(w.id, sid);
+          w = w.copyWith(serverWalletId: sid);
+        } catch (_) {
+          // Ignore — keep the lower-priority avatar seed.
+        }
+      }
+
+      final seed = avatarSeedForWallet(
+        lnAddress: myLnAddress,
+        bolt12: myBolt12,
+        lnurlp: myLnurlp,
+        serverWalletId: w?.serverWalletId,
+        fallbackLocalId: w?.id ?? '',
+      );
+
+      if (!mounted) return;
       setState(() {
         balance = b;
         fiatCurrency = cur;
         fiatRate = rates?[cur];
         currentWallet = w;
+        avatarSeed = seed.isEmpty ? null : seed;
       });
     } catch (e) {
       if (!mounted) return;
@@ -285,25 +319,27 @@ class _HomeScreenState extends State<HomeScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Material(
-              color: currentWallet == null ? bitcoinOrange : Colors.transparent,
+              color: avatarSeed == null ? bitcoinOrange : Colors.transparent,
               shape: const CircleBorder(),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const MyContactScreen()),
-                ),
+                ).then((_) {
+                  if (mounted) _load();
+                }),
                 child: SizedBox(
                   width: 88,
                   height: 88,
-                  child: currentWallet == null
+                  child: avatarSeed == null
                       ? const Icon(
                           Icons.person,
                           size: 48,
                           color: Colors.white,
                         )
                       : RandomAvatar(
-                          currentWallet!.id,
+                          avatarSeed!,
                           height: 88,
                           width: 88,
                         ),
