@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  EmberSpark is a Lightning wallet client. flutter_secure_storage holds the
+  LNbits server URL and admin/invoice keys; auto-backing those up to Google
+  Drive or transferring them via device-to-device would leak wallet
+  credentials. Opt out of both transports entirely — the user re-enters
+  their server URL + key on a new device, same as any other LN wallet.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root"/>
+        <exclude domain="file"/>
+        <exclude domain="database"/>
+        <exclude domain="sharedpref"/>
+        <exclude domain="external"/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root"/>
+        <exclude domain="file"/>
+        <exclude domain="database"/>
+        <exclude domain="sharedpref"/>
+        <exclude domain="external"/>
+    </device-transfer>
+</data-extraction-rules>
