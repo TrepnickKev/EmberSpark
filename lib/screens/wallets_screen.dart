@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
+import 'home_screen.dart';
 import 'login_screen.dart';
 
 /// Lists every saved wallet on the device and lets the user switch
@@ -40,7 +41,17 @@ class _WalletsScreenState extends State<WalletsScreen> {
   Future<void> _switchTo(WalletAccount w) async {
     await setCurrentWalletId(w.id);
     if (!mounted) return;
-    Navigator.pop(context, true);
+    if (Navigator.canPop(context)) {
+      // Opened from Home menu — pop back so HomeScreen reloads.
+      Navigator.pop(context, true);
+    } else {
+      // Root route (post-logout) — replace with a fresh HomeScreen so the
+      // navigator has something to render and the new wallet's data loads.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   Future<void> _addWallet() async {
