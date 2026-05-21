@@ -1,6 +1,8 @@
 # EmberSpark — Lightning wallet
 
-<img src="images/Logo.png" alt="EmberSpark logo" width="50%">
+<p align="center">
+  <img src="images/Logo.png" alt="EmberSpark logo" width="50%">
+</p>
 
 A small Flutter wallet that talks to your own [LNbits](https://lnbits.com) server. Built primarily for Android; also runs on Windows desktop and Chrome for development.
 
