@@ -1,9 +1,11 @@
 name: Build & release Android APKs + AAB
 
-# Manual only. Click "Run workflow" in the Actions tab, fill in the version,
-# and the workflow builds the APKs and publishes a GitHub Release on the
-# PUBLIC TrepnickKev/EmberSpark repo (cross-repo write authenticated via a
-# short-lived GitHub App installation token).
+# Manual only. Click "Run workflow" in the Actions tab, fill in the version.
+# APKs are published as a GitHub Release on the PUBLIC TrepnickKev/EmberSpark
+# repo (cross-repo write authenticated via a short-lived GitHub App
+# installation token) for sideloaders. The AAB is uploaded as an Actions
+# workflow artifact (90-day retention) so only the repo owner can fetch it
+# from the workflow run page for Play Console uploads.
 on:
   workflow_dispatch:
     inputs:
@@ -103,6 +105,14 @@ jobs:
           mv app-release.aab "EmberSpark-v${{ inputs.version }}.aab"
           ls -lh
 
+      - name: Upload AAB as workflow artifact (Play Console source)
+        uses: actions/upload-artifact@v4
+        with:
+          name: EmberSpark-v${{ inputs.version }}-aab
+          path: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
+          retention-days: 90
+          if-no-files-found: error
+
       - name: Generate App installation token
         id: app_token
         uses: actions/create-github-app-token@v2
@@ -124,5 +134,4 @@ jobs:
             build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-arm64-v8a.apk
             build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-armeabi-v7a.apk
             build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-x86_64.apk
-            build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
           fail_on_unmatched_files: true
