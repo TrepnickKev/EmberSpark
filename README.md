@@ -1,6 +1,8 @@
 # EmberSpark
 
-<img src="images/Logo.png" alt="EmberSpark logo" width="50%">
+<p align="center">
+  <img src="images/Logo.png" alt="EmberSpark logo" width="50%">
+</p>
 
 A small Lightning wallet for your own [LNbits](https://lnbits.com) server.
 Built for everyday personal and family use. Send, receive, scan a QR, and
