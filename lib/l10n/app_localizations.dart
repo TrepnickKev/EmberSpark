@@ -200,6 +200,12 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get commonRetry;
 
+  /// No description provided for @commonEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get commonEdit;
+
   /// No description provided for @commonAmount.
   ///
   /// In en, this message translates to:
@@ -529,6 +535,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New contact'**
   String get contactsNew;
+
+  /// No description provided for @contactsEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit contact'**
+  String get contactsEdit;
 
   /// No description provided for @contactsScanTitle.
   ///
@@ -911,8 +923,14 @@ abstract class AppLocalizations {
   /// No description provided for @aboutSupportBody.
   ///
   /// In en, this message translates to:
-  /// **'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below — every bit keeps the project alive. Thank you!'**
+  /// **'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below. Every bit keeps the project alive. Thank you! Reporting bugs or feature requests on GitHub is just as welcome.'**
   String get aboutSupportBody;
+
+  /// No description provided for @aboutContributeOnGithub.
+  ///
+  /// In en, this message translates to:
+  /// **'Contribute on GitHub'**
+  String get aboutContributeOnGithub;
 
   /// No description provided for @aboutCopyAddress.
   ///
@@ -1027,6 +1045,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LNbits has no Lightning backend configured (VoidWallet). Connect a Lightning node in LNbits → Server → Funding.'**
   String get error520;
+
+  /// No description provided for @errorInsufficientFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough sats in your wallet for this payment.'**
+  String get errorInsufficientFunds;
+
+  /// No description provided for @errorLnurlInsecureCallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Your LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.'**
+  String get errorLnurlInsecureCallback;
 
   /// No description provided for @errorServerGeneric.
   ///
@@ -1190,6 +1220,12 @@ abstract class AppLocalizations {
   /// **'LNbits doesn\'t have a BOLT12 extension installed, or your Lightning node doesn\'t support BOLT12.'**
   String get myContactBolt12ExtensionMissing;
 
+  /// No description provided for @myContactAvatarPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.'**
+  String get myContactAvatarPriority;
+
   /// No description provided for @walletsMenu.
   ///
   /// In en, this message translates to:
@@ -1220,23 +1256,11 @@ abstract class AppLocalizations {
   /// **'Active'**
   String get walletsActive;
 
-  /// No description provided for @walletsRename.
+  /// No description provided for @walletsEdit.
   ///
   /// In en, this message translates to:
-  /// **'Rename'**
-  String get walletsRename;
-
-  /// No description provided for @walletsRenameDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Rename wallet'**
-  String get walletsRenameDialogTitle;
-
-  /// No description provided for @walletsLabelLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Label'**
-  String get walletsLabelLabel;
+  /// **'Edit wallet'**
+  String get walletsEdit;
 
   /// No description provided for @walletsRemove.
   ///

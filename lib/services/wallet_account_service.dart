@@ -149,13 +149,34 @@ Future<void> setServerWalletId(String id, String serverWalletId) async {
   await _writeWallets(next);
 }
 
-Future<void> updateWalletLabel(String id, String label) async {
-  final trimmed = label.trim();
-  if (trimmed.isEmpty) return;
+/// Updates a wallet's connection details and/or label in place. Clears
+/// the cached `serverWalletId` when (url, adminKey) changes — that
+/// cache is keyed by the connection, so it'd be stale after the edit
+/// and Home._load will re-fetch lazily.
+Future<void> updateWallet(
+  String id, {
+  required String url,
+  required String adminKey,
+  String? label,
+}) async {
   final wallets = await listWallets();
-  final next = [
-    for (final w in wallets) w.id == id ? w.copyWith(label: trimmed) : w,
-  ];
+  final next = [...wallets];
+  for (var i = 0; i < next.length; i++) {
+    final w = next[i];
+    if (w.id != id) continue;
+    final connChanged = w.url != url || w.adminKey != adminKey;
+    final newLabel = (label != null && label.trim().isNotEmpty)
+        ? label.trim()
+        : w.label;
+    next[i] = WalletAccount(
+      id: w.id,
+      label: newLabel,
+      url: url,
+      adminKey: adminKey,
+      serverWalletId: connChanged ? null : w.serverWalletId,
+    );
+    break;
+  }
   await _writeWallets(next);
 }
 

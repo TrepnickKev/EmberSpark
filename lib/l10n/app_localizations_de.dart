@@ -60,6 +60,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonRetry => 'Erneut versuchen';
 
   @override
+  String get commonEdit => 'Bearbeiten';
+
+  @override
   String get commonAmount => 'Betrag (Sats)';
 
   @override
@@ -236,6 +239,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get contactsNew => 'Neuer Kontakt';
+
+  @override
+  String get contactsEdit => 'Kontakt bearbeiten';
 
   @override
   String get contactsScanTitle => 'Ziel scannen';
@@ -463,7 +469,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutSupportBody =>
-      'EmberSpark wird in der Freizeit gebaut und gepflegt. Wenn dir die App hilft, deine Sats besser zu verwalten, kannst du gerne ein paar On-Chain-BTC an die Adresse unten schicken — jedes bisschen hält das Projekt am Leben. Danke!';
+      'EmberSpark wird in der Freizeit gebaut und gepflegt. Wenn dir die App hilft, deine Sats besser zu verwalten, kannst du gerne ein paar On-Chain-BTC an die Adresse unten schicken. Jedes bisschen hält das Projekt am Leben. Danke! Bug-Reports oder Feature-Wünsche auf GitHub sind genauso willkommen.';
+
+  @override
+  String get aboutContributeOnGithub => 'Auf GitHub mitwirken';
 
   @override
   String get aboutCopyAddress => 'Adresse kopieren';
@@ -533,6 +542,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get error520 =>
       'LNbits hat kein Lightning-Backend konfiguriert (VoidWallet). Verbinde einen Lightning-Node unter LNbits → Server → Funding.';
+
+  @override
+  String get errorInsufficientFunds =>
+      'Nicht genug Sats in deiner Wallet für diese Zahlung.';
+
+  @override
+  String get errorLnurlInsecureCallback =>
+      'Dein LNbits-Server hat eine unsichere (http://) Callback-URL zurückgegeben. Wahrscheinlich steht LNbits hinter einem Reverse Proxy und kennt seine öffentliche HTTPS-Adresse nicht. Setze auf dem LNbits-Server LNBITS_BASE_URL=https://dein-host in der .env und starte ihn neu. Alternativ konfiguriere den Proxy so, dass X-Forwarded-Proto: https weitergereicht wird.';
 
   @override
   String errorServerGeneric(String code) {
@@ -624,6 +641,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.';
 
   @override
+  String get myContactAvatarPriority =>
+      'Dein Profil-Avatar wird aus diesen Kennungen erzeugt. Der höchstpriorisierte gesetzte Wert dient als Seed. Änderst du ihn, ändert sich auch der Avatar.\n\nReihenfolge: Lightning-Adresse > BOLT12-Angebot > LNURL-Pay-Link > LNbits-Wallet-UUID > lokale ID.';
+
+  @override
   String get walletsMenu => 'Wallets';
 
   @override
@@ -639,13 +660,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get walletsActive => 'Aktiv';
 
   @override
-  String get walletsRename => 'Umbenennen';
-
-  @override
-  String get walletsRenameDialogTitle => 'Wallet umbenennen';
-
-  @override
-  String get walletsLabelLabel => 'Bezeichnung';
+  String get walletsEdit => 'Wallet bearbeiten';
 
   @override
   String get walletsRemove => 'Wallet entfernen';

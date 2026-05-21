@@ -50,6 +50,14 @@ Future<void> addContact(Contact c) async {
   await saveContacts(list);
 }
 
+Future<void> updateContact(int index, Contact c) async {
+  final list = List<Contact>.of(await getContacts());
+  if (index < 0 || index >= list.length) return;
+  list[index] = c;
+  list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+  await saveContacts(list);
+}
+
 Future<void> deleteContact(int index) async {
   final list = List<Contact>.of(await getContacts());
   if (index < 0 || index >= list.length) return;

@@ -11,6 +11,7 @@ import '../services/avatar_seed.dart';
 import '../services/my_contact_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
+import 'about_screen.dart';
 import 'contacts_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
@@ -258,9 +259,16 @@ class _HomeScreenState extends State<HomeScreen>
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Image.asset('images/Logo_icon.png'),
+        leading: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AboutScreen()),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Image.asset('images/Logo_icon.png'),
+          ),
         ),
         title: Text(l10n.appTitle),
         actions: [

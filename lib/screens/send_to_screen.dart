@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
+import '../services/nfc_service.dart';
+import '../widgets/stacked_action_button.dart';
 import 'contacts_screen.dart' show contactAvatar, contactTypeBadge;
 import 'qr_scan_screen.dart';
 
@@ -44,6 +49,108 @@ class _SendToScreenState extends State<SendToScreen> {
     await routeLightningCode(Navigator.of(context), c.destination);
   }
 
+  Future<void> _handleIncomingCode(String code) async {
+    final clean = code.trim();
+    if (clean.isEmpty || !mounted) return;
+    await routeLightningCode(Navigator.of(context), clean);
+  }
+
+  Future<void> _paste() async {
+    final l10n = AppLocalizations.of(context)!;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (!mounted) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.clipboardEmpty)),
+      );
+      return;
+    }
+    await _handleIncomingCode(text);
+  }
+
+  Future<void> _readNfc() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    NfcSession? session;
+    try {
+      session = await readNdefText(
+        onRead: (payload) async {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          await _handleIncomingCode(payload);
+        },
+        onError: (_) {
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pop();
+          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
+        },
+      );
+    } on NfcUnavailable {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
+      return;
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
+      return;
+    }
+    if (!mounted) {
+      await session.stop();
+      return;
+    }
+    await _showNfcDialog(session);
+  }
+
+  Future<void> _showNfcDialog(NfcSession session) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            const SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Text(l10n.nfcHoldTag)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+        ],
+      ),
+    );
+    await session.stop();
+  }
+
+  Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final controller = MobileScannerController();
+    try {
+      final result = await controller.analyzeImage(picked.path);
+      final code = (result?.barcodes.isNotEmpty ?? false)
+          ? result!.barcodes.first.rawValue
+          : null;
+      if (code == null || code.isEmpty) {
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
+        return;
+      }
+      if (!mounted) return;
+      await _handleIncomingCode(code);
+    } finally {
+      await controller.dispose();
+    }
+  }
+
   Future<void> _scan() async {
     final l10n = AppLocalizations.of(context)!;
     final code = await Navigator.push<String>(
@@ -53,7 +160,7 @@ class _SendToScreenState extends State<SendToScreen> {
       ),
     );
     if (code == null || !mounted) return;
-    await routeLightningCode(Navigator.of(context), code);
+    await _handleIncomingCode(code);
   }
 
   @override
@@ -68,6 +175,32 @@ class _SendToScreenState extends State<SendToScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                StackedActionButton(
+                  icon: Icons.content_paste,
+                  label: l10n.commonPaste,
+                  onPressed: _paste,
+                ),
+                StackedActionButton(
+                  icon: Icons.nfc,
+                  label: l10n.commonNfc,
+                  onPressed: _readNfc,
+                ),
+                StackedActionButton(
+                  icon: Icons.image_outlined,
+                  label: l10n.commonImage,
+                  onPressed: _pickImage,
+                ),
+                StackedActionButton(
+                  icon: Icons.qr_code_scanner,
+                  label: l10n.commonScan,
+                  onPressed: _scan,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
@@ -78,11 +211,6 @@ class _SendToScreenState extends State<SendToScreen> {
                     decoration: InputDecoration(
                       labelText: l10n.sendToInputLabel,
                       hintText: l10n.sendToInputHint,
-                      suffixIcon: IconButton(
-                        tooltip: l10n.commonScanQr,
-                        icon: const Icon(Icons.qr_code_scanner),
-                        onPressed: _scan,
-                      ),
                     ),
                   ),
                 ),
@@ -119,7 +247,7 @@ class _SendToScreenState extends State<SendToScreen> {
                           itemBuilder: (_, i) {
                             final c = list[i];
                             return ListTile(
-                              leading: contactAvatar(c.name),
+                              leading: contactAvatar(c.destination),
                               title: Row(
                                 children: [
                                   Flexible(child: Text(c.name)),

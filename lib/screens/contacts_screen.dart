@@ -39,6 +39,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
     await _load();
   }
 
+  Future<void> _edit(int index, Contact c) async {
+    final result = await showDialog<Contact>(
+      context: context,
+      builder: (_) => _ContactFormDialog(initial: c),
+    );
+    if (result == null) return;
+    await updateContact(index, result);
+    await _load();
+  }
+
   Future<void> _confirmDelete(int index, String name) async {
     final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
@@ -102,9 +112,20 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 12),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => _confirmDelete(i, c.name),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: l10n.commonEdit,
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () => _edit(i, c),
+                          ),
+                          IconButton(
+                            tooltip: l10n.commonDelete,
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => _confirmDelete(i, c.name),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -164,16 +185,27 @@ Widget contactAvatar(String destination) {
 }
 
 class _ContactFormDialog extends StatefulWidget {
-  const _ContactFormDialog();
+  const _ContactFormDialog({this.initial});
+
+  /// When non-null, the dialog opens pre-filled with this contact's
+  /// values and the title swaps to "Edit contact".
+  final Contact? initial;
 
   @override
   State<_ContactFormDialog> createState() => _ContactFormDialogState();
 }
 
 class _ContactFormDialogState extends State<_ContactFormDialog> {
-  final nameCtrl = TextEditingController();
-  final destCtrl = TextEditingController();
+  late final TextEditingController nameCtrl;
+  late final TextEditingController destCtrl;
   String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    nameCtrl = TextEditingController(text: widget.initial?.name ?? '');
+    destCtrl = TextEditingController(text: widget.initial?.destination ?? '');
+  }
 
   @override
   void dispose() {
@@ -214,7 +246,7 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(l10n.contactsNew),
+      title: Text(widget.initial == null ? l10n.contactsNew : l10n.contactsEdit),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

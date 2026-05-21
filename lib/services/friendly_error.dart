@@ -40,6 +40,23 @@ String friendlyError(AppLocalizations l10n, Object e) {
     return l10n.errorTimeout;
   }
 
+  // --- Insufficient funds (LNbits 400 / 520 body usually contains one of
+  //     these substrings when the wallet balance is too low for the pay) --
+  final lower = s.toLowerCase();
+  if (lower.contains('insufficient') ||
+      lower.contains('not enough') ||
+      (lower.contains('balance') && lower.contains('payment'))) {
+    return l10n.errorInsufficientFunds;
+  }
+
+  // --- LNbits behind a reverse proxy emitting http:// callback URLs that
+  //     its own Pydantic validator then rejects. Server-side misconfig;
+  //     surface a diagnostic instead of the raw JSON blob.
+  if (lower.contains('http scheme is only allowed for localhost') ||
+      lower.contains('parsingmodel[callbackurl]')) {
+    return l10n.errorLnurlInsecureCallback;
+  }
+
   // --- HTTP status codes (we wrap them like "LNbits 4xx: ..." or
   //     "Payment failed (4xx): ..." in the service layer) ------------------
   final code = RegExp(r'\b(401|403|404|5\d\d)\b').firstMatch(s);

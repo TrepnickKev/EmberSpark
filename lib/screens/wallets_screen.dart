@@ -52,32 +52,11 @@ class _WalletsScreenState extends State<WalletsScreen> {
     await _reload();
   }
 
-  Future<void> _rename(WalletAccount w) async {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: w.label);
-    final newLabel = await showDialog<String>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(l10n.walletsRenameDialogTitle),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(labelText: l10n.walletsLabelLabel),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text(l10n.commonSave),
-          ),
-        ],
-      ),
+  Future<void> _edit(WalletAccount w) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => LoginScreen(initial: w)),
     );
-    if (newLabel == null || newLabel.isEmpty || newLabel == w.label) return;
-    await updateWalletLabel(w.id, newLabel);
     if (!mounted) return;
     await _reload();
   }
@@ -170,13 +149,13 @@ class _WalletsScreenState extends State<WalletsScreen> {
           ),
           trailing: PopupMenuButton<String>(
             onSelected: (v) {
-              if (v == 'rename') _rename(w);
+              if (v == 'edit') _edit(w);
               if (v == 'remove') _remove(w);
             },
             itemBuilder: (_) => [
               PopupMenuItem(
-                value: 'rename',
-                child: Text(l10n.walletsRename),
+                value: 'edit',
+                child: Text(l10n.walletsEdit),
               ),
               PopupMenuItem(
                 value: 'remove',

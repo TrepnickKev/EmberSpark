@@ -4,11 +4,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/update_service.dart';
+import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
-  static const _btcAddress = '3P7XsSqDJjJ5fCtcwSdiatrFFyq28aCZVJ';
+  static const _btcAddress = 'bc1qcvm7vc3cqt3dazjj9pqvxdg0pxuxf3jtdaf5la';
 
   @override
   State<AboutScreen> createState() => _AboutScreenState();
@@ -38,6 +39,13 @@ class _AboutScreenState extends State<AboutScreen> {
     final url = info?.releaseUrl;
     if (url == null) return;
     await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _openGithub() async {
+    await launchUrl(
+      Uri.parse('https://github.com/TrepnickKev/EmberSpark'),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Future<void> _copyBtc(BuildContext context) async {
@@ -212,6 +220,12 @@ class _AboutScreenState extends State<AboutScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
+                const Icon(
+                  Icons.currency_bitcoin,
+                  color: bitcoinOrange,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
                 const Expanded(
                   child: SelectableText(
                     AboutScreen._btcAddress,
@@ -227,6 +241,15 @@ class _AboutScreenState extends State<AboutScreen> {
                   onPressed: () => _copyBtc(context),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                icon: const Icon(Icons.open_in_new, size: 18),
+                label: Text(l10n.aboutContributeOnGithub),
+                onPressed: _openGithub,
+              ),
             ),
           ],
         ),

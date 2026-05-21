@@ -60,6 +60,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonRetry => 'Retry';
 
   @override
+  String get commonEdit => 'Edit';
+
+  @override
   String get commonAmount => 'Amount (sats)';
 
   @override
@@ -234,6 +237,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactsNew => 'New contact';
+
+  @override
+  String get contactsEdit => 'Edit contact';
 
   @override
   String get contactsScanTitle => 'Scan destination';
@@ -460,7 +466,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutSupportBody =>
-      'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below — every bit keeps the project alive. Thank you!';
+      'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below. Every bit keeps the project alive. Thank you! Reporting bugs or feature requests on GitHub is just as welcome.';
+
+  @override
+  String get aboutContributeOnGithub => 'Contribute on GitHub';
 
   @override
   String get aboutCopyAddress => 'Copy address';
@@ -529,6 +538,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get error520 =>
       'LNbits has no Lightning backend configured (VoidWallet). Connect a Lightning node in LNbits → Server → Funding.';
+
+  @override
+  String get errorInsufficientFunds =>
+      'Not enough sats in your wallet for this payment.';
+
+  @override
+  String get errorLnurlInsecureCallback =>
+      'Your LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.';
 
   @override
   String errorServerGeneric(String code) {
@@ -620,6 +637,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'LNbits doesn\'t have a BOLT12 extension installed, or your Lightning node doesn\'t support BOLT12.';
 
   @override
+  String get myContactAvatarPriority =>
+      'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.';
+
+  @override
   String get walletsMenu => 'Wallets';
 
   @override
@@ -635,13 +656,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletsActive => 'Active';
 
   @override
-  String get walletsRename => 'Rename';
-
-  @override
-  String get walletsRenameDialogTitle => 'Rename wallet';
-
-  @override
-  String get walletsLabelLabel => 'Label';
+  String get walletsEdit => 'Edit wallet';
 
   @override
   String get walletsRemove => 'Remove wallet';

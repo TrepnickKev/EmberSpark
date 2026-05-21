@@ -234,6 +234,29 @@ class _MyContactScreenState extends State<MyContactScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.myContactAvatarPriority,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 _section(
                   l10n: l10n,
                   kind: _Kind.lnAddress,

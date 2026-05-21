@@ -6,22 +6,38 @@ import 'home_screen.dart';
 import 'qr_scan_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.addFlow = false});
+  const LoginScreen({super.key, this.addFlow = false, this.initial});
 
   /// True when launched from the Wallets screen to add another wallet.
   /// On save, pops back to the caller (Wallets) instead of replacing to
   /// Home, so the new wallet shows up in the list immediately.
   final bool addFlow;
 
+  /// When non-null, the screen is in **edit** mode: controllers pre-fill
+  /// from this wallet, the title swaps to "Edit wallet", and Save calls
+  /// `updateWallet` instead of `addWallet`. Always pops back on save.
+  final WalletAccount? initial;
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final nameController = TextEditingController();
-  final urlController = TextEditingController();
-  final adminKeyController = TextEditingController();
+  late final TextEditingController nameController;
+  late final TextEditingController urlController;
+  late final TextEditingController adminKeyController;
   String? error;
+
+  bool get _isEdit => widget.initial != null;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.initial?.label ?? '');
+    urlController = TextEditingController(text: widget.initial?.url ?? '');
+    adminKeyController =
+        TextEditingController(text: widget.initial?.adminKey ?? '');
+  }
 
   @override
   void dispose() {
@@ -56,10 +72,22 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     final name = nameController.text.trim();
+    final labelArg = name.isEmpty ? null : name;
+    if (_isEdit) {
+      await updateWallet(
+        widget.initial!.id,
+        url: url,
+        adminKey: admin,
+        label: labelArg,
+      );
+      if (!mounted) return;
+      Navigator.pop(context, true);
+      return;
+    }
     final account = await addWallet(
       url: url,
       adminKey: admin,
-      label: name.isEmpty ? null : name,
+      label: labelArg,
     );
     await setCurrentWalletId(account.id);
     if (!mounted) return;
@@ -89,7 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.loginTitle)),
+      appBar: AppBar(
+        title: Text(_isEdit ? l10n.walletsEdit : l10n.loginTitle),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(

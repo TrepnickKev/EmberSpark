@@ -91,6 +91,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Future<void> _create() async {
+    FocusScope.of(context).unfocus();
     final l10n = AppLocalizations.of(context)!;
     final sats = _resolveSats();
     if (sats == null) {
