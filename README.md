@@ -4,17 +4,19 @@
   <img src="images/Logo.png" alt="EmberSpark logo" width="60%">
 </p>
 
-A small Lightning wallet for your own [LNbits](https://lnbits.com) server.
-Built for everyday personal and family use. Send, receive, scan a QR, and
-move on.
+An Android client for your own [LNbits](https://lnbits.com) server.
+EmberSpark is not a wallet on its own. The LNbits server you operate is the
+wallet, and EmberSpark works like a remote control that lets you use it
+from your phone. Built for everyday personal and family use. Send,
+receive, scan a QR, and move on.
 
 [![Latest release](https://img.shields.io/github/v/release/TrepnickKev/EmberSpark?label=latest&color=ff8c42)](https://github.com/TrepnickKev/EmberSpark/releases/latest)
 
 ## Features
 
 - Lightning **send & receive** through your LNbits wallet
-- **Multiple LNbits wallets** managed in one app, with a quick switcher under
-  the home menu and per-wallet identifiers and label
+- **Multiple LNbits server connections** managed in one app, with a quick
+  switcher under the home menu and per-connection identifiers and label
 - **QR scanner** that auto-detects BOLT11, BOLT12, LNURL, or Lightning
   addresses and routes to the right flow
 - **BOLT12** support: pay offers (`lno1…`) and invoices (`lni1…`), or
@@ -24,9 +26,10 @@ move on.
 - **My Contact**: share your Lightning address, BOLT12 offer, and LNURL-pay
   link via QR, copy, system share, or NFC. The LNURL-pay link and BOLT12
   offer can be auto-generated from your LNbits server.
-- **Deterministic per-wallet avatars** derived from your public Lightning
-  identity, so the same wallet shows the same avatar across devices and
-  saved contacts show the same avatar as the owner's home screen
+- **Deterministic avatars per LNbits connection** derived from your public
+  Lightning identity, so the same connection shows the same avatar across
+  devices and saved contacts show the same avatar as the owner's home
+  screen
 - **NFC** read and write for Lightning destinations
 - Acts as a **system handler for `lightning:` deep links**. Tap a Lightning
   link in any app and EmberSpark opens.
@@ -40,8 +43,8 @@ move on.
   mempool.space
 - **Contacts**: save destinations you pay regularly, scan-to-add or paste,
   edit or delete, pick from the list on the Send-to screen
-- Editable **wallets** (URL, admin key, label) without losing the
-  per-wallet My-Contact entries
+- Editable **LNbits connections** (URL, admin key, label) without losing
+  the per-connection My-Contact entries
 - **Biometric or device-PIN lock** on app launch
 - API key stored in Android KeyStore via `flutter_secure_storage`
 - "Allow unverified HTTPS" toggle for self-signed certificates or `.onion`
@@ -72,7 +75,7 @@ Grab the latest APK from
   can't move sats.
 - Network reachability from your phone to your LNbits server
 
-## Configure the wallet
+## Configure the connection
 
 On first launch, the Setup screen asks for two fields. Use the QR icon next
 to each to scan from LNbits' API Info panel.
@@ -111,10 +114,10 @@ Bug reports, ideas, and feedback all go in the
   derivation rather than BIP-32, so a reinstall generates a new identity,
   and sites you've authed against will see a new user.
 - **Android only.** iOS / desktop builds aren't published here.
-- **No cloud backup or device-to-device transfer.** Wallet credentials are
-  intentionally excluded from Android Auto Backup so they cannot leak to
-  Google Drive. Set up your wallet again on a new device the same way you
-  did the first time.
+- **No cloud backup or device-to-device transfer.** LNbits API credentials
+  are intentionally excluded from Android Auto Backup so they cannot leak
+  to Google Drive. Set up your connection again on a new device the same
+  way you did the first time.
 
 ## Support development
 
