@@ -1,7 +1,7 @@
 # EmberSpark
 
 <p align="center">
-  <img src="images/Logo.png" alt="EmberSpark logo" width="50%">
+  <img src="images/Logo.png" alt="EmberSpark logo" width="60%">
 </p>
 
 A small Lightning wallet for your own [LNbits](https://lnbits.com) server.
