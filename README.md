@@ -8,21 +8,21 @@ A small Flutter wallet that talks to your own [LNbits](https://lnbits.com) serve
 
 ## Features
 
-- Balance, send, and receive — directly against your LNbits wallet
+- Balance, send, and receive directly against your LNbits wallet
 - QR scanner that auto-detects what you scanned and routes to the right flow:
   - **BOLT11** invoice → pre-filled Send screen
   - **LNURL-pay** → amount prompt → invoice → pay
   - **LNURL-withdraw** → amount prompt → invoice → submit
   - **LNURL-auth** → cryptographic site login (secp256k1 ECDSA)
   - **Lightning address** (`name@host`) → resolves and treats as LNURL-pay
-- Registered as a system Lightning handler — `lightning:` and `lnurl:` deep links from other apps open EmberSpark
+- Registered as a system Lightning handler. `lightning:` and `lnurl:` deep links from other apps open EmberSpark.
 - Transaction history with pull-to-refresh
-- Two-key setup (admin + invoice) — invoice key is used for read operations, admin key only for outgoing payments
+- Two-key setup (admin + invoice). Invoice key is used for read operations, admin key only for outgoing payments.
 - Settings toggle to allow self-signed / incomplete-chain HTTPS for hobbyist or `.onion` LNbits servers
 
 ## Requirements
 
-- An **LNbits server** with a real Lightning funding source (LND / CLN / Phoenixd / NWC / etc.) — VoidWallet won't work, it can't move sats
+- An **LNbits server** with a real Lightning funding source (LND / CLN / Phoenixd / NWC / etc.). VoidWallet won't work, it can't move sats.
 - For Android builds: Android SDK (platform `android-36`, build-tools, platform-tools) and JDK 17+
 - Flutter SDK (3.27 or newer)
 
@@ -30,7 +30,7 @@ A small Flutter wallet that talks to your own [LNbits](https://lnbits.com) serve
 
 ### One-time setup
 
-1. Install Flutter — https://docs.flutter.dev/install
+1. Install Flutter from https://docs.flutter.dev/install
 2. Clone or copy this repo
 3. From the project root:
 
@@ -91,11 +91,11 @@ After installing, on first launch you see the Setup screen with three fields. Th
 
 | Field | What to enter |
 | --- | --- |
-| **LNbits URL** | Base URL of your LNbits server, e.g. `https://lnbits.example.com` or `http://abcd.onion`. Leading `https://` is optional — the app fills it in. |
+| **LNbits URL** | Base URL of your LNbits server, e.g. `https://lnbits.example.com` or `http://abcd.onion`. Leading `https://` is optional; the app fills it in. |
 | **Admin key** | Used only for sending payments. Find it in LNbits → wallet → **API Info → Admin key**. |
 | **Invoice / read key** | Used for balance, creating invoices, and reading payments. LNbits → wallet → **API Info → Invoice/read key**. |
 
-Find all three QR codes in your LNbits wallet's "API Info" panel — each field's scan button accepts its QR.
+Find all three QR codes in your LNbits wallet's "API Info" panel. Each field's scan button accepts its QR.
 
 ### Settings → Allow unverified HTTPS
 
@@ -103,10 +103,10 @@ Off by default. Turn on if your LNbits sits behind a self-signed cert, an incomp
 
 ## How to use
 
-- **Receive sats** — Receive → enter amount + optional memo → screen shows a QR for the BOLT11 invoice, plus Copy button.
-- **Send sats** — Send → paste a BOLT11 invoice → Pay. Or, easier: tap **Scan QR** on the home screen, the wallet detects the format and routes you to the right flow.
-- **History** — clock icon in the top bar. Pull down to refresh.
-- **Lightning deep link from another app** — when an app like a Bitcoin game offers "Open with…", pick EmberSpark; the wallet handles the BOLT11/LNURL/Lightning-address automatically.
+- **Receive sats**: Receive → enter amount + optional memo → screen shows a QR for the BOLT11 invoice, plus Copy button.
+- **Send sats**: Send → paste a BOLT11 invoice → Pay. Or, easier: tap **Scan QR** on the home screen, the app detects the format and routes you to the right flow.
+- **History**: clock icon in the top bar. Pull down to refresh.
+- **Lightning deep link from another app**: when an app like a Bitcoin game offers "Open with…", pick EmberSpark; the app handles the BOLT11/LNURL/Lightning-address automatically.
 
 ## Troubleshooting
 
@@ -114,7 +114,7 @@ Off by default. Turn on if your LNbits sits behind a self-signed cert, an incomp
 | --- | --- |
 | `VoidWallet cannot create invoices` (520) | LNbits has no real funding source. Configure LND/CLN/Phoenixd/NWC in LNbits → Server → Funding. |
 | `CERTIFICATE_VERIFY_FAILED` | Self-signed or incomplete chain on the LNbits / LNURL server. Settings → Allow unverified HTTPS. |
-| `403 Forbidden` from an LNURL endpoint | Most often the voucher is already redeemed or expired. Confirm by pasting the URL (use the "Copy URL" button on the error screen) into a browser — same 403 means it's the server, not the app. |
+| `403 Forbidden` from an LNURL endpoint | Most often the voucher is already redeemed or expired. Confirm by pasting the URL (use the "Copy URL" button on the error screen) into a browser; same 403 means it's the server, not the app. |
 | LNURL withdraw says success but balance doesn't change | LNURL-withdraw is fire-and-forget; the server has to actually pay your invoice. Pull-to-refresh History after a few seconds. |
 | Build fails with Kotlin "different roots" / `relativeTo` errors | Pub cache is on a different drive than the project. Set `PUB_CACHE` to a folder on the same drive as the project, then `flutter clean` + `flutter pub get`. |
 
@@ -146,6 +146,6 @@ images/                              # source artwork (Logo.png, Logo_icon.png)
 ## Caveats
 
 - **Debug APKs are large** (~88 MB) because they bundle the Dart VM, debug symbols, and JIT. Release builds are 25–35 MB.
-- **APKs are signed with the auto-generated debug key** — fine for sideloading; not Play-Store-ready.
+- **No cloud backup or device-to-device transfer.** LNbits API credentials are intentionally excluded from Android Auto Backup so they cannot leak to Google Drive. Set up your connection again on a new device the same way you did the first time.
 - **LNURL-auth** uses a simplified HMAC derivation, not BIP-32. This means your identity doesn't roam to other LNURL-auth wallets. Each install generates a fresh master seed; sites you've logged into will see you as a new user after a reinstall.
 - The **invoice key alone** is enough for receive + history; the **admin key** is required only for send. If you only paste the invoice key, paying will fail with a 401 until you add the admin key.
