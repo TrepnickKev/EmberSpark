@@ -436,7 +436,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutTitle => 'Über';
 
   @override
-  String get aboutTagline => 'Eine kleine Lightning-Wallet für LNbits';
+  String get aboutTagline => 'Eine schlanke Lightning-Wallet für LNbits';
 
   @override
   String get aboutCopyright => '© 2026 Trepnick Solutions';
