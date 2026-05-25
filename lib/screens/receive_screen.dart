@@ -46,10 +46,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Future<void> _loadInitial() async {
-    final results = await Future.wait([
-      getBtcRates(),
-      getSelectedCurrency(),
-    ]);
+    final results = await Future.wait([getBtcRates(), getSelectedCurrency()]);
     if (!mounted) return;
     setState(() {
       rates = results[0] as Map<String, double>?;
@@ -124,9 +121,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(ClipboardData(text: invoice!));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.receiveInvoiceCopied)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.receiveInvoiceCopied)));
   }
 
   Future<void> _share() async {
@@ -209,111 +206,116 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.receiveTitle)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: amountCtrl,
-                      keyboardType: isSats
-                          ? TextInputType.number
-                          : const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      decoration: InputDecoration(labelText: l10n.receiveAmount),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  DropdownButton<String>(
-                    value: currency,
-                    items: [
-                      DropdownMenuItem(
-                        value: 'sats',
-                        child: Text(l10n.receiveCurrencySats),
-                      ),
-                      for (final c in supportedCurrencies)
-                        DropdownMenuItem(value: c, child: Text(c)),
-                    ],
-                    onChanged: (next) {
-                      if (next == null) return;
-                      setState(() => currency = next);
-                    },
-                  ),
-                ],
-              ),
-              _buildPreview(l10n, isSats, fiatUnavailable),
-              TextField(
-                controller: memoCtrl,
-                decoration: InputDecoration(labelText: l10n.receiveMemo),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: busy || fiatUnavailable ? null : _create,
-                child: busy
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.receiveCreateInvoice),
-              ),
-              if (error != null) ...[
-                const SizedBox(height: 16),
-                Text(error!, style: const TextStyle(color: Colors.redAccent)),
-              ],
-              if (invoice != null) ...[
-                const SizedBox(height: 24),
-                Center(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(12),
-                    child: QrImageView(
-                      data: invoice!,
-                      size: 240,
-                      backgroundColor: Colors.white,
-                      embeddedImage: const AssetImage('images/Logo_icon.png'),
-                      embeddedImageStyle: const QrEmbeddedImageStyle(
-                        size: Size(48, 48),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    StackedActionButton(
-                      icon: Icons.copy,
-                      label: l10n.commonCopy,
-                      onPressed: _copy,
+                    Expanded(
+                      child: TextField(
+                        controller: amountCtrl,
+                        keyboardType: isSats
+                            ? TextInputType.number
+                            : const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        decoration: InputDecoration(
+                          labelText: l10n.receiveAmount,
+                        ),
+                      ),
                     ),
-                    StackedActionButton(
-                      icon: Icons.ios_share,
-                      label: l10n.commonShare,
-                      onPressed: _share,
-                    ),
-                    StackedActionButton(
-                      icon: Icons.nfc,
-                      label: l10n.commonNfc,
-                      onPressed: _writeNfc,
+                    const SizedBox(width: 12),
+                    DropdownButton<String>(
+                      value: currency,
+                      items: [
+                        DropdownMenuItem(
+                          value: 'sats',
+                          child: Text(l10n.receiveCurrencySats),
+                        ),
+                        for (final c in supportedCurrencies)
+                          DropdownMenuItem(value: c, child: Text(c)),
+                      ],
+                      onChanged: (next) {
+                        if (next == null) return;
+                        setState(() => currency = next);
+                      },
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                SelectableText(
-                  invoice!,
-                  style: const TextStyle(fontSize: 11),
+                _buildPreview(l10n, isSats, fiatUnavailable),
+                TextField(
+                  controller: memoCtrl,
+                  decoration: InputDecoration(labelText: l10n.receiveMemo),
                 ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: busy || fiatUnavailable ? null : _create,
+                  child: busy
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.receiveCreateInvoice),
+                ),
+                if (error != null) ...[
+                  const SizedBox(height: 16),
+                  Text(error!, style: const TextStyle(color: Colors.redAccent)),
+                ],
+                if (invoice != null) ...[
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(12),
+                      child: QrImageView(
+                        data: invoice!,
+                        size: 240,
+                        backgroundColor: Colors.white,
+                        embeddedImage: const AssetImage('images/Logo_icon.png'),
+                        embeddedImageStyle: const QrEmbeddedImageStyle(
+                          size: Size(48, 48),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StackedActionButton(
+                        icon: Icons.copy,
+                        label: l10n.commonCopy,
+                        onPressed: _copy,
+                      ),
+                      StackedActionButton(
+                        icon: Icons.ios_share,
+                        label: l10n.commonShare,
+                        onPressed: _share,
+                      ),
+                      StackedActionButton(
+                        icon: Icons.nfc,
+                        label: l10n.commonNfc,
+                        onPressed: _writeNfc,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    invoice!,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

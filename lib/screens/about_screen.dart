@@ -50,13 +50,11 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Future<void> _copyBtc(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    await Clipboard.setData(
-      const ClipboardData(text: AboutScreen._btcAddress),
-    );
+    await Clipboard.setData(const ClipboardData(text: AboutScreen._btcAddress));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.aboutAddressCopied)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.aboutAddressCopied)));
   }
 
   @override
@@ -64,41 +62,44 @@ class _AboutScreenState extends State<AboutScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.aboutTitle)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Center(
-            child: Column(
-              children: [
-                Image.asset('images/Logo_icon.png', width: 96),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.appTitle,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Center(
+              child: Column(
+                children: [
+                  Image.asset('images/Logo_icon.png', width: 96),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.appTitle,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.aboutTagline,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.aboutCopyright,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.aboutTagline,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.aboutCopyright,
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          _buildVersionCard(l10n),
-          const SizedBox(height: 16),
-          _buildDonateCard(context, l10n),
-          const SizedBox(height: 16),
-          _buildLicensesCard(context, l10n),
-        ],
+            const SizedBox(height: 24),
+            _buildVersionCard(l10n),
+            const SizedBox(height: 16),
+            _buildDonateCard(context, l10n),
+            const SizedBox(height: 16),
+            _buildLicensesCard(context, l10n),
+          ],
+        ),
       ),
     );
   }
@@ -229,10 +230,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 const Expanded(
                   child: SelectableText(
                     AboutScreen._btcAddress,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                   ),
                 ),
                 IconButton(

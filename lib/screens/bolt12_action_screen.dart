@@ -97,72 +97,74 @@ class _Bolt12ActionScreenState extends State<Bolt12ActionScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isOffer = widget.isOffer;
-    final canPay =
-        !busy && (isOffer ? _amountValid : true) && success == null;
+    final canPay = !busy && (isOffer ? _amountValid : true) && success == null;
     return Scaffold(
       appBar: AppBar(
         title: Text(
           isOffer ? l10n.bolt12TitlePayOffer : l10n.bolt12TitlePayInvoice,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.bolt12RawStringLabel,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-              const SizedBox(height: 4),
-              SelectableText(
-                widget.code,
-                maxLines: 3,
-                style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
-              ),
-              const SizedBox(height: 24),
-              if (isOffer) ...[
-                TextField(
-                  controller: amountCtrl,
-                  keyboardType: TextInputType.number,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: InputDecoration(
-                    labelText: l10n.bolt12AmountLabel,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: memoCtrl,
-                  decoration: InputDecoration(
-                    labelText: l10n.bolt12MemoLabel,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-              ElevatedButton(
-                onPressed: canPay ? _pay : null,
-                child: busy
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.sendPay),
-              ),
-              if (error != null) ...[
-                const SizedBox(height: 16),
-                Text(error!, style: const TextStyle(color: Colors.redAccent)),
-              ],
-              if (success != null) ...[
-                const SizedBox(height: 16),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 Text(
-                  success!,
-                  style: const TextStyle(color: Colors.greenAccent),
+                  l10n.bolt12RawStringLabel,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  widget.code,
+                  maxLines: 3,
+                  style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
+                ),
+                const SizedBox(height: 24),
+                if (isOffer) ...[
+                  TextField(
+                    controller: amountCtrl,
+                    keyboardType: TextInputType.number,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    decoration: InputDecoration(
+                      labelText: l10n.bolt12AmountLabel,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: memoCtrl,
+                    decoration: InputDecoration(
+                      labelText: l10n.bolt12MemoLabel,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                ElevatedButton(
+                  onPressed: canPay ? _pay : null,
+                  child: busy
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.sendPay),
+                ),
+                if (error != null) ...[
+                  const SizedBox(height: 16),
+                  Text(error!, style: const TextStyle(color: Colors.redAccent)),
+                ],
+                if (success != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    success!,
+                    style: const TextStyle(color: Colors.greenAccent),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

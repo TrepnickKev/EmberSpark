@@ -60,10 +60,10 @@ class _MyContactScreenState extends State<MyContactScreen> {
   }
 
   String? _valueOf(_Kind kind) => switch (kind) {
-        _Kind.lnAddress => _lnAddress,
-        _Kind.lnurlp => _lnurlp,
-        _Kind.bolt12 => _bolt12,
-      };
+    _Kind.lnAddress => _lnAddress,
+    _Kind.lnurlp => _lnurlp,
+    _Kind.bolt12 => _bolt12,
+  };
 
   Future<void> _setValue(_Kind kind, String? value) async {
     switch (kind) {
@@ -140,9 +140,7 @@ class _MyContactScreenState extends State<MyContactScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(content: Text(friendlyError(l10n, e))),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(friendlyError(l10n, e))));
     } finally {
       if (mounted) setState(() => _generating[kind] = false);
     }
@@ -152,9 +150,9 @@ class _MyContactScreenState extends State<MyContactScreen> {
     final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(ClipboardData(text: value));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.myContactCopied)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.myContactCopied)));
   }
 
   Future<void> _share(String value) async {
@@ -229,65 +227,68 @@ class _MyContactScreenState extends State<MyContactScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.myContactTitle)),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          l10n.myContactAvatarPriority,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
+      body: SafeArea(
+        top: false,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.myContactAvatarPriority,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                _section(
-                  l10n: l10n,
-                  kind: _Kind.lnAddress,
-                  title: l10n.myContactLnAddressSection,
-                  hint: l10n.myContactLnAddressHint,
-                  addLabel: l10n.myContactAddLnAddress,
-                  value: _lnAddress,
-                  canAutoGenerate: false,
-                ),
-                const SizedBox(height: 16),
-                _section(
-                  l10n: l10n,
-                  kind: _Kind.lnurlp,
-                  title: l10n.myContactLnurlpSection,
-                  hint: l10n.myContactLnurlpHint,
-                  addLabel: l10n.myContactAddLnurlp,
-                  value: _lnurlp,
-                  canAutoGenerate: true,
-                ),
-                const SizedBox(height: 16),
-                _section(
-                  l10n: l10n,
-                  kind: _Kind.bolt12,
-                  title: l10n.myContactBolt12Section,
-                  hint: l10n.myContactBolt12Hint,
-                  addLabel: l10n.myContactAddBolt12,
-                  value: _bolt12,
-                  canAutoGenerate: true,
-                ),
-              ],
-            ),
+                  _section(
+                    l10n: l10n,
+                    kind: _Kind.lnAddress,
+                    title: l10n.myContactLnAddressSection,
+                    hint: l10n.myContactLnAddressHint,
+                    addLabel: l10n.myContactAddLnAddress,
+                    value: _lnAddress,
+                    canAutoGenerate: false,
+                  ),
+                  const SizedBox(height: 16),
+                  _section(
+                    l10n: l10n,
+                    kind: _Kind.lnurlp,
+                    title: l10n.myContactLnurlpSection,
+                    hint: l10n.myContactLnurlpHint,
+                    addLabel: l10n.myContactAddLnurlp,
+                    value: _lnurlp,
+                    canAutoGenerate: true,
+                  ),
+                  const SizedBox(height: 16),
+                  _section(
+                    l10n: l10n,
+                    kind: _Kind.bolt12,
+                    title: l10n.myContactBolt12Section,
+                    hint: l10n.myContactBolt12Hint,
+                    addLabel: l10n.myContactAddBolt12,
+                    value: _bolt12,
+                    canAutoGenerate: true,
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -399,10 +400,7 @@ class _MyContactScreenState extends State<MyContactScreen> {
               const SizedBox(height: 12),
               SelectableText(
                 value,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                ),
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
               ),
               const SizedBox(height: 16),
               Row(
@@ -459,16 +457,16 @@ class _EditDialogState extends State<_EditDialog> {
   }
 
   bool _isValid(String value) => switch (widget.kind) {
-        _Kind.lnAddress => isMyLightningAddress(value),
-        _Kind.lnurlp => isMyLnurlpLink(value),
-        _Kind.bolt12 => isMyBolt12Offer(value),
-      };
+    _Kind.lnAddress => isMyLightningAddress(value),
+    _Kind.lnurlp => isMyLnurlpLink(value),
+    _Kind.bolt12 => isMyBolt12Offer(value),
+  };
 
   String _invalidMessage(AppLocalizations l10n) => switch (widget.kind) {
-        _Kind.lnAddress => l10n.myContactInvalidLnAddress,
-        _Kind.lnurlp => l10n.myContactInvalidLnurlp,
-        _Kind.bolt12 => l10n.myContactInvalidBolt12,
-      };
+    _Kind.lnAddress => l10n.myContactInvalidLnAddress,
+    _Kind.lnurlp => l10n.myContactInvalidLnurlp,
+    _Kind.bolt12 => l10n.myContactInvalidBolt12,
+  };
 
   void _save() {
     final l10n = AppLocalizations.of(context)!;

@@ -50,8 +50,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   }
 
   Future<void> _loadRates() async {
-    final results =
-        await Future.wait([getBtcRates(), getSelectedCurrency()]);
+    final results = await Future.wait([getBtcRates(), getSelectedCurrency()]);
     if (!mounted) return;
     setState(() {
       rates = results[0] as Map<String, double>?;
@@ -105,9 +104,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     try {
       await performLnurlAuth(i);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.lnurlAuthSuccess(i.host))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.lnurlAuthSuccess(i.host))));
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
@@ -186,9 +185,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       );
       await submitWithdrawInvoice(i, bolt11);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.lnurlWithdrawing(sats))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.lnurlWithdrawing(sats))));
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
@@ -211,13 +210,16 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     };
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: busy && i == null
-            ? const Center(child: CircularProgressIndicator())
-            : i == null
-                ? _buildError(l10n)
-                : _buildForm(l10n, i),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: busy && i == null
+              ? const Center(child: CircularProgressIndicator())
+              : i == null
+              ? _buildError(l10n)
+              : _buildForm(l10n, i),
+        ),
       ),
     );
   }
@@ -237,10 +239,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
           const SizedBox(height: 8),
-          SelectableText(
-            resolvedUrl!,
-            style: const TextStyle(fontSize: 12),
-          ),
+          SelectableText(resolvedUrl!, style: const TextStyle(fontSize: 12)),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerLeft,
@@ -250,9 +249,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: resolvedUrl!));
                 if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.lnurlUrlCopied)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.lnurlUrlCopied)));
               },
             ),
           ),
@@ -314,9 +313,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     };
     final (minSats, maxSats) = switch (i) {
       LnurlPayInfo(:final minSendableMsat, :final maxSendableMsat) => (
-          minSendableMsat ~/ 1000,
-          maxSendableMsat ~/ 1000,
-        ),
+        minSendableMsat ~/ 1000,
+        maxSendableMsat ~/ 1000,
+      ),
       LnurlWithdrawInfo(
         :final minWithdrawableMsat,
         :final maxWithdrawableMsat,
@@ -328,10 +327,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (desc.isNotEmpty) ...[
-            Text(desc),
-            const SizedBox(height: 12),
-          ],
+          if (desc.isNotEmpty) ...[Text(desc), const SizedBox(height: 12)],
           Text(
             l10n.lnurlAmountRange(minSats, maxSats),
             style: const TextStyle(color: Colors.grey),
@@ -369,7 +365,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(
-                    i is LnurlPayInfo ? l10n.lnurlGetAndPay : l10n.lnurlWithdraw,
+                    i is LnurlPayInfo
+                        ? l10n.lnurlGetAndPay
+                        : l10n.lnurlWithdraw,
                   ),
           ),
           if (error != null) ...[

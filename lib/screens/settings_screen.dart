@@ -49,9 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (next) {
       if (!deviceSupportsLock) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsLockNeedSetup)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.settingsLockNeedSetup)));
         return;
       }
       // Verify the user can actually authenticate before locking themselves out.
@@ -64,12 +64,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// Settings-tile title in Bitcoin orange.
   Text _title(String text) => Text(
-        text,
-        style: const TextStyle(
-          color: bitcoinOrange,
-          fontWeight: FontWeight.w500,
-        ),
-      );
+    text,
+    style: const TextStyle(color: bitcoinOrange, fontWeight: FontWeight.w500),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -86,77 +83,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
-      body: ListView(
-        children: [
-          ListTile(
-            title: _title(l10n.settingsLanguage),
-            subtitle: Text(l10n.settingsLanguageSubtitle),
-            trailing: DropdownButton<String>(
-              value: lang,
-              items: [
-                DropdownMenuItem(
-                  value: 'system',
-                  child: Text(l10n.languageSystemDefault),
-                ),
-                const DropdownMenuItem(value: 'en', child: Text('English')),
-                const DropdownMenuItem(value: 'de', child: Text('Deutsch')),
-              ],
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          children: [
+            ListTile(
+              title: _title(l10n.settingsLanguage),
+              subtitle: Text(l10n.settingsLanguageSubtitle),
+              trailing: DropdownButton<String>(
+                value: lang,
+                items: [
+                  DropdownMenuItem(
+                    value: 'system',
+                    child: Text(l10n.languageSystemDefault),
+                  ),
+                  const DropdownMenuItem(value: 'en', child: Text('English')),
+                  const DropdownMenuItem(value: 'de', child: Text('Deutsch')),
+                ],
+                onChanged: (next) async {
+                  if (next == null) return;
+                  await setSelectedLanguage(next);
+                  if (mounted) setState(() => language = next);
+                },
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              title: _title(l10n.settingsDisplayCurrency),
+              subtitle: Text(l10n.settingsDisplayCurrencySubtitle),
+              trailing: DropdownButton<String>(
+                value: cur,
+                items: [
+                  for (final c in supportedCurrencies)
+                    DropdownMenuItem(value: c, child: Text(c)),
+                ],
+                onChanged: (next) async {
+                  if (next == null) return;
+                  await setSelectedCurrency(next);
+                  if (mounted) setState(() => currency = next);
+                },
+              ),
+            ),
+            const Divider(),
+            SwitchListTile(
+              title: _title(l10n.settingsLockOnLaunch),
+              subtitle: Text(
+                deviceSupportsLock
+                    ? l10n.settingsLockSubtitleEnabled
+                    : l10n.settingsLockSubtitleUnavailable,
+              ),
+              value: lock,
+              onChanged: deviceSupportsLock ? _toggleLock : null,
+            ),
+            const Divider(),
+            SwitchListTile(
+              title: _title(l10n.settingsTrustTls),
+              subtitle: Text(l10n.settingsTrustTlsSubtitle),
+              value: tls,
               onChanged: (next) async {
-                if (next == null) return;
-                await setSelectedLanguage(next);
-                if (mounted) setState(() => language = next);
+                await setUnverifiedTlsAllowed(next);
+                if (mounted) setState(() => trustUnverified = next);
               },
             ),
-          ),
-          const Divider(),
-          ListTile(
-            title: _title(l10n.settingsDisplayCurrency),
-            subtitle: Text(l10n.settingsDisplayCurrencySubtitle),
-            trailing: DropdownButton<String>(
-              value: cur,
-              items: [
-                for (final c in supportedCurrencies)
-                  DropdownMenuItem(value: c, child: Text(c)),
-              ],
-              onChanged: (next) async {
-                if (next == null) return;
-                await setSelectedCurrency(next);
-                if (mounted) setState(() => currency = next);
-              },
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: _title(l10n.settingsAbout),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutScreen()),
+              ),
             ),
-          ),
-          const Divider(),
-          SwitchListTile(
-            title: _title(l10n.settingsLockOnLaunch),
-            subtitle: Text(
-              deviceSupportsLock
-                  ? l10n.settingsLockSubtitleEnabled
-                  : l10n.settingsLockSubtitleUnavailable,
-            ),
-            value: lock,
-            onChanged: deviceSupportsLock ? _toggleLock : null,
-          ),
-          const Divider(),
-          SwitchListTile(
-            title: _title(l10n.settingsTrustTls),
-            subtitle: Text(l10n.settingsTrustTlsSubtitle),
-            value: tls,
-            onChanged: (next) async {
-              await setUnverifiedTlsAllowed(next);
-              if (mounted) setState(() => trustUnverified = next);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: _title(l10n.settingsAbout),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AboutScreen()),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -61,9 +61,9 @@ class _SendToScreenState extends State<SendToScreen> {
     final text = data?.text?.trim() ?? '';
     if (!mounted) return;
     if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.clipboardEmpty)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.clipboardEmpty)));
       return;
     }
     await _handleIncomingCode(text);
@@ -169,103 +169,105 @@ class _SendToScreenState extends State<SendToScreen> {
     final list = contacts;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.sendToTitle)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                StackedActionButton(
-                  icon: Icons.content_paste,
-                  label: l10n.commonPaste,
-                  onPressed: _paste,
-                ),
-                StackedActionButton(
-                  icon: Icons.nfc,
-                  label: l10n.commonNfc,
-                  onPressed: _readNfc,
-                ),
-                StackedActionButton(
-                  icon: Icons.image_outlined,
-                  label: l10n.commonImage,
-                  onPressed: _pickImage,
-                ),
-                StackedActionButton(
-                  icon: Icons.qr_code_scanner,
-                  label: l10n.commonScan,
-                  onPressed: _scan,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: inputCtrl,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    decoration: InputDecoration(
-                      labelText: l10n.sendToInputLabel,
-                      hintText: l10n.sendToInputHint,
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  StackedActionButton(
+                    icon: Icons.content_paste,
+                    label: l10n.commonPaste,
+                    onPressed: _paste,
+                  ),
+                  StackedActionButton(
+                    icon: Icons.nfc,
+                    label: l10n.commonNfc,
+                    onPressed: _readNfc,
+                  ),
+                  StackedActionButton(
+                    icon: Icons.image_outlined,
+                    label: l10n.commonImage,
+                    onPressed: _pickImage,
+                  ),
+                  StackedActionButton(
+                    icon: Icons.qr_code_scanner,
+                    label: l10n.commonScan,
+                    onPressed: _scan,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: inputCtrl,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(
+                        labelText: l10n.sendToInputLabel,
+                        hintText: l10n.sendToInputHint,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _continue,
-                  child: Text(l10n.commonContinue),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                l10n.sendToContacts,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: _continue,
+                    child: Text(l10n.commonContinue),
+                  ),
+                ],
               ),
-            ),
-            const Divider(height: 16),
-            Expanded(
-              child: list == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : list.isEmpty
-                      ? Center(
-                          child: Text(
-                            l10n.sendToNoContacts,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        )
-                      : ListView.separated(
-                          itemCount: list.length,
-                          separatorBuilder: (_, __) =>
-                              const Divider(height: 1),
-                          itemBuilder: (_, i) {
-                            final c = list[i];
-                            return ListTile(
-                              leading: contactAvatar(c.destination),
-                              title: Row(
-                                children: [
-                                  Flexible(child: Text(c.name)),
-                                  contactTypeBadge(c.destination),
-                                ],
-                              ),
-                              subtitle: Text(
-                                c.destination,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              onTap: () => _useContact(c),
-                            );
-                          },
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.sendToContacts,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ),
+              const Divider(height: 16),
+              Expanded(
+                child: list == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : list.isEmpty
+                    ? Center(
+                        child: Text(
+                          l10n.sendToNoContacts,
+                          style: const TextStyle(color: Colors.grey),
                         ),
-            ),
-          ],
+                      )
+                    : ListView.separated(
+                        itemCount: list.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (_, i) {
+                          final c = list[i];
+                          return ListTile(
+                            leading: contactAvatar(c.destination),
+                            title: Row(
+                              children: [
+                                Flexible(child: Text(c.name)),
+                                contactTypeBadge(c.destination),
+                              ],
+                            ),
+                            subtitle: Text(
+                              c.destination,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            onTap: () => _useContact(c),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

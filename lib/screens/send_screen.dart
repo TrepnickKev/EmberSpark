@@ -97,9 +97,9 @@ class _SendScreenState extends State<SendScreen> {
     final text = data?.text?.trim() ?? '';
     if (text.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.clipboardEmpty)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.clipboardEmpty)));
       return;
     }
     await _handleIncomingCode(text);
@@ -229,75 +229,78 @@ class _SendScreenState extends State<SendScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.sendTitle)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  StackedActionButton(
-                    icon: Icons.content_paste,
-                    label: l10n.commonPaste,
-                    onPressed: _paste,
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    StackedActionButton(
+                      icon: Icons.content_paste,
+                      label: l10n.commonPaste,
+                      onPressed: _paste,
+                    ),
+                    StackedActionButton(
+                      icon: Icons.nfc,
+                      label: l10n.commonNfc,
+                      onPressed: _readNfc,
+                    ),
+                    StackedActionButton(
+                      icon: Icons.image_outlined,
+                      label: l10n.commonImage,
+                      onPressed: _pickImage,
+                    ),
+                    StackedActionButton(
+                      icon: Icons.qr_code_scanner,
+                      label: l10n.commonScan,
+                      onPressed: _scanQr,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: bolt11Ctrl,
+                  maxLines: 4,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    labelText: l10n.sendBolt11Label,
+                    border: const OutlineInputBorder(),
                   ),
-                  StackedActionButton(
-                    icon: Icons.nfc,
-                    label: l10n.commonNfc,
-                    onPressed: _readNfc,
-                  ),
-                  StackedActionButton(
-                    icon: Icons.image_outlined,
-                    label: l10n.commonImage,
-                    onPressed: _pickImage,
-                  ),
-                  StackedActionButton(
-                    icon: Icons.qr_code_scanner,
-                    label: l10n.commonScan,
-                    onPressed: _scanQr,
+                ),
+                if (decoded != null) ...[
+                  const SizedBox(height: 16),
+                  _DecodedCard(decoded: decoded!),
+                ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: busy ? null : _pay,
+                  child: busy
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.sendPay),
+                ),
+                if (error != null) ...[
+                  const SizedBox(height: 16),
+                  Text(error!, style: const TextStyle(color: Colors.redAccent)),
+                ],
+                if (success != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    success!,
+                    style: const TextStyle(color: Colors.greenAccent),
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: bolt11Ctrl,
-                maxLines: 4,
-                autocorrect: false,
-                enableSuggestions: false,
-                decoration: InputDecoration(
-                  labelText: l10n.sendBolt11Label,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              if (decoded != null) ...[
-                const SizedBox(height: 16),
-                _DecodedCard(decoded: decoded!),
               ],
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: busy ? null : _pay,
-                child: busy
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.sendPay),
-              ),
-              if (error != null) ...[
-                const SizedBox(height: 16),
-                Text(error!, style: const TextStyle(color: Colors.redAccent)),
-              ],
-              if (success != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  success!,
-                  style: const TextStyle(color: Colors.greenAccent),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
       ),
@@ -325,10 +328,7 @@ class _DecodedCard extends StatelessWidget {
           children: [
             Text(
               amountText,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             if (decoded.description.isNotEmpty) ...[
               const SizedBox(height: 6),

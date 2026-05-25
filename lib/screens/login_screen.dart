@@ -35,8 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     nameController = TextEditingController(text: widget.initial?.label ?? '');
     urlController = TextEditingController(text: widget.initial?.url ?? '');
-    adminKeyController =
-        TextEditingController(text: widget.initial?.adminKey ?? '');
+    adminKeyController = TextEditingController(
+      text: widget.initial?.adminKey ?? '',
+    );
   }
 
   @override
@@ -84,11 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pop(context, true);
       return;
     }
-    final account = await addWallet(
-      url: url,
-      adminKey: admin,
-      label: labelArg,
-    );
+    final account = await addWallet(url: url, adminKey: admin, label: labelArg);
     await setCurrentWalletId(account.id);
     if (!mounted) return;
     if (widget.addFlow) {
@@ -117,69 +114,67 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEdit ? l10n.walletsEdit : l10n.loginTitle),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: nameController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l10n.loginWalletNameLabel,
-                  helperText: l10n.loginWalletNameHint,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: urlController,
-                keyboardType: TextInputType.url,
-                autocorrect: false,
-                enableSuggestions: false,
-                decoration: InputDecoration(
-                  labelText: l10n.loginUrlLabel,
-                  hintText: l10n.loginUrlHint,
-                  suffixIcon: _scanButton(
-                    urlController,
-                    l10n.commonScanQr,
-                    l10n.loginScanUrlTitle,
+      appBar: AppBar(title: Text(_isEdit ? l10n.walletsEdit : l10n.loginTitle)),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  controller: nameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: l10n.loginWalletNameLabel,
+                    helperText: l10n.loginWalletNameHint,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: adminKeyController,
-                autocorrect: false,
-                enableSuggestions: false,
-                decoration: InputDecoration(
-                  labelText: l10n.loginAdminKeyLabel,
-                  helperText: l10n.loginAdminKeyHelper,
-                  suffixIcon: _scanButton(
-                    adminKeyController,
-                    l10n.commonScanQr,
-                    l10n.loginScanAdminTitle,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _save,
-                child: Text(l10n.commonSave),
-              ),
-              if (error != null) ...[
                 const SizedBox(height: 12),
-                Text(error!, style: const TextStyle(color: Colors.redAccent)),
+                TextField(
+                  controller: urlController,
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    labelText: l10n.loginUrlLabel,
+                    hintText: l10n.loginUrlHint,
+                    suffixIcon: _scanButton(
+                      urlController,
+                      l10n.commonScanQr,
+                      l10n.loginScanUrlTitle,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: adminKeyController,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    labelText: l10n.loginAdminKeyLabel,
+                    helperText: l10n.loginAdminKeyHelper,
+                    suffixIcon: _scanButton(
+                      adminKeyController,
+                      l10n.commonScanQr,
+                      l10n.loginScanAdminTitle,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(onPressed: _save, child: Text(l10n.commonSave)),
+                if (error != null) ...[
+                  const SizedBox(height: 12),
+                  Text(error!, style: const TextStyle(color: Colors.redAccent)),
+                ],
+                const SizedBox(height: 16),
+                Text(
+                  l10n.loginHint,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
-              const SizedBox(height: 16),
-              Text(
-                l10n.loginHint,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
+            ),
           ),
         ),
       ),
