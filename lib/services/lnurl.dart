@@ -41,11 +41,16 @@ class LnurlPayInfo extends LnurlInfo {
   final int maxSendableMsat;
   final String description;
 
+  /// LUD-12: maximum length of a sender comment. 0 means the endpoint does
+  /// not accept comments (and the wallet should not show the field).
+  final int commentAllowed;
+
   const LnurlPayInfo({
     required this.callback,
     required this.minSendableMsat,
     required this.maxSendableMsat,
     required this.description,
+    this.commentAllowed = 0,
   });
 }
 
@@ -116,6 +121,7 @@ Future<LnurlInfo> fetchLnurl(String url) async {
         minSendableMsat: (data['minSendable'] as num).toInt(),
         maxSendableMsat: (data['maxSendable'] as num).toInt(),
         description: _extractPayDescription(data['metadata'] as String?),
+        commentAllowed: (data['commentAllowed'] as num?)?.toInt() ?? 0,
       );
     case 'withdrawRequest':
       return LnurlWithdrawInfo(
@@ -131,9 +137,17 @@ Future<LnurlInfo> fetchLnurl(String url) async {
 }
 
 /// Asks the LNURL-pay endpoint for a BOLT11 invoice for [amountMsat].
-Future<String> requestPayInvoice(LnurlPayInfo info, int amountMsat) async {
+/// Optionally attaches a LUD-12 [comment] (must fit `info.commentAllowed`).
+Future<String> requestPayInvoice(
+  LnurlPayInfo info,
+  int amountMsat, {
+  String? comment,
+}) async {
   final sep = info.callback.contains('?') ? '&' : '?';
-  final url = '${info.callback}${sep}amount=$amountMsat';
+  var url = '${info.callback}${sep}amount=$amountMsat';
+  if (comment != null && comment.isNotEmpty) {
+    url += '&comment=${Uri.encodeQueryComponent(comment)}';
+  }
   final client = await getHttpClient();
   final res = await client
       .get(Uri.parse(url), headers: browserLikeHeaders)

@@ -140,6 +140,13 @@
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
   "lnurlWithdrawing": "Withdrawing {amount} sats…",
   "@lnurlWithdrawing": { "placeholders": { "amount": { "type": "int" } } },
+  "lnurlCommentLabel": "Memo (optional)",
+  "@lnurlCommentLabel": { "description": "Label for the LUD-12 comment field on the LNURL-pay screen." },
+  "lnurlCommentHelp": "Max {max} characters",
+  "@lnurlCommentHelp": {
+    "description": "Helper text under the LUD-12 comment field; shows the endpoint-advertised max length.",
+    "placeholders": { "max": { "type": "int" } }
+  },
 
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",

@@ -123,6 +123,8 @@
   "lnurlWithdraw": "Abheben",
   "lnurlWithdrawDefaultMemo": "LNURL-Auszahlung",
   "lnurlWithdrawing": "{amount} Sats werden abgehoben …",
+  "lnurlCommentLabel": "Notiz (optional)",
+  "lnurlCommentHelp": "Maximal {max} Zeichen",
 
   "settingsTitle": "Einstellungen",
   "settingsLanguage": "Sprache",

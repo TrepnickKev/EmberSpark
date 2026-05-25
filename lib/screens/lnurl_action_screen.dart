@@ -21,6 +21,7 @@ class LnurlActionScreen extends StatefulWidget {
 
 class _LnurlActionScreenState extends State<LnurlActionScreen> {
   final amountCtrl = TextEditingController();
+  final commentCtrl = TextEditingController();
   LnurlInfo? info;
   String? error;
   String? resolvedUrl;
@@ -42,6 +43,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   void dispose() {
     amountCtrl.removeListener(_onAmountChanged);
     amountCtrl.dispose();
+    commentCtrl.dispose();
     super.dispose();
   }
 
@@ -139,7 +141,12 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       error = null;
     });
     try {
-      final bolt11 = await requestPayInvoice(i, msat);
+      final comment = commentCtrl.text.trim();
+      final bolt11 = await requestPayInvoice(
+        i,
+        msat,
+        comment: comment.isEmpty ? null : comment,
+      );
       if (!mounted) return;
       await Navigator.pushReplacement(
         context,
@@ -349,6 +356,17 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
               loading: ratesLoading,
             ),
           ),
+          if (i is LnurlPayInfo && i.commentAllowed > 0) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: commentCtrl,
+              maxLength: i.commentAllowed,
+              decoration: InputDecoration(
+                labelText: l10n.lnurlCommentLabel,
+                helperText: l10n.lnurlCommentHelp(i.commentAllowed),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: busy
