@@ -7,6 +7,7 @@ import '../services/avatar_seed.dart';
 import '../services/bolt11.dart';
 import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
+import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
@@ -230,7 +231,9 @@ class _SendScreenState extends State<SendScreen> {
       final WalletBackend svc = await loadWalletBackend();
       await svc.payInvoice(bolt11);
       if (!mounted) return;
-      setState(() => success = l10n.sendPaymentSent);
+      signalPaymentSuccess();
+      Navigator.popUntil(context, (r) => r.isFirst);
+      return;
     } catch (e) {
       if (!mounted) return;
       setState(() => error = friendlyError(AppLocalizations.of(context)!, e));

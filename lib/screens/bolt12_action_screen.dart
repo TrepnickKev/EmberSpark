@@ -4,6 +4,7 @@ import '../services/avatar_seed.dart';
 import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../services/payment_feedback.dart';
 import '../widgets/payment_route_header.dart';
 
 /// Pay either a BOLT12 offer (`lno1…`) or a BOLT12 invoice (`lni1…`).
@@ -85,7 +86,9 @@ class _Bolt12ActionScreenState extends State<Bolt12ActionScreen> {
         await svc.payInvoice(widget.code);
       }
       if (!mounted) return;
-      setState(() => success = l10n.sendPaymentSent);
+      signalPaymentSuccess();
+      Navigator.popUntil(context, (r) => r.isFirst);
+      return;
     } catch (e) {
       if (!mounted) return;
       setState(() => error = _classifyError(l10n, e));

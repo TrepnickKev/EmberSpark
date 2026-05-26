@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:random_avatar/random_avatar.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
@@ -9,7 +8,9 @@ import '../services/lightning_router.dart';
 import '../services/price_service.dart';
 import '../services/avatar_seed.dart';
 import '../services/my_contact_service.dart';
+import '../services/payment_feedback.dart';
 import '../services/wallet_account_service.dart';
+import '../widgets/flipping_avatar.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'about_screen.dart';
 import 'contacts_screen.dart';
@@ -346,10 +347,9 @@ class _HomeScreenState extends State<HomeScreen>
                           size: 48,
                           color: Colors.white,
                         )
-                      : RandomAvatar(
-                          avatarSeed!,
-                          height: 88,
-                          width: 88,
+                      : FlippingAvatar(
+                          seed: avatarSeed!,
+                          trigger: paymentSuccessTrigger,
                         ),
                 ),
               ),
