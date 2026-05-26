@@ -2,15 +2,24 @@ import 'package:flutter/material.dart';
 import '../screens/bolt12_action_screen.dart';
 import '../screens/lnurl_action_screen.dart';
 import '../screens/send_screen.dart';
+import 'contact_service.dart' show Contact;
 import 'wallet_account_service.dart';
 
 /// Classifies a Lightning string (BOLT11 / LNURL / Lightning address) and
-/// pushes the appropriate flow on [navigator]. Used by both the in-app QR
-/// scanner and Android deep-link intents.
+/// pushes the appropriate flow on [navigator]. Used by the in-app QR
+/// scanner, Android deep-link intents, and the Send-to contact picker.
+/// When [fromContact] is set, the destination screen renders the
+/// sender → recipient avatar row at the top.
+///
+/// The destination is lowercased before being forwarded. Bech32 (BOLT11 /
+/// BOLT12 / LNURL) must be single-case per spec, and Lightning addresses
+/// are case-insensitive in practice, so this is a safe normalization that
+/// makes contacts saved with mixed case route correctly.
 Future<void> routeLightningCode(
   NavigatorState navigator,
-  String code,
-) async {
+  String code, {
+  Contact? fromContact,
+}) async {
   final clean = code.trim().replaceFirst(
     RegExp(r'^(lightning|lnurl):', caseSensitive: false),
     '',
@@ -19,16 +28,31 @@ Future<void> routeLightningCode(
 
   if (lower.startsWith('lnbc')) {
     await navigator.push(
-      MaterialPageRoute(builder: (_) => SendScreen(initialInvoice: clean)),
+      MaterialPageRoute(
+        builder: (_) => SendScreen(
+          initialInvoice: lower,
+          fromContact: fromContact,
+        ),
+      ),
     );
   } else if (lower.startsWith('lno1') || lower.startsWith('lni1')) {
     await navigator.push(
-      MaterialPageRoute(builder: (_) => Bolt12ActionScreen(code: clean)),
+      MaterialPageRoute(
+        builder: (_) => Bolt12ActionScreen(
+          code: lower,
+          fromContact: fromContact,
+        ),
+      ),
     );
   } else if (lower.startsWith('lnurl') ||
-      (clean.contains('@') && clean.contains('.'))) {
+      (lower.contains('@') && lower.contains('.'))) {
     await navigator.push(
-      MaterialPageRoute(builder: (_) => LnurlActionScreen(code: clean)),
+      MaterialPageRoute(
+        builder: (_) => LnurlActionScreen(
+          code: lower,
+          fromContact: fromContact,
+        ),
+      ),
     );
   } else {
     final ctx = navigator.context;

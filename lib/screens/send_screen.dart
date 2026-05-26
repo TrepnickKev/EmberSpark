@@ -3,20 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
+import '../services/avatar_seed.dart';
 import '../services/bolt11.dart';
+import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
+import '../widgets/payment_route_header.dart';
 import '../widgets/stacked_action_button.dart';
 import 'bolt12_action_screen.dart';
 import 'lnurl_action_screen.dart';
 import 'qr_scan_screen.dart';
 
 class SendScreen extends StatefulWidget {
-  const SendScreen({super.key, this.initialInvoice});
+  const SendScreen({super.key, this.initialInvoice, this.fromContact});
 
   final String? initialInvoice;
+  final Contact? fromContact;
 
   @override
   State<SendScreen> createState() => _SendScreenState();
@@ -28,6 +32,7 @@ class _SendScreenState extends State<SendScreen> {
   String? success;
   bool busy = false;
   Bolt11Decoded? decoded;
+  ({String seed, String name})? senderInfo;
 
   @override
   void initState() {
@@ -37,6 +42,16 @@ class _SendScreenState extends State<SendScreen> {
       bolt11Ctrl.text = widget.initialInvoice!;
     } else {
       _onChanged();
+    }
+    if (widget.fromContact != null) {
+      _loadSenderInfo();
+    }
+  }
+
+  Future<void> _loadSenderInfo() async {
+    final info = await getOwnAvatarInfo();
+    if (mounted && info.seed.isNotEmpty) {
+      setState(() => senderInfo = info);
     }
   }
 
@@ -237,6 +252,15 @@ class _SendScreenState extends State<SendScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (widget.fromContact != null && senderInfo != null)
+                  PaymentRouteHeader(
+                    senderSeed: senderInfo!.seed,
+                    senderName: senderInfo!.name,
+                    recipientSeed: normalizeDestination(
+                      widget.fromContact!.destination,
+                    ),
+                    recipientName: widget.fromContact!.name,
+                  ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [

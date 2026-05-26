@@ -46,7 +46,7 @@ class _SendToScreenState extends State<SendToScreen> {
   }
 
   Future<void> _useContact(Contact c) async {
-    await routeLightningCode(Navigator.of(context), c.destination);
+    await routeLightningCode(Navigator.of(context), c.destination, fromContact: c);
   }
 
   Future<void> _handleIncomingCode(String code) async {

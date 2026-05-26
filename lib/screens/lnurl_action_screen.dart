@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
+import '../services/avatar_seed.dart';
+import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
 import '../services/wallet_backend.dart';
 import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
 import '../services/price_service.dart';
+import '../widgets/payment_route_header.dart';
 import 'send_screen.dart';
 
 /// Resolves a scanned LNURL or Lightning address and runs the appropriate
 /// pay or withdraw flow.
 class LnurlActionScreen extends StatefulWidget {
-  const LnurlActionScreen({super.key, required this.code});
+  const LnurlActionScreen({super.key, required this.code, this.fromContact});
 
   final String code;
+  final Contact? fromContact;
 
   @override
   State<LnurlActionScreen> createState() => _LnurlActionScreenState();
@@ -26,6 +30,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   String? error;
   String? resolvedUrl;
   bool busy = true;
+  ({String seed, String name})? senderInfo;
 
   Map<String, double>? rates;
   String displayCurrency = 'USD';
@@ -37,6 +42,16 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     amountCtrl.addListener(_onAmountChanged);
     _resolve();
     _loadRates();
+    if (widget.fromContact != null) {
+      _loadSenderInfo();
+    }
+  }
+
+  Future<void> _loadSenderInfo() async {
+    final info = await getOwnAvatarInfo();
+    if (mounted && info.seed.isNotEmpty) {
+      setState(() => senderInfo = info);
+    }
   }
 
   @override
@@ -150,7 +165,12 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       if (!mounted) return;
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => SendScreen(initialInvoice: bolt11)),
+        MaterialPageRoute(
+          builder: (_) => SendScreen(
+            initialInvoice: bolt11,
+            fromContact: widget.fromContact,
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -334,6 +354,17 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (i is LnurlPayInfo &&
+              widget.fromContact != null &&
+              senderInfo != null)
+            PaymentRouteHeader(
+              senderSeed: senderInfo!.seed,
+              senderName: senderInfo!.name,
+              recipientSeed: normalizeDestination(
+                widget.fromContact!.destination,
+              ),
+              recipientName: widget.fromContact!.name,
+            ),
           if (desc.isNotEmpty) ...[Text(desc), const SizedBox(height: 12)],
           Text(
             l10n.lnurlAmountRange(minSats, maxSats),

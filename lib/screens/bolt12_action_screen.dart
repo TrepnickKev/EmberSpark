@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/avatar_seed.dart';
+import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
+import '../widgets/payment_route_header.dart';
 
 /// Pay either a BOLT12 offer (`lno1…`) or a BOLT12 invoice (`lni1…`).
 /// For offers we ask LNbits' BOLT12 community extension to fetchinvoice
@@ -11,9 +14,10 @@ import '../services/lnbits_service.dart';
 /// invoices in the `bolt11` field; other backends fall through with a
 /// localized "not supported" message.
 class Bolt12ActionScreen extends StatefulWidget {
-  const Bolt12ActionScreen({super.key, required this.code});
+  const Bolt12ActionScreen({super.key, required this.code, this.fromContact});
 
   final String code;
+  final Contact? fromContact;
 
   bool get isOffer => code.toLowerCase().startsWith('lno1');
 
@@ -27,11 +31,22 @@ class _Bolt12ActionScreenState extends State<Bolt12ActionScreen> {
   String? error;
   String? success;
   bool busy = false;
+  ({String seed, String name})? senderInfo;
 
   @override
   void initState() {
     super.initState();
     amountCtrl.addListener(() => setState(() {}));
+    if (widget.fromContact != null) {
+      _loadSenderInfo();
+    }
+  }
+
+  Future<void> _loadSenderInfo() async {
+    final info = await getOwnAvatarInfo();
+    if (mounted && info.seed.isNotEmpty) {
+      setState(() => senderInfo = info);
+    }
   }
 
   @override
@@ -112,6 +127,15 @@ class _Bolt12ActionScreenState extends State<Bolt12ActionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (widget.fromContact != null && senderInfo != null)
+                  PaymentRouteHeader(
+                    senderSeed: senderInfo!.seed,
+                    senderName: senderInfo!.name,
+                    recipientSeed: normalizeDestination(
+                      widget.fromContact!.destination,
+                    ),
+                    recipientName: widget.fromContact!.name,
+                  ),
                 Text(
                   l10n.bolt12RawStringLabel,
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
