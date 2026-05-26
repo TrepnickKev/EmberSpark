@@ -4,7 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
-import '../services/lnbits_service.dart';
+import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
 import '../widgets/stacked_action_button.dart';
@@ -101,7 +101,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       invoice = null;
     });
     try {
-      final svc = await LNbitsService.fromStorage();
+      final WalletBackend svc = await loadWalletBackend();
       final bolt11 = await svc.createInvoice(
         amountSats: sats,
         memo: memoCtrl.text.trim(),

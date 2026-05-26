@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
-import '../services/lnbits_service.dart';
+import '../services/wallet_backend.dart';
 import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
 import '../services/price_service.dart';
@@ -183,7 +183,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       error = null;
     });
     try {
-      final svc = await LNbitsService.fromStorage();
+      final WalletBackend svc = await loadWalletBackend();
       final bolt11 = await svc.createInvoice(
         amountSats: sats,
         memo: i.description.isEmpty

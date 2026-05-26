@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
-import '../services/lnbits_service.dart';
+import '../services/wallet_backend.dart';
 import '../services/price_service.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       error = null;
     });
     try {
-      final svc = await LNbitsService.fromStorage();
+      final WalletBackend svc = await loadWalletBackend();
       final results = await Future.wait([
         svc.listPayments(),
         getSelectedCurrency(),

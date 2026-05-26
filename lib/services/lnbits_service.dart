@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'http_client_factory.dart';
 import 'wallet_account_service.dart';
+import 'wallet_backend.dart';
 
-class LNbitsService {
+class LNbitsService implements WalletBackend {
   final String baseUrl;
   final String adminKey;
   final http.Client _client;
@@ -79,6 +80,7 @@ class LNbitsService {
     return id;
   }
 
+  @override
   Future<int> getBalanceSats() async {
     final res = await _client
         .get(_uri('/api/v1/wallet'), headers: _headers(adminKey))
@@ -91,6 +93,7 @@ class LNbitsService {
     return msat ~/ 1000;
   }
 
+  @override
   Future<void> payInvoice(String bolt11) async {
     final res = await _client
         .post(
@@ -104,6 +107,7 @@ class LNbitsService {
     }
   }
 
+  @override
   Future<String> createInvoice({
     required int amountSats,
     required String memo,
@@ -228,6 +232,7 @@ class LNbitsService {
     return invoice;
   }
 
+  @override
   Future<List<Payment>> listPayments({int limit = 50}) async {
     final res = await _client
         .get(

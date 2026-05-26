@@ -5,7 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
-import '../services/lnbits_service.dart';
+import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
 import '../widgets/stacked_action_button.dart';
@@ -212,7 +212,7 @@ class _SendScreenState extends State<SendScreen> {
       success = null;
     });
     try {
-      final svc = await LNbitsService.fromStorage();
+      final WalletBackend svc = await loadWalletBackend();
       await svc.payInvoice(bolt11);
       if (!mounted) return;
       setState(() => success = l10n.sendPaymentSent);
