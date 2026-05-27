@@ -77,3 +77,51 @@ Future<void> deleteContact(int index) async {
   list.removeAt(index);
   await saveContacts(list);
 }
+
+/// Serializes contacts to the EmberSpark export format (pretty-printed).
+String exportContactsJson(List<Contact> contacts) =>
+    const JsonEncoder.withIndent('  ').convert({
+      'app': 'EmberSpark',
+      'type': 'contacts',
+      'version': 1,
+      'contacts': contacts.map((c) => c.toJson()).toList(),
+    });
+
+/// Parses an exported contacts file. Accepts either the wrapped object
+/// (`{"contacts":[...]}`) or a bare array. Throws [FormatException] if the
+/// shape is unrecognized. Skips entries missing a name or destination.
+List<Contact> parseContactsJson(String raw) {
+  final decoded = jsonDecode(raw);
+  final List items;
+  if (decoded is List) {
+    items = decoded;
+  } else if (decoded is Map && decoded['contacts'] is List) {
+    items = decoded['contacts'] as List;
+  } else {
+    throw const FormatException('Unrecognized contacts file');
+  }
+  return items
+      .whereType<Map<String, dynamic>>()
+      .map(Contact.fromJson)
+      .map(_normalize)
+      .where((c) => c.name.isNotEmpty && c.destination.isNotEmpty)
+      .toList();
+}
+
+/// Merges [incoming] into the saved contacts, skipping any whose
+/// destination (prefix-stripped, lower-cased) already exists. Never removes
+/// existing contacts. Returns how many were actually added.
+Future<int> importContacts(List<Contact> incoming) async {
+  final merged = List<Contact>.of(await getContacts());
+  String key(Contact c) => _stripLightningPrefix(c.destination).toLowerCase();
+  final seen = merged.map(key).toSet();
+  var added = 0;
+  for (final c in incoming.map(_normalize)) {
+    if (c.destination.isEmpty || !seen.add(key(c))) continue;
+    merged.add(c);
+    added++;
+  }
+  merged.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+  await saveContacts(merged);
+  return added;
+}

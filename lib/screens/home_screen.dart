@@ -30,8 +30,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int? balance;
   String? error;
   bool loading = false;
@@ -158,7 +157,8 @@ class _HomeScreenState extends State<HomeScreen>
       // successful load. Best-effort: any failure (404 on older servers,
       // wrong shape) is swallowed; avatar falls through to lower-priority
       // seeds.
-      if (w != null && (w.serverWalletId == null || w.serverWalletId!.isEmpty)) {
+      if (w != null &&
+          (w.serverWalletId == null || w.serverWalletId!.isEmpty)) {
         try {
           final sid = await svc.getServerWalletId();
           await setServerWalletId(w.id, sid);
@@ -212,9 +212,8 @@ class _HomeScreenState extends State<HomeScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => wallets.isEmpty
-            ? const LoginScreen()
-            : const WalletsScreen(),
+        builder: (_) =>
+            wallets.isEmpty ? const LoginScreen() : const WalletsScreen(),
       ),
     );
   }
@@ -237,11 +236,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (mounted) _load();
   }
 
-  PopupMenuItem<String> _menuItem(
-    String value,
-    IconData icon,
-    String label,
-  ) {
+  PopupMenuItem<String> _menuItem(String value, IconData icon, String label) {
     return PopupMenuItem<String>(
       value: value,
       height: 52,
@@ -332,21 +327,20 @@ class _HomeScreenState extends State<HomeScreen>
               shape: const CircleBorder(),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MyContactScreen()),
-                ).then((_) {
-                  if (mounted) _load();
-                }),
+                onTap: () =>
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MyContactScreen(),
+                      ),
+                    ).then((_) {
+                      if (mounted) _load();
+                    }),
                 child: SizedBox(
                   width: 88,
                   height: 88,
                   child: avatarSeed == null
-                      ? const Icon(
-                          Icons.person,
-                          size: 48,
-                          color: Colors.white,
-                        )
+                      ? const Icon(Icons.person, size: 48, color: Colors.white)
                       : FlippingAvatar(
                           seed: avatarSeed!,
                           trigger: paymentSuccessTrigger,
@@ -475,9 +469,7 @@ class _HomeScreenState extends State<HomeScreen>
                     onPressed: () async {
                       await Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const SendToScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const SendToScreen()),
                       );
                       if (mounted) _load();
                     },
@@ -493,9 +485,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const ReceiveScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ReceiveScreen()),
                     ),
                   ),
                 ),

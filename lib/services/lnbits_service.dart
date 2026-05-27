@@ -233,6 +233,16 @@ class LNbitsService implements WalletBackend {
   }
 
   @override
+  Future<bool> isInvoicePaid(String paymentHash) async {
+    final res = await _client
+        .get(_uri('/api/v1/payments/$paymentHash'), headers: _headers(adminKey))
+        .timeout(_readTimeout);
+    if (res.statusCode != 200) return false;
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return data['paid'] == true || data['status'] == 'success';
+  }
+
+  @override
   Future<List<Payment>> listPayments({int limit = 50}) async {
     final res = await _client
         .get(

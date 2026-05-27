@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
+import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/avatar_seed.dart';
 import '../services/contact_service.dart';
@@ -72,12 +77,69 @@ class _ContactsScreenState extends State<ContactsScreen> {
     await _load();
   }
 
+  Future<void> _export() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final list = contacts ?? const [];
+    if (list.isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.contactsExportEmpty)),
+      );
+      return;
+    }
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/EmberSpark-contacts.json');
+    await file.writeAsString(exportContactsJson(list));
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        subject: l10n.contactsShareSubject,
+      ),
+    );
+  }
+
+  Future<void> _import() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    final path = result?.files.single.path;
+    if (path == null) return; // cancelled
+    try {
+      final raw = await File(path).readAsString();
+      final added = await importContacts(parseContactsJson(raw));
+      await _load();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.contactsImported(added))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.contactsImportFailed)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final list = contacts;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.contactsTitle)),
+      appBar: AppBar(
+        title: Text(l10n.contactsTitle),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (v) => v == 'import' ? _import() : _export(),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'import', child: Text(l10n.contactsImport)),
+              PopupMenuItem(value: 'export', child: Text(l10n.contactsExport)),
+            ],
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
         backgroundColor: bitcoinOrange,

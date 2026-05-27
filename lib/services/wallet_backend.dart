@@ -27,6 +27,11 @@ abstract class WalletBackend {
 
   /// Lists recent payments, newest first.
   Future<List<Payment>> listPayments({int limit = 50});
+
+  /// Whether the invoice identified by [paymentHash] (lower-case hex) has
+  /// been paid. Used by the Receive screen to detect its own invoice
+  /// settling. Returns false on not-found / transient errors.
+  Future<bool> isInvoicePaid(String paymentHash);
 }
 
 /// Loads the appropriate backend for the currently-selected wallet account.

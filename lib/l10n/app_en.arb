@@ -92,6 +92,16 @@
   "contactsDestinationLabel": "Lightning address, LNURL, or BOLT11",
   "contactsRequired": "Name and destination are required",
   "contactsInvalidDestination": "Not a valid Lightning destination. Use a Lightning address (user@host.tld), BOLT11 invoice, BOLT12 offer/invoice (lno1…/lni1…), or LNURL.",
+  "contactsImport": "Import contacts",
+  "contactsExport": "Export contacts",
+  "contactsExportEmpty": "No contacts to export",
+  "contactsShareSubject": "EmberSpark contacts",
+  "contactsImportFailed": "Couldn't read that contacts file",
+  "contactsImported": "Imported {count} contacts",
+  "@contactsImported": {
+    "description": "Snackbar after a contacts import; count is how many new contacts were added.",
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "historyTitle": "History",
   "historyEmpty": "No transactions yet",

@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
+import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
+import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
 import '../services/price_service.dart';
@@ -30,6 +34,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   Map<String, double>? rates;
   bool ratesLoading = true;
 
+  // Polls the displayed invoice for settlement so we can auto-return to
+  // home with the coin-flip when it's paid.
+  Timer? _paidPollTimer;
+
   @override
   void initState() {
     super.initState();
@@ -39,10 +47,29 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   @override
   void dispose() {
+    _paidPollTimer?.cancel();
     amountCtrl.removeListener(_onInputChanged);
     amountCtrl.dispose();
     memoCtrl.dispose();
     super.dispose();
+  }
+
+  void _startPaidPolling(String bolt11) {
+    _paidPollTimer?.cancel();
+    final hash = decodeBolt11(bolt11)?.paymentHash ?? '';
+    if (hash.isEmpty) return;
+    _paidPollTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      try {
+        final svc = await loadWalletBackend();
+        final paid = await svc.isInvoicePaid(hash);
+        if (!paid || !mounted) return;
+        _paidPollTimer?.cancel();
+        signalPaymentSuccess();
+        Navigator.popUntil(context, (r) => r.isFirst);
+      } catch (_) {
+        // Transient poll error — keep trying on the next tick.
+      }
+    });
   }
 
   Future<void> _loadInitial() async {
@@ -95,6 +122,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       setState(() => error = l10n.receiveAmountError);
       return;
     }
+    _paidPollTimer?.cancel();
     setState(() {
       busy = true;
       error = null;
@@ -108,6 +136,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       );
       if (!mounted) return;
       setState(() => invoice = bolt11);
+      _startPaidPolling(bolt11);
     } catch (e) {
       if (!mounted) return;
       setState(() => error = friendlyError(AppLocalizations.of(context)!, e));

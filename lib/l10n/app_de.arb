@@ -87,6 +87,12 @@
   "contactsDestinationLabel": "Lightning-Adresse, LNURL oder BOLT11",
   "contactsRequired": "Name und Ziel sind erforderlich",
   "contactsInvalidDestination": "Keine gültige Lightning-Adresse. Verwende eine Lightning-Adresse (user@host.tld), eine BOLT11-Rechnung, ein BOLT12-Angebot/-Rechnung (lno1…/lni1…) oder LNURL.",
+  "contactsImport": "Kontakte importieren",
+  "contactsExport": "Kontakte exportieren",
+  "contactsExportEmpty": "Keine Kontakte zum Exportieren",
+  "contactsShareSubject": "EmberSpark-Kontakte",
+  "contactsImportFailed": "Diese Kontaktdatei konnte nicht gelesen werden",
+  "contactsImported": "{count} Kontakte importiert",
 
   "historyTitle": "Verlauf",
   "historyEmpty": "Noch keine Transaktionen",
