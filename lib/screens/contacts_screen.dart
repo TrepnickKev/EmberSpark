@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:share_plus/share_plus.dart';
@@ -101,11 +101,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
   Future<void> _import() async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
+    final path = await FlutterFileDialog.pickFile(
+      params: const OpenFileDialogParams(
+        fileExtensionsFilter: ['json'],
+        mimeTypesFilter: ['application/json'],
+      ),
     );
-    final path = result?.files.single.path;
     if (path == null) return; // cancelled
     try {
       final raw = await File(path).readAsString();
