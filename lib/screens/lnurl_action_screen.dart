@@ -36,6 +36,10 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   String displayCurrency = 'USD';
   bool ratesLoading = true;
 
+  // Amount-entry currency for the pay case: 'sats' or a supportedCurrencies
+  // code. Lets the user type the amount in fiat and convert to sats.
+  String currency = 'sats';
+
   @override
   void initState() {
     super.initState();
@@ -136,7 +140,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
 
   Future<void> _submitPay(LnurlPayInfo i) async {
     final l10n = AppLocalizations.of(context)!;
-    final sats = int.tryParse(amountCtrl.text.trim());
+    final sats = _resolveSats();
     if (sats == null || sats <= 0) {
       setState(() => error = l10n.lnurlAmountPositive);
       return;
@@ -332,6 +336,50 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     );
   }
 
+  /// Converts the amount field to sats based on the selected [currency].
+  /// Returns null on empty / invalid input or a missing fiat rate.
+  int? _resolveSats() {
+    final text = amountCtrl.text.trim().replaceAll(',', '.');
+    if (text.isEmpty) return null;
+    if (currency == 'sats') {
+      final n = int.tryParse(text);
+      return (n != null && n > 0) ? n : null;
+    }
+    final value = double.tryParse(text);
+    final rate = rates?[currency];
+    if (value == null || value <= 0 || rate == null || rate <= 0) return null;
+    final sats = (value / rate * 100000000).round();
+    return sats > 0 ? sats : null;
+  }
+
+  /// Conversion preview under the pay amount field: shows the fiat equivalent
+  /// when entering sats, or the sats equivalent when entering fiat.
+  Widget _buildPayPreview(AppLocalizations l10n) {
+    const style = TextStyle(color: Colors.grey, fontSize: 12);
+    if (ratesLoading) {
+      return const SizedBox(
+        height: 14,
+        width: 14,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    if (currency == 'sats') {
+      final sats = int.tryParse(amountCtrl.text.trim()) ?? 0;
+      if (sats <= 0) return const SizedBox.shrink();
+      final rate = rates?[displayCurrency];
+      if (rate == null) return Text(l10n.receiveRatesUnavailable, style: style);
+      return Text('≈ ${formatFiat(sats / 1e8 * rate, displayCurrency)}',
+          style: style);
+    }
+    final sats = _resolveSats();
+    if (sats == null) {
+      final rate = rates?[currency];
+      if (rate == null) return Text(l10n.receiveRatesUnavailable, style: style);
+      return const SizedBox.shrink();
+    }
+    return Text(l10n.receiveSatsApprox(formatThousands(sats)), style: style);
+  }
+
   Widget _buildAmountForm(AppLocalizations l10n, LnurlInfo i) {
     final desc = switch (i) {
       LnurlPayInfo(:final description) => description,
@@ -365,28 +413,74 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
               ),
               recipientName: widget.fromContact!.name,
             ),
-          if (desc.isNotEmpty) ...[Text(desc), const SizedBox(height: 12)],
+          // Remote LNURL text/plain metadata ("Payment to xxx"). Hidden when
+          // paying a saved contact — the avatar row above already shows the
+          // contact's name as the user saved it, and this remote text is
+          // untranslatable and often lower-cased by the payee's server.
+          if (desc.isNotEmpty && widget.fromContact == null) ...[
+            Text(desc),
+            const SizedBox(height: 12),
+          ],
           Text(
             l10n.lnurlAmountRange(minSats, maxSats),
             style: const TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: amountCtrl,
-            keyboardType: TextInputType.number,
-            autocorrect: false,
-            enableSuggestions: false,
-            decoration: InputDecoration(labelText: l10n.commonAmount),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: _FiatPreview(
-              sats: int.tryParse(amountCtrl.text.trim()) ?? 0,
-              rates: rates,
-              currency: displayCurrency,
-              loading: ratesLoading,
+          if (i is LnurlPayInfo) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: amountCtrl,
+                    keyboardType: currency == 'sats'
+                        ? TextInputType.number
+                        : const TextInputType.numberWithOptions(decimal: true),
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    decoration: InputDecoration(labelText: l10n.commonAmount),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                DropdownButton<String>(
+                  value: currency,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'sats',
+                      child: Text(l10n.receiveCurrencySats),
+                    ),
+                    for (final c in supportedCurrencies)
+                      DropdownMenuItem(value: c, child: Text(c)),
+                  ],
+                  onChanged: (next) {
+                    if (next == null) return;
+                    setState(() => currency = next);
+                  },
+                ),
+              ],
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: _buildPayPreview(l10n),
+            ),
+          ] else ...[
+            TextField(
+              controller: amountCtrl,
+              keyboardType: TextInputType.number,
+              autocorrect: false,
+              enableSuggestions: false,
+              decoration: InputDecoration(labelText: l10n.commonAmount),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: _FiatPreview(
+                sats: int.tryParse(amountCtrl.text.trim()) ?? 0,
+                rates: rates,
+                currency: displayCurrency,
+                loading: ratesLoading,
+              ),
+            ),
+          ],
           if (i is LnurlPayInfo && i.commentAllowed > 0) ...[
             const SizedBox(height: 12),
             TextField(
