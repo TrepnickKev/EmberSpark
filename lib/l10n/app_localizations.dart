@@ -572,6 +572,42 @@ abstract class AppLocalizations {
   /// **'Not a valid Lightning destination. Use a Lightning address (user@host.tld), BOLT11 invoice, BOLT12 offer/invoice (lno1…/lni1…), or LNURL.'**
   String get contactsInvalidDestination;
 
+  /// No description provided for @contactsImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import contacts'**
+  String get contactsImport;
+
+  /// No description provided for @contactsExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export contacts'**
+  String get contactsExport;
+
+  /// No description provided for @contactsExportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts to export'**
+  String get contactsExportEmpty;
+
+  /// No description provided for @contactsShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'EmberSpark contacts'**
+  String get contactsShareSubject;
+
+  /// No description provided for @contactsImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read that contacts file'**
+  String get contactsImportFailed;
+
+  /// Snackbar after a contacts import; count is how many new contacts were added.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count} contacts'**
+  String contactsImported(int count);
+
   /// No description provided for @historyTitle.
   ///
   /// In en, this message translates to:
@@ -769,6 +805,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Withdrawing {amount} sats…'**
   String lnurlWithdrawing(int amount);
+
+  /// Label for the LUD-12 comment field on the LNURL-pay screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Memo (optional)'**
+  String get lnurlCommentLabel;
+
+  /// Helper text under the LUD-12 comment field; shows the endpoint-advertised max length.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {max} characters'**
+  String lnurlCommentHelp(int max);
 
   /// No description provided for @settingsTitle.
   ///

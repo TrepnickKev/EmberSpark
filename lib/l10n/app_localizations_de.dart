@@ -260,6 +260,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine gültige Lightning-Adresse. Verwende eine Lightning-Adresse (user@host.tld), eine BOLT11-Rechnung, ein BOLT12-Angebot/-Rechnung (lno1…/lni1…) oder LNURL.';
 
   @override
+  String get contactsImport => 'Kontakte importieren';
+
+  @override
+  String get contactsExport => 'Kontakte exportieren';
+
+  @override
+  String get contactsExportEmpty => 'Keine Kontakte zum Exportieren';
+
+  @override
+  String get contactsShareSubject => 'EmberSpark-Kontakte';
+
+  @override
+  String get contactsImportFailed =>
+      'Diese Kontaktdatei konnte nicht gelesen werden';
+
+  @override
+  String contactsImported(int count) {
+    return '$count Kontakte importiert';
+  }
+
+  @override
   String get historyTitle => 'Verlauf';
 
   @override
@@ -382,6 +403,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String lnurlWithdrawing(int amount) {
     return '$amount Sats werden abgehoben …';
+  }
+
+  @override
+  String get lnurlCommentLabel => 'Notiz (optional)';
+
+  @override
+  String lnurlCommentHelp(int max) {
+    return 'Maximal $max Zeichen';
   }
 
   @override

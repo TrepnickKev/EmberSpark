@@ -159,7 +159,7 @@ class _PaymentTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        '${_formatTime(l10n, payment.time)}'
+        '${_formatTime(context, l10n, payment.time)}'
         '${payment.pending ? ' · ${l10n.historyPending}' : ''}',
         style: const TextStyle(fontSize: 12),
       ),
@@ -185,14 +185,11 @@ class _PaymentTile extends StatelessWidget {
   }
 }
 
-String _formatTime(AppLocalizations l10n, DateTime t) {
+String _formatTime(BuildContext context, AppLocalizations l10n, DateTime t) {
   final diff = DateTime.now().difference(t);
   if (diff.inSeconds < 60) return l10n.historyJustNow;
   if (diff.inMinutes < 60) return l10n.historyMinutesAgo(diff.inMinutes);
   if (diff.inHours < 24) return l10n.historyHoursAgo(diff.inHours);
   if (diff.inDays < 7) return l10n.historyDaysAgo(diff.inDays);
-  final y = t.year.toString().padLeft(4, '0');
-  final m = t.month.toString().padLeft(2, '0');
-  final d = t.day.toString().padLeft(2, '0');
-  return '$y-$m-$d';
+  return MaterialLocalizations.of(context).formatCompactDate(t);
 }

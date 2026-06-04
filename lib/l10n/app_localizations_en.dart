@@ -258,6 +258,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not a valid Lightning destination. Use a Lightning address (user@host.tld), BOLT11 invoice, BOLT12 offer/invoice (lno1…/lni1…), or LNURL.';
 
   @override
+  String get contactsImport => 'Import contacts';
+
+  @override
+  String get contactsExport => 'Export contacts';
+
+  @override
+  String get contactsExportEmpty => 'No contacts to export';
+
+  @override
+  String get contactsShareSubject => 'EmberSpark contacts';
+
+  @override
+  String get contactsImportFailed => 'Couldn\'t read that contacts file';
+
+  @override
+  String contactsImported(int count) {
+    return 'Imported $count contacts';
+  }
+
+  @override
   String get historyTitle => 'History';
 
   @override
@@ -380,6 +400,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String lnurlWithdrawing(int amount) {
     return 'Withdrawing $amount sats…';
+  }
+
+  @override
+  String get lnurlCommentLabel => 'Memo (optional)';
+
+  @override
+  String lnurlCommentHelp(int max) {
+    return 'Max $max characters';
   }
 
   @override
