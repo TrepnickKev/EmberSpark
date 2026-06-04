@@ -7,6 +7,7 @@ import '../services/friendly_error.dart';
 import '../services/wallet_backend.dart';
 import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
+import '../services/payment_feedback.dart';
 import '../services/price_service.dart';
 import '../widgets/payment_route_header.dart';
 import 'send_screen.dart';
@@ -216,10 +217,8 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       );
       await submitWithdrawInvoice(i, bolt11);
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.lnurlWithdrawing(sats))));
-      Navigator.pop(context);
+      signalPaymentSuccess();
+      Navigator.popUntil(context, (r) => r.isFirst);
     } catch (e) {
       if (!mounted) return;
       setState(() {
