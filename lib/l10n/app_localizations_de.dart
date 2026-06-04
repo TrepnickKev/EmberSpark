@@ -586,6 +586,23 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get lnurlAuthErrorKeyInUse =>
+      'Dieser Authentifizierungsschlüssel wird bereits für diese Seite verwendet. Warte einen Moment und versuche es erneut oder lade den Login-QR neu.';
+
+  @override
+  String get lnurlAuthErrorInvalidSignature =>
+      'Die Seite hat die Authentifizierungssignatur abgelehnt. Bitte erneut versuchen.';
+
+  @override
+  String get lnurlAuthErrorLinkingKeyMismatch =>
+      'Die Seite erkennt diesen Authentifizierungsschlüssel nicht. Das passiert meist, wenn du dich zuvor mit einem anderen Wallet-Seed authentifiziert hast.';
+
+  @override
+  String lnurlAuthErrorGeneric(String reason) {
+    return 'LNURL-Auth fehlgeschlagen: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12-Angebot bezahlen';
 
   @override

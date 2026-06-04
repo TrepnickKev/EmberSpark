@@ -1112,6 +1112,30 @@ abstract class AppLocalizations {
   /// **'Server error ({code}).'**
   String errorServerGeneric(String code);
 
+  /// No description provided for @lnurlAuthErrorKeyInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'This authentication key is already in use for this site. Wait a moment and try again, or reload the login QR.'**
+  String get lnurlAuthErrorKeyInUse;
+
+  /// No description provided for @lnurlAuthErrorInvalidSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'The site rejected the authentication signature. Please try again.'**
+  String get lnurlAuthErrorInvalidSignature;
+
+  /// No description provided for @lnurlAuthErrorLinkingKeyMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The site doesn\'t recognize this authentication key. This usually means you\'ve previously authenticated with a different wallet seed.'**
+  String get lnurlAuthErrorLinkingKeyMismatch;
+
+  /// No description provided for @lnurlAuthErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'LNURL-auth failed: {reason}'**
+  String lnurlAuthErrorGeneric(String reason);
+
   /// No description provided for @bolt12TitlePayOffer.
   ///
   /// In en, this message translates to:

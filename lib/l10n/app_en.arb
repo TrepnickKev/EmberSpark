@@ -211,6 +211,11 @@
   "errorLnurlInsecureCallback": "Your LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn't know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.",
   "errorServerGeneric": "Server error ({code}).",
   "@errorServerGeneric": { "placeholders": { "code": { "type": "String" } } },
+  "lnurlAuthErrorKeyInUse": "This authentication key is already in use for this site. Wait a moment and try again, or reload the login QR.",
+  "lnurlAuthErrorInvalidSignature": "The site rejected the authentication signature. Please try again.",
+  "lnurlAuthErrorLinkingKeyMismatch": "The site doesn't recognize this authentication key. This usually means you've previously authenticated with a different wallet seed.",
+  "lnurlAuthErrorGeneric": "LNURL-auth failed: {reason}",
+  "@lnurlAuthErrorGeneric": { "placeholders": { "reason": { "type": "String" } } },
 
   "bolt12TitlePayOffer": "Pay BOLT12 offer",
   "bolt12TitlePayInvoice": "Pay BOLT12 invoice",

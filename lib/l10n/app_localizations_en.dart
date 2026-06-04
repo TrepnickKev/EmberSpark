@@ -581,6 +581,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get lnurlAuthErrorKeyInUse =>
+      'This authentication key is already in use for this site. Wait a moment and try again, or reload the login QR.';
+
+  @override
+  String get lnurlAuthErrorInvalidSignature =>
+      'The site rejected the authentication signature. Please try again.';
+
+  @override
+  String get lnurlAuthErrorLinkingKeyMismatch =>
+      'The site doesn\'t recognize this authentication key. This usually means you\'ve previously authenticated with a different wallet seed.';
+
+  @override
+  String lnurlAuthErrorGeneric(String reason) {
+    return 'LNURL-auth failed: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'Pay BOLT12 offer';
 
   @override

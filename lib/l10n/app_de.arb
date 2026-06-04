@@ -183,6 +183,10 @@
   "errorInsufficientFunds": "Nicht genug Sats in deiner Wallet für diese Zahlung.",
   "errorLnurlInsecureCallback": "Dein LNbits-Server hat eine unsichere (http://) Callback-URL zurückgegeben. Wahrscheinlich steht LNbits hinter einem Reverse Proxy und kennt seine öffentliche HTTPS-Adresse nicht. Setze auf dem LNbits-Server LNBITS_BASE_URL=https://dein-host in der .env und starte ihn neu. Alternativ konfiguriere den Proxy so, dass X-Forwarded-Proto: https weitergereicht wird.",
   "errorServerGeneric": "Serverfehler ({code}).",
+  "lnurlAuthErrorKeyInUse": "Dieser Authentifizierungsschlüssel wird bereits für diese Seite verwendet. Warte einen Moment und versuche es erneut oder lade den Login-QR neu.",
+  "lnurlAuthErrorInvalidSignature": "Die Seite hat die Authentifizierungssignatur abgelehnt. Bitte erneut versuchen.",
+  "lnurlAuthErrorLinkingKeyMismatch": "Die Seite erkennt diesen Authentifizierungsschlüssel nicht. Das passiert meist, wenn du dich zuvor mit einem anderen Wallet-Seed authentifiziert hast.",
+  "lnurlAuthErrorGeneric": "LNURL-Auth fehlgeschlagen: {reason}",
 
   "bolt12TitlePayOffer": "BOLT12-Angebot bezahlen",
   "bolt12TitlePayInvoice": "BOLT12-Rechnung bezahlen",

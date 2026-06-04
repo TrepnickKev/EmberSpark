@@ -57,6 +57,29 @@ String friendlyError(AppLocalizations l10n, Object e) {
     return l10n.errorLnurlInsecureCallback;
   }
 
+  // --- LNURL-auth ERROR responses (LUD-04) ------------------------------
+  //     lnurl_auth.dart wraps these as "Exception: LNURL-auth error: <reason>"
+  //     where <reason> is the server's English text from
+  //     {"status":"ERROR","reason":"..."}. Map known reasons to translated
+  //     strings; fall back to a translated prefix + the raw reason.
+  if (s.contains('LNURL-auth error:')) {
+    if (lower.contains('already in use')) {
+      return l10n.lnurlAuthErrorKeyInUse;
+    }
+    if (lower.contains('invalid sig') || lower.contains('invalid signature')) {
+      return l10n.lnurlAuthErrorInvalidSignature;
+    }
+    if (lower.contains('linking key mismatch') ||
+        lower.contains('key mismatch')) {
+      return l10n.lnurlAuthErrorLinkingKeyMismatch;
+    }
+    final reason = s.replaceFirst(
+      RegExp(r'^Exception:\s*LNURL-auth error:\s*'),
+      '',
+    );
+    return l10n.lnurlAuthErrorGeneric(reason);
+  }
+
   // --- HTTP status codes (we wrap them like "LNbits 4xx: ..." or
   //     "Payment failed (4xx): ..." in the service layer) ------------------
   final code = RegExp(r'\b(401|403|404|5\d\d)\b').firstMatch(s);
