@@ -148,13 +148,18 @@ class _PaymentTile extends StatelessWidget {
     final fiatText = rate == null
         ? null
         : '$sign${formatFiat((abs / 100000000) * rate, fiatCurrency)}';
+    final memo = payment.memo;
+    final comment = payment.comment;
+    final titleText = comment.isEmpty
+        ? (memo.isEmpty ? l10n.historyPaymentDefault : memo)
+        : (memo.isEmpty ? comment : '$memo: $comment');
     return ListTile(
       leading: Icon(
         incoming ? Icons.arrow_downward : Icons.arrow_upward,
         color: color,
       ),
       title: Text(
-        payment.memo.isEmpty ? l10n.historyPaymentDefault : payment.memo,
+        titleText,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),

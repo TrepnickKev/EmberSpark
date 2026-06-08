@@ -275,6 +275,7 @@ class Payment {
   /// Sats. Always non-negative; only meaningful for outgoing payments.
   final int feeSats;
   final String memo;
+  final String comment;
   final DateTime time;
   final bool pending;
   final String paymentHash;
@@ -283,6 +284,7 @@ class Payment {
     required this.amountSats,
     required this.feeSats,
     required this.memo,
+    this.comment = '',
     required this.time,
     required this.pending,
     required this.paymentHash,
@@ -306,10 +308,22 @@ class Payment {
       time = DateTime.now();
     }
     final pending = j['pending'] == true || j['status'] == 'pending';
+    String comment = '';
+    final extra = j['extra'];
+    if (extra is Map) {
+      final c = extra['comment'];
+      if (c is String && c.isNotEmpty) {
+        comment = c;
+      } else {
+        final c2 = extra['extra'];
+        if (c2 is String && c2.isNotEmpty) comment = c2;
+      }
+    }
     return Payment(
       amountSats: amountMsat ~/ 1000,
       feeSats: feeMsat.abs() ~/ 1000,
       memo: (j['memo'] as String?) ?? '',
+      comment: comment,
       time: time,
       pending: pending,
       paymentHash: (j['payment_hash'] as String?) ?? '',
