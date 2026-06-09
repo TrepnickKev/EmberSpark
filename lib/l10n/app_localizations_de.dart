@@ -739,6 +739,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dein Profil-Avatar wird aus diesen Kennungen erzeugt. Der höchstpriorisierte gesetzte Wert dient als Seed. Änderst du ihn, ändert sich auch der Avatar.\n\nReihenfolge: Lightning-Adresse > BOLT12-Angebot > LNURL-Pay-Link > LNbits-Wallet-UUID > lokale ID.';
 
   @override
+  String get myContactTabLnAddress => 'LN-Adresse';
+
+  @override
+  String get myContactTabLnurlp => 'LNURL';
+
+  @override
+  String get myContactTabBolt12 => 'BOLT12';
+
+  @override
+  String get myContactLnAddressUse =>
+      'Einfach an Freunde und Familie weiterzugeben.';
+
+  @override
+  String get myContactLnurlpUse =>
+      'Weniger identifizierende Bech32-Zeichenkette, läuft aber über denselben Server.';
+
+  @override
+  String get myContactBolt12Use =>
+      'Beste Privatsphäre: Zahlungen laufen direkt über Lightning, ohne Domain-Betreiber dazwischen.';
+
+  @override
   String get walletsMenu => 'Wallets';
 
   @override

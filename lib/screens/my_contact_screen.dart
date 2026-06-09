@@ -25,7 +25,8 @@ class MyContactScreen extends StatefulWidget {
 
 enum _Kind { lnAddress, lnurlp, bolt12 }
 
-class _MyContactScreenState extends State<MyContactScreen> {
+class _MyContactScreenState extends State<MyContactScreen>
+    with SingleTickerProviderStateMixin {
   String? _lnAddress;
   String? _lnurlp;
   String? _bolt12;
@@ -39,10 +40,19 @@ class _MyContactScreenState extends State<MyContactScreen> {
     _Kind.bolt12: false,
   };
 
+  late final TabController _tabController =
+      TabController(length: 3, vsync: this);
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -232,11 +242,10 @@ class _MyContactScreenState extends State<MyContactScreen> {
         top: false,
         child: _loading
             ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                padding: const EdgeInsets.all(16),
+            : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -258,34 +267,65 @@ class _MyContactScreenState extends State<MyContactScreen> {
                       ],
                     ),
                   ),
-                  _section(
-                    l10n: l10n,
-                    kind: _Kind.lnAddress,
-                    title: l10n.myContactLnAddressSection,
-                    hint: l10n.myContactLnAddressHint,
-                    addLabel: l10n.myContactAddLnAddress,
-                    value: _lnAddress,
-                    canAutoGenerate: false,
+                  TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(text: l10n.myContactTabLnAddress),
+                      Tab(text: l10n.myContactTabLnurlp),
+                      Tab(text: l10n.myContactTabBolt12),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _section(
-                    l10n: l10n,
-                    kind: _Kind.lnurlp,
-                    title: l10n.myContactLnurlpSection,
-                    hint: l10n.myContactLnurlpHint,
-                    addLabel: l10n.myContactAddLnurlp,
-                    value: _lnurlp,
-                    canAutoGenerate: true,
-                  ),
-                  const SizedBox(height: 16),
-                  _section(
-                    l10n: l10n,
-                    kind: _Kind.bolt12,
-                    title: l10n.myContactBolt12Section,
-                    hint: l10n.myContactBolt12Hint,
-                    addLabel: l10n.myContactAddBolt12,
-                    value: _bolt12,
-                    canAutoGenerate: true,
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            _section(
+                              l10n: l10n,
+                              kind: _Kind.lnAddress,
+                              title: l10n.myContactLnAddressSection,
+                              useHint: l10n.myContactLnAddressUse,
+                              hint: l10n.myContactLnAddressHint,
+                              addLabel: l10n.myContactAddLnAddress,
+                              value: _lnAddress,
+                              canAutoGenerate: false,
+                            ),
+                          ],
+                        ),
+                        ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            _section(
+                              l10n: l10n,
+                              kind: _Kind.lnurlp,
+                              title: l10n.myContactLnurlpSection,
+                              useHint: l10n.myContactLnurlpUse,
+                              hint: l10n.myContactLnurlpHint,
+                              addLabel: l10n.myContactAddLnurlp,
+                              value: _lnurlp,
+                              canAutoGenerate: true,
+                            ),
+                          ],
+                        ),
+                        ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            _section(
+                              l10n: l10n,
+                              kind: _Kind.bolt12,
+                              title: l10n.myContactBolt12Section,
+                              useHint: l10n.myContactBolt12Use,
+                              hint: l10n.myContactBolt12Hint,
+                              addLabel: l10n.myContactAddBolt12,
+                              value: _bolt12,
+                              canAutoGenerate: true,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -297,6 +337,7 @@ class _MyContactScreenState extends State<MyContactScreen> {
     required AppLocalizations l10n,
     required _Kind kind,
     required String title,
+    required String useHint,
     required String hint,
     required String addLabel,
     required String? value,
@@ -333,6 +374,12 @@ class _MyContactScreenState extends State<MyContactScreen> {
                 ],
               ],
             ),
+            const SizedBox(height: 4),
+            Text(
+              useHint,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
             if (value == null) ...[
               const SizedBox(height: 6),
               Text(
@@ -344,7 +391,7 @@ class _MyContactScreenState extends State<MyContactScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: ElevatedButton.icon(
                         icon: const Icon(Icons.add, size: 18),
                         label: Text(addLabel),
                         onPressed: isGenerating ? null : () => _edit(kind),

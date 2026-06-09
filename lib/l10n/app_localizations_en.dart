@@ -734,6 +734,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.';
 
   @override
+  String get myContactTabLnAddress => 'LN Address';
+
+  @override
+  String get myContactTabLnurlp => 'LNURL';
+
+  @override
+  String get myContactTabBolt12 => 'BOLT12';
+
+  @override
+  String get myContactLnAddressUse => 'Easy to share with friends and family.';
+
+  @override
+  String get myContactLnurlpUse =>
+      'Less identifying bech32 string, but routes through the same server.';
+
+  @override
+  String get myContactBolt12Use =>
+      'Best privacy: payments go directly over Lightning, no domain operator in the middle.';
+
+  @override
   String get walletsMenu => 'Wallets';
 
   @override

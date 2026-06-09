@@ -1394,6 +1394,42 @@ abstract class AppLocalizations {
   /// **'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.'**
   String get myContactAvatarPriority;
 
+  /// No description provided for @myContactTabLnAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'LN Address'**
+  String get myContactTabLnAddress;
+
+  /// No description provided for @myContactTabLnurlp.
+  ///
+  /// In en, this message translates to:
+  /// **'LNURL'**
+  String get myContactTabLnurlp;
+
+  /// No description provided for @myContactTabBolt12.
+  ///
+  /// In en, this message translates to:
+  /// **'BOLT12'**
+  String get myContactTabBolt12;
+
+  /// No description provided for @myContactLnAddressUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy to share with friends and family.'**
+  String get myContactLnAddressUse;
+
+  /// No description provided for @myContactLnurlpUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Less identifying bech32 string, but routes through the same server.'**
+  String get myContactLnurlpUse;
+
+  /// No description provided for @myContactBolt12Use.
+  ///
+  /// In en, this message translates to:
+  /// **'Best privacy: payments go directly over Lightning, no domain operator in the middle.'**
+  String get myContactBolt12Use;
+
   /// No description provided for @walletsMenu.
   ///
   /// In en, this message translates to:

@@ -232,6 +232,12 @@
   "myContactLnurlpExtensionMissing": "Auf deinem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.",
   "myContactBolt12ExtensionMissing": "Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.",
   "myContactAvatarPriority": "Dein Profil-Avatar wird aus diesen Kennungen erzeugt. Der höchstpriorisierte gesetzte Wert dient als Seed. Änderst du ihn, ändert sich auch der Avatar.\n\nReihenfolge: Lightning-Adresse > BOLT12-Angebot > LNURL-Pay-Link > LNbits-Wallet-UUID > lokale ID.",
+  "myContactTabLnAddress": "LN-Adresse",
+  "myContactTabLnurlp": "LNURL",
+  "myContactTabBolt12": "BOLT12",
+  "myContactLnAddressUse": "Einfach an Freunde und Familie weiterzugeben.",
+  "myContactLnurlpUse": "Weniger identifizierende Bech32-Zeichenkette, läuft aber über denselben Server.",
+  "myContactBolt12Use": "Beste Privatsphäre: Zahlungen laufen direkt über Lightning, ohne Domain-Betreiber dazwischen.",
 
   "walletsMenu": "Wallets",
   "walletsTitle": "Wallets",

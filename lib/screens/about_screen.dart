@@ -244,7 +244,7 @@ class _AboutScreenState extends State<AboutScreen> {
               onTap: () => _donateLn(context),
               child: Row(
                 children: [
-                  const Icon(Icons.bolt, color: Colors.amber, size: 18),
+                  const Icon(Icons.bolt, color: bitcoinOrange, size: 18),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(

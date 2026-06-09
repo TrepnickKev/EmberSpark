@@ -85,6 +85,10 @@ class _MyAppState extends State<MyApp> {
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: bitcoinOrange),
             ),
+            tabBarTheme: const TabBarThemeData(
+              labelColor: Colors.white,
+              indicatorColor: Colors.white,
+            ),
           ),
           locale: locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
