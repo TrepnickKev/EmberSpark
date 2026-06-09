@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/wallet_backend.dart';
@@ -154,6 +157,13 @@ class _PaymentTile extends StatelessWidget {
         ? (memo.isEmpty ? l10n.historyPaymentDefault : memo)
         : (memo.isEmpty ? comment : '$memo: $comment');
     return ListTile(
+      onTap: () => _showPaymentDetails(
+        context,
+        l10n,
+        payment,
+        fiatCurrency,
+        fiatRate,
+      ),
       leading: Icon(
         incoming ? Icons.arrow_downward : Icons.arrow_upward,
         color: color,
@@ -197,4 +207,161 @@ String _formatTime(BuildContext context, AppLocalizations l10n, DateTime t) {
   if (diff.inHours < 24) return l10n.historyHoursAgo(diff.inHours);
   if (diff.inDays < 7) return l10n.historyDaysAgo(diff.inDays);
   return MaterialLocalizations.of(context).formatCompactDate(t);
+}
+
+Future<void> _showPaymentDetails(
+  BuildContext context,
+  AppLocalizations l10n,
+  Payment p,
+  String fiatCurrency,
+  double? fiatRate,
+) {
+  final ml = MaterialLocalizations.of(context);
+  final use24h = MediaQuery.of(context).alwaysUse24HourFormat;
+  final dateLine = ml.formatFullDate(p.time);
+  final timeLine = ml.formatTimeOfDay(
+    TimeOfDay.fromDateTime(p.time),
+    alwaysUse24HourFormat: use24h,
+  );
+  final absSats = p.amountSats.abs();
+  final amountFiat = fiatRate == null
+      ? null
+      : formatFiat((absSats / 100000000) * fiatRate, fiatCurrency);
+  final feeFiat = (fiatRate == null || p.feeSats == 0)
+      ? null
+      : formatFiat((p.feeSats / 100000000) * fiatRate, fiatCurrency);
+  final showInvoice =
+      p.pending && p.incoming && p.bolt11.isNotEmpty;
+  return showDialog<void>(
+    context: context,
+    builder: (_) => Dialog(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+        child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.historyDetailsTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            _detailRow(l10n.historyTimestampLabel, '$dateLine · $timeLine'),
+            _detailRow(
+              p.incoming
+                  ? l10n.historyDirectionReceived
+                  : l10n.historyDirectionSent,
+              p.pending
+                  ? l10n.historyStatusPendingLabel
+                  : l10n.historyStatusPaid,
+            ),
+            _detailRow(
+              l10n.historyAmountLabel,
+              '${formatThousands(absSats)} ${l10n.homeSatsUnit}'
+              '${amountFiat == null ? '' : '  ·  $amountFiat'}',
+            ),
+            if (p.feeSats > 0)
+              _detailRow(
+                l10n.historyFeeLabel,
+                '${formatThousands(p.feeSats)} ${l10n.homeSatsUnit}'
+                '${feeFiat == null ? '' : '  ·  $feeFiat'}',
+              ),
+            if (p.memo.isNotEmpty)
+              _detailRow(l10n.historyMemoLabel, p.memo),
+            if (p.comment.isNotEmpty)
+              _detailRow(l10n.historyCommentLabel, p.comment),
+            if (p.paymentHash.isNotEmpty)
+              _detailRow(
+                l10n.historyPaymentHashLabel,
+                p.paymentHash,
+                monospace: true,
+              ),
+            if (showInvoice) ...[
+              const SizedBox(height: 12),
+              Text(
+                l10n.historyInvoiceLabel,
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 220,
+                    height: 220,
+                    child: QrImageView(
+                      data: p.bolt11,
+                      size: 220,
+                      backgroundColor: Colors.white,
+                      embeddedImage:
+                          const AssetImage('images/Logo_icon.png'),
+                      embeddedImageStyle: const QrEmbeddedImageStyle(
+                        size: Size(40, 40),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton.icon(
+                    icon: const Icon(Icons.copy),
+                    label: Text(l10n.commonCopy),
+                    onPressed: () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: p.bolt11),
+                      );
+                    },
+                  ),
+                  TextButton.icon(
+                    icon: const Icon(Icons.ios_share),
+                    label: Text(l10n.commonShare),
+                    onPressed: () => SharePlus.instance.share(
+                      ShareParams(text: p.bolt11),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.historyClose),
+              ),
+            ),
+          ],
+        ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _detailRow(String label, String value, {bool monospace = false}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(color: Colors.grey, fontSize: 11),
+        ),
+        const SizedBox(height: 2),
+        SelectableText(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: monospace ? 'monospace' : null,
+          ),
+        ),
+      ],
+    ),
+  );
 }

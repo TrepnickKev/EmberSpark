@@ -384,7 +384,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
         child: Text(
-          '≈ ${formatFiat(fiat, displayCurrency)}',
+          formatFiatApprox(fiat, displayCurrency),
           style: const TextStyle(color: Colors.grey, fontSize: 12),
         ),
       );

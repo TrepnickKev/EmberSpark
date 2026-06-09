@@ -301,6 +301,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get historyDetailsTitle => 'Transaction';
+
+  @override
+  String get historyDirectionSent => 'Sent';
+
+  @override
+  String get historyDirectionReceived => 'Received';
+
+  @override
+  String get historyStatusPaid => 'Paid';
+
+  @override
+  String get historyStatusPendingLabel => 'Pending';
+
+  @override
+  String get historyAmountLabel => 'Amount';
+
+  @override
+  String get historyFeeLabel => 'Fee';
+
+  @override
+  String get historyMemoLabel => 'Memo';
+
+  @override
+  String get historyCommentLabel => 'Comment';
+
+  @override
+  String get historyTimestampLabel => 'Time';
+
+  @override
+  String get historyPaymentHashLabel => 'Payment hash';
+
+  @override
+  String get historyInvoiceLabel => 'Invoice';
+
+  @override
+  String get historyClose => 'Close';
+
+  @override
   String get historyJustNow => 'just now';
 
   @override

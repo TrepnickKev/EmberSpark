@@ -304,6 +304,45 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get historyDetailsTitle => 'Zahlung';
+
+  @override
+  String get historyDirectionSent => 'Gesendet';
+
+  @override
+  String get historyDirectionReceived => 'Empfangen';
+
+  @override
+  String get historyStatusPaid => 'Bezahlt';
+
+  @override
+  String get historyStatusPendingLabel => 'Ausstehend';
+
+  @override
+  String get historyAmountLabel => 'Betrag';
+
+  @override
+  String get historyFeeLabel => 'Gebühr';
+
+  @override
+  String get historyMemoLabel => 'Notiz';
+
+  @override
+  String get historyCommentLabel => 'Kommentar';
+
+  @override
+  String get historyTimestampLabel => 'Zeit';
+
+  @override
+  String get historyPaymentHashLabel => 'Zahlungs-Hash';
+
+  @override
+  String get historyInvoiceLabel => 'Rechnung';
+
+  @override
+  String get historyClose => 'Schließen';
+
+  @override
   String get historyJustNow => 'gerade eben';
 
   @override

@@ -96,7 +96,20 @@ String formatThousands(int n) {
 }
 
 String formatFiat(double value, String currency) {
+  if (value > 0 && value < 0.01) {
+    return '< 0.01 $currency';
+  }
   final whole = value.floor();
   final cents = ((value - whole) * 100).round();
   return '${formatThousands(whole)}.${cents.toString().padLeft(2, '0')} $currency';
+}
+
+/// Like [formatFiat] but prepends the approximation marker "≈ " unless
+/// the value is below one cent. Sub-cent values render as "<0.01 EUR";
+/// the "<" already conveys imprecision so the "≈ " is suppressed.
+String formatFiatApprox(double value, String currency) {
+  if (value > 0 && value < 0.01) {
+    return '< 0.01 $currency';
+  }
+  return '≈ ${formatFiat(value, currency)}';
 }

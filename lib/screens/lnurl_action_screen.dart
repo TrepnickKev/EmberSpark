@@ -367,7 +367,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       if (sats <= 0) return const SizedBox.shrink();
       final rate = rates?[displayCurrency];
       if (rate == null) return Text(l10n.receiveRatesUnavailable, style: style);
-      return Text('≈ ${formatFiat(sats / 1e8 * rate, displayCurrency)}',
+      return Text(formatFiatApprox(sats / 1e8 * rate, displayCurrency),
           style: style);
     }
     final sats = _resolveSats();
@@ -555,7 +555,7 @@ class _FiatPreview extends StatelessWidget {
     }
     final fiat = sats / 1e8 * rate;
     return Text(
-      '≈ ${formatFiat(fiat, currency)}',
+      formatFiatApprox(fiat, currency),
       style: const TextStyle(color: Colors.grey),
     );
   }

@@ -276,6 +276,7 @@ class Payment {
   final int feeSats;
   final String memo;
   final String comment;
+  final String bolt11;
   final DateTime time;
   final bool pending;
   final String paymentHash;
@@ -285,6 +286,7 @@ class Payment {
     required this.feeSats,
     required this.memo,
     this.comment = '',
+    this.bolt11 = '',
     required this.time,
     required this.pending,
     required this.paymentHash,
@@ -319,11 +321,15 @@ class Payment {
         if (c2 is String && c2.isNotEmpty) comment = c2;
       }
     }
+    final bolt11 = (j['bolt11'] as String?) ??
+        (j['payment_request'] as String?) ??
+        '';
     return Payment(
       amountSats: amountMsat ~/ 1000,
       feeSats: feeMsat.abs() ~/ 1000,
       memo: (j['memo'] as String?) ?? '',
       comment: comment,
+      bolt11: bolt11,
       time: time,
       pending: pending,
       paymentHash: (j['payment_hash'] as String?) ?? '',

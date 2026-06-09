@@ -650,6 +650,84 @@ abstract class AppLocalizations {
   /// **'fee {amount}'**
   String historyFee(String amount);
 
+  /// No description provided for @historyDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction'**
+  String get historyDetailsTitle;
+
+  /// No description provided for @historyDirectionSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get historyDirectionSent;
+
+  /// No description provided for @historyDirectionReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get historyDirectionReceived;
+
+  /// No description provided for @historyStatusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get historyStatusPaid;
+
+  /// No description provided for @historyStatusPendingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get historyStatusPendingLabel;
+
+  /// No description provided for @historyAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get historyAmountLabel;
+
+  /// No description provided for @historyFeeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fee'**
+  String get historyFeeLabel;
+
+  /// No description provided for @historyMemoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Memo'**
+  String get historyMemoLabel;
+
+  /// No description provided for @historyCommentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get historyCommentLabel;
+
+  /// No description provided for @historyTimestampLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get historyTimestampLabel;
+
+  /// No description provided for @historyPaymentHashLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment hash'**
+  String get historyPaymentHashLabel;
+
+  /// No description provided for @historyInvoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get historyInvoiceLabel;
+
+  /// No description provided for @historyClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get historyClose;
+
   /// No description provided for @historyJustNow.
   ///
   /// In en, this message translates to:
