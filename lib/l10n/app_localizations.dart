@@ -458,6 +458,18 @@ abstract class AppLocalizations {
   /// **'No contacts yet'**
   String get sendToNoContacts;
 
+  /// No description provided for @contactsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter contacts'**
+  String get contactsSearchHint;
+
+  /// No description provided for @contactsNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching contacts'**
+  String get contactsNoMatches;
+
   /// No description provided for @receiveTitle.
   ///
   /// In en, this message translates to:

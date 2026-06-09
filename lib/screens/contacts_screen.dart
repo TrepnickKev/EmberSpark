@@ -21,17 +21,35 @@ class ContactsScreen extends StatefulWidget {
 
 class _ContactsScreenState extends State<ContactsScreen> {
   List<Contact>? contacts;
+  final searchCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    searchCtrl.addListener(() => setState(() {}));
     _load();
+  }
+
+  @override
+  void dispose() {
+    searchCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
     final list = await getContacts();
     if (!mounted) return;
     setState(() => contacts = list);
+  }
+
+  List<Contact> _filteredContacts(List<Contact> all) {
+    final q = searchCtrl.text.trim().toLowerCase();
+    if (q.isEmpty) return all;
+    return all
+        .where((c) =>
+            c.name.toLowerCase().contains(q) ||
+            c.destination.toLowerCase().contains(q))
+        .toList();
   }
 
   Future<void> _add() async {
@@ -156,42 +174,80 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     style: const TextStyle(color: Colors.grey),
                   ),
                 )
-              : ListView.separated(
-                  itemCount: list.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (_, i) {
-                    final c = list[i];
-                    return ListTile(
-                      leading: contactAvatar(c.destination),
-                      title: Row(
-                        children: [
-                          Flexible(child: Text(c.name)),
-                          contactTypeBadge(c.destination),
-                        ],
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: TextField(
+                        controller: searchCtrl,
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        decoration: InputDecoration(
+                          labelText: l10n.contactsSearchHint,
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: searchCtrl.text.isEmpty
+                              ? null
+                              : IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () => searchCtrl.clear(),
+                                ),
+                        ),
                       ),
-                      subtitle: Text(
-                        c.destination,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            tooltip: l10n.commonEdit,
-                            icon: const Icon(Icons.edit_outlined),
-                            onPressed: () => _edit(i, c),
-                          ),
-                          IconButton(
-                            tooltip: l10n.commonDelete,
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () => _confirmDelete(i, c.name),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                    ),
+                    Expanded(
+                      child: Builder(builder: (_) {
+                        final visible = _filteredContacts(list);
+                        if (visible.isEmpty) {
+                          return Center(
+                            child: Text(
+                              l10n.contactsNoMatches,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          );
+                        }
+                        return ListView.separated(
+                          itemCount: visible.length,
+                          separatorBuilder: (_, __) =>
+                              const Divider(height: 1),
+                          itemBuilder: (_, vi) {
+                            final c = visible[vi];
+                            final i = list.indexOf(c);
+                            return ListTile(
+                              onTap: () => _edit(i, c),
+                              leading: contactAvatar(c.destination),
+                              title: Row(
+                                children: [
+                                  Flexible(child: Text(c.name)),
+                                  contactTypeBadge(c.destination),
+                                ],
+                              ),
+                              subtitle: Text(
+                                c.destination,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    tooltip: l10n.commonEdit,
+                                    icon: const Icon(Icons.edit_outlined),
+                                    onPressed: () => _edit(i, c),
+                                  ),
+                                  IconButton(
+                                    tooltip: l10n.commonDelete,
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed: () => _confirmDelete(i, c.name),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                    ),
+                  ],
                 ),
     );
   }
@@ -234,15 +290,15 @@ Widget contactTypeBadge(String destination) {
 /// destination. Matches the contact's own Home bubble when the same
 /// destination is their primary identity, giving "same person, same
 /// avatar everywhere" recognisability.
-Widget contactAvatar(String destination) {
+Widget contactAvatar(String destination, {double size = 40}) {
   final seed = normalizeDestination(destination);
   return SizedBox(
-    width: 40,
-    height: 40,
+    width: size,
+    height: size,
     child: RandomAvatar(
       seed.isEmpty ? '?' : seed,
-      height: 40,
-      width: 40,
+      height: size,
+      width: size,
     ),
   );
 }
@@ -268,6 +324,7 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
     super.initState();
     nameCtrl = TextEditingController(text: widget.initial?.name ?? '');
     destCtrl = TextEditingController(text: widget.initial?.destination ?? '');
+    destCtrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -308,50 +365,77 @@ class _ContactFormDialogState extends State<_ContactFormDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(widget.initial == null ? l10n.contactsNew : l10n.contactsEdit),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(labelText: l10n.contactsName),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: destCtrl,
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: InputDecoration(
-                labelText: l10n.contactsDestinationLabel,
-                suffixIcon: IconButton(
-                  tooltip: l10n.commonScanQr,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  onPressed: _scan,
-                ),
+    return Dialog(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 64, 24, 16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Text(
+                      widget.initial == null
+                          ? l10n.contactsNew
+                          : l10n.contactsEdit,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: InputDecoration(labelText: l10n.contactsName),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: destCtrl,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    decoration: InputDecoration(
+                      labelText: l10n.contactsDestinationLabel,
+                      suffixIcon: IconButton(
+                        tooltip: l10n.commonScanQr,
+                        icon: const Icon(Icons.qr_code_scanner),
+                        onPressed: _scan,
+                      ),
+                    ),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      error!,
+                      style: const TextStyle(color: Colors.redAccent),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(l10n.commonCancel),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: _save,
+                        child: Text(l10n.commonSave),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            if (error != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                error!,
-                style: const TextStyle(color: Colors.redAccent),
-              ),
-            ],
-          ],
-        ),
+          ),
+          Positioned(
+            top: -44,
+            child: contactAvatar(destCtrl.text, size: 88),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.commonCancel),
-        ),
-        ElevatedButton(
-          onPressed: _save,
-          child: Text(l10n.commonSave),
-        ),
-      ],
     );
   }
 }

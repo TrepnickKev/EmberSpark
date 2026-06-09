@@ -69,6 +69,8 @@
   "sendToScanTitle": "Scan to send",
   "sendToContacts": "Contacts",
   "sendToNoContacts": "No contacts yet",
+  "contactsSearchHint": "Filter contacts",
+  "contactsNoMatches": "No matching contacts",
 
   "receiveTitle": "Receive",
   "receiveAmount": "Amount",

@@ -24,6 +24,7 @@ class _SendToScreenState extends State<SendToScreen> {
   @override
   void initState() {
     super.initState();
+    inputCtrl.addListener(() => setState(() {}));
     _loadContacts();
   }
 
@@ -37,6 +38,17 @@ class _SendToScreenState extends State<SendToScreen> {
     final list = await getContacts();
     if (!mounted) return;
     setState(() => contacts = list);
+  }
+
+  List<Contact> _filteredContacts() {
+    final all = contacts ?? const <Contact>[];
+    final q = inputCtrl.text.trim().toLowerCase();
+    if (q.isEmpty) return all;
+    return all
+        .where((c) =>
+            c.name.toLowerCase().contains(q) ||
+            c.destination.toLowerCase().contains(q))
+        .toList();
   }
 
   Future<void> _continue() async {
@@ -233,38 +245,53 @@ class _SendToScreenState extends State<SendToScreen> {
               ),
               const Divider(height: 16),
               Expanded(
-                child: list == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : list.isEmpty
-                    ? Center(
+                child: Builder(
+                  builder: (_) {
+                    if (list == null) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (list.isEmpty) {
+                      return Center(
                         child: Text(
                           l10n.sendToNoContacts,
                           style: const TextStyle(color: Colors.grey),
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: list.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (_, i) {
-                          final c = list[i];
-                          return ListTile(
-                            leading: contactAvatar(c.destination),
-                            title: Row(
-                              children: [
-                                Flexible(child: Text(c.name)),
-                                contactTypeBadge(c.destination),
-                              ],
-                            ),
-                            subtitle: Text(
-                              c.destination,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            onTap: () => _useContact(c),
-                          );
-                        },
-                      ),
+                      );
+                    }
+                    final visible = _filteredContacts();
+                    if (visible.isEmpty) {
+                      return Center(
+                        child: Text(
+                          l10n.contactsNoMatches,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      itemCount: visible.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final c = visible[i];
+                        return ListTile(
+                          leading: contactAvatar(c.destination),
+                          title: Row(
+                            children: [
+                              Flexible(child: Text(c.name)),
+                              contactTypeBadge(c.destination),
+                            ],
+                          ),
+                          subtitle: Text(
+                            c.destination,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          onTap: () => _useContact(c),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

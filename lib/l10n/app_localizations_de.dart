@@ -197,6 +197,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sendToNoContacts => 'Noch keine Kontakte';
 
   @override
+  String get contactsSearchHint => 'Kontakte filtern';
+
+  @override
+  String get contactsNoMatches => 'Keine passenden Kontakte';
+
+  @override
   String get receiveTitle => 'Empfangen';
 
   @override
