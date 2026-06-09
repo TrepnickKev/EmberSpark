@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/lightning_router.dart';
 import '../services/update_service.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 
@@ -10,6 +11,8 @@ class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
   static const _btcAddress = 'bc1qcvm7vc3cqt3dazjj9pqvxdg0pxuxf3jtdaf5la';
+  static const _lnDonation =
+      'LNURL1DP68GURN8GHJ7MRWVF5HGUEWW3EX2URWD93KKTNYV5HKCMN4WFK8QTE08969GKTSW5QK9MSC';
 
   @override
   State<AboutScreen> createState() => _AboutScreenState();
@@ -55,6 +58,19 @@ class _AboutScreenState extends State<AboutScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(l10n.aboutAddressCopied)));
+  }
+
+  Future<void> _copyLn(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    await Clipboard.setData(const ClipboardData(text: AboutScreen._lnDonation));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.aboutAddressCopied)));
+  }
+
+  Future<void> _donateLn(BuildContext context) async {
+    await routeLightningCode(Navigator.of(context), AboutScreen._lnDonation);
   }
 
   @override
@@ -219,6 +235,34 @@ class _AboutScreenState extends State<AboutScreen> {
             const SizedBox(height: 8),
             Text(l10n.aboutSupportBody),
             const SizedBox(height: 16),
+            Text(
+              l10n.aboutDonateMethods,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => _donateLn(context),
+              child: Row(
+                children: [
+                  const Icon(Icons.bolt, color: Colors.amber, size: 18),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      AboutScreen._lnDonation,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.copy),
+                    tooltip: l10n.aboutCopyAddress,
+                    onPressed: () => _copyLn(context),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 const Icon(

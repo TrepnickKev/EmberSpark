@@ -189,7 +189,7 @@
   "settingsAbout": "About",
 
   "aboutTitle": "About",
-  "aboutTagline": "A small Lightning wallet for LNbits",
+  "aboutTagline": "A lightweight Lightning wallet for LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
   "aboutVersionLabel": "Version",
   "aboutCheckAgain": "Check again",
@@ -201,6 +201,7 @@
   "aboutCheckFailed": "Couldn't check for updates",
   "aboutSupportDevelopment": "Support development",
   "aboutSupportBody": "EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below. Every bit keeps the project alive. Thank you! Reporting bugs or feature requests on GitHub is just as welcome.",
+  "aboutDonateMethods": "Donate via Lightning / On-Chain",
   "aboutContributeOnGithub": "Contribute on GitHub",
   "aboutCopyAddress": "Copy address",
   "aboutAddressCopied": "Address copied",

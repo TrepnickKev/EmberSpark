@@ -543,7 +543,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutSupportBody =>
-      'EmberSpark wird in der Freizeit gebaut und gepflegt. Wenn dir die App hilft, deine Sats besser zu verwalten, kannst du gerne ein paar On-Chain-BTC an die Adresse unten schicken. Jedes bisschen hält das Projekt am Leben. Danke! Bug-Reports oder Feature-Wünsche auf GitHub sind genauso willkommen.';
+      'EmberSpark wird in der Freizeit entwickelt und gepflegt. Wenn dir die App hilft, deine Sats besser zu verwalten, kannst du gerne ein paar On-Chain-BTC an die Adresse unten schicken. Jedes bisschen hält das Projekt am Leben. Danke! Bug-Reports oder Feature-Wünsche auf GitHub sind genauso willkommen.';
+
+  @override
+  String get aboutDonateMethods => 'Spenden via Lightning / On-Chain';
 
   @override
   String get aboutContributeOnGithub => 'Auf GitHub mitwirken';

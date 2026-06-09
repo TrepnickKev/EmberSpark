@@ -1001,7 +1001,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTagline.
   ///
   /// In en, this message translates to:
-  /// **'A small Lightning wallet for LNbits'**
+  /// **'A lightweight Lightning wallet for LNbits'**
   String get aboutTagline;
 
   /// No description provided for @aboutCopyright.
@@ -1063,6 +1063,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below. Every bit keeps the project alive. Thank you! Reporting bugs or feature requests on GitHub is just as welcome.'**
   String get aboutSupportBody;
+
+  /// No description provided for @aboutDonateMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate via Lightning / On-Chain'**
+  String get aboutDonateMethods;
 
   /// No description provided for @aboutContributeOnGithub.
   ///

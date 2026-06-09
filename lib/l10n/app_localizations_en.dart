@@ -506,7 +506,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About';
 
   @override
-  String get aboutTagline => 'A small Lightning wallet for LNbits';
+  String get aboutTagline => 'A lightweight Lightning wallet for LNbits';
 
   @override
   String get aboutCopyright => '© 2026 Trepnick Solutions';
@@ -540,6 +540,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutSupportBody =>
       'EmberSpark is built and maintained in spare time. If it makes your sats easier to manage, consider tossing a few on-chain BTC at the address below. Every bit keeps the project alive. Thank you! Reporting bugs or feature requests on GitHub is just as welcome.';
+
+  @override
+  String get aboutDonateMethods => 'Donate via Lightning / On-Chain';
 
   @override
   String get aboutContributeOnGithub => 'Contribute on GitHub';
