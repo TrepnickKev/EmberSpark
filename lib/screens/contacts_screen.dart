@@ -292,11 +292,25 @@ Widget contactTypeBadge(String destination) {
 /// avatar everywhere" recognisability.
 Widget contactAvatar(String destination, {double size = 40}) {
   final seed = normalizeDestination(destination);
+  if (seed.isEmpty) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CircleAvatar(
+        backgroundColor: Colors.grey.shade800,
+        child: Icon(
+          Icons.person_outline,
+          color: Colors.grey.shade400,
+          size: size * 0.6,
+        ),
+      ),
+    );
+  }
   return SizedBox(
     width: size,
     height: size,
     child: RandomAvatar(
-      seed.isEmpty ? '?' : seed,
+      seed,
       height: size,
       width: size,
     ),

@@ -9,6 +9,7 @@ import '../services/lnbits_service.dart';
 import '../services/my_contact_service.dart';
 import '../services/nfc_service.dart';
 import '../widgets/stacked_action_button.dart';
+import 'contacts_screen.dart' show contactAvatar;
 
 /// Stores and presents the user's *own* static Lightning destinations
 /// (Lightning address, LNURL-pay link, BOLT12 offer) for sharing with
@@ -448,6 +449,7 @@ class _EditDialogState extends State<_EditDialog> {
   void initState() {
     super.initState();
     ctrl = TextEditingController(text: widget.initialValue ?? '');
+    ctrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -506,6 +508,72 @@ class _EditDialogState extends State<_EditDialog> {
       _Kind.bolt12 => 'lno1…',
     };
     final isSingleLine = widget.kind == _Kind.lnAddress;
+    if (isSingleLine) {
+      return Dialog(
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.topCenter,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 64, 24, 16),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      hint,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: ctrl,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      maxLines: 1,
+                      decoration: InputDecoration(hintText: hintText),
+                    ),
+                    if (error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        error!,
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, null),
+                          child: Text(l10n.commonCancel),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: _save,
+                          child: Text(l10n.commonSave),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: -44,
+              child: contactAvatar(ctrl.text, size: 88),
+            ),
+          ],
+        ),
+      );
+    }
     return AlertDialog(
       title: Text(title),
       content: SingleChildScrollView(
@@ -522,7 +590,7 @@ class _EditDialogState extends State<_EditDialog> {
               controller: ctrl,
               autocorrect: false,
               enableSuggestions: false,
-              maxLines: isSingleLine ? 1 : 4,
+              maxLines: 4,
               decoration: InputDecoration(hintText: hintText),
             ),
             if (error != null) ...[
