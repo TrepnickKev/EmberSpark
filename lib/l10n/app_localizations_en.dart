@@ -731,7 +731,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myContactAvatarPriority =>
-      'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.';
+      'Your profile avatar is generated from one of these identifiers. Tap a star to choose which one. Otherwise it uses Lightning address, then BOLT12, then LNURL.';
+
+  @override
+  String get myContactSetDefault => 'Set as default identity';
+
+  @override
+  String get myContactUnsetDefault => 'Remove as default identity';
 
   @override
   String get myContactTabLnAddress => 'LN Address';

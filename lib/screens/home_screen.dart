@@ -38,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   double? fiatRate;
   WalletAccount? currentWallet;
   String? avatarSeed;
+  MyContactKind? _defaultContactKind;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -143,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         getMyLightningAddress(),
         getMyBolt12Offer(),
         getMyLnurlpLink(),
+        getMyDefaultContactKind(),
       ]);
       if (!mounted) return;
       final b = results[0] as int;
@@ -152,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final myLnAddress = results[4] as String?;
       final myBolt12 = results[5] as String?;
       final myLnurlp = results[6] as String?;
+      final defaultKind = results[7] as MyContactKind?;
 
       // Lazy-fetch the LNbits server-side wallet UUID on the first
       // successful load. Best-effort: any failure (404 on older servers,
@@ -174,6 +177,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         lnurlp: myLnurlp,
         serverWalletId: w?.serverWalletId,
         fallbackLocalId: w?.id ?? '',
+        defaultKind: defaultKind,
       );
 
       if (!mounted) return;
@@ -183,6 +187,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         fiatRate = rates?[cur];
         currentWallet = w;
         avatarSeed = seed.isEmpty ? null : seed;
+        _defaultContactKind = defaultKind;
       });
     } catch (e) {
       if (!mounted) return;
@@ -331,7 +336,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const MyContactScreen(),
+                        builder: (_) =>
+                            MyContactScreen(initialKind: _defaultContactKind),
                       ),
                     ).then((_) {
                       if (mounted) _load();

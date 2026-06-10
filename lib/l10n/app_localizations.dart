@@ -1391,8 +1391,20 @@ abstract class AppLocalizations {
   /// No description provided for @myContactAvatarPriority.
   ///
   /// In en, this message translates to:
-  /// **'Your profile avatar is generated from these identifiers. The highest-priority one that is set is used as the seed, so changing it also changes the avatar.\n\nPriority: Lightning address > BOLT12 offer > LNURL-pay link > LNbits wallet UUID > local id.'**
+  /// **'Your profile avatar is generated from one of these identifiers. Tap a star to choose which one. Otherwise it uses Lightning address, then BOLT12, then LNURL.'**
   String get myContactAvatarPriority;
+
+  /// Tooltip to pin this identifier as the default profile avatar / avatar-tap tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as default identity'**
+  String get myContactSetDefault;
+
+  /// Tooltip to clear the default identity, reverting to the priority order.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove as default identity'**
+  String get myContactUnsetDefault;
 
   /// No description provided for @myContactTabLnAddress.
   ///

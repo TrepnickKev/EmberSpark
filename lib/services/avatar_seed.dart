@@ -19,13 +19,28 @@ String normalizeDestination(String s) =>
 /// less-shared ones. Order: LN address > BOLT12 offer > LNURL-pay link >
 /// LNbits server-side wallet UUID > local random id. Matches what most
 /// contacts will save someone by, so the bubble matches their tile.
+///
+/// When [defaultKind] is set and its identifier is non-empty, the user has
+/// pinned a default identity and it overrides the priority order. If the
+/// pinned identifier is empty we fall through to the order as normal.
 String avatarSeedForWallet({
   String? lnAddress,
   String? bolt12,
   String? lnurlp,
   String? serverWalletId,
   required String fallbackLocalId,
+  MyContactKind? defaultKind,
 }) {
+  if (defaultKind != null) {
+    final chosen = switch (defaultKind) {
+      MyContactKind.lnAddress => lnAddress,
+      MyContactKind.lnurlp => lnurlp,
+      MyContactKind.bolt12 => bolt12,
+    };
+    if (chosen != null && chosen.trim().isNotEmpty) {
+      return normalizeDestination(chosen);
+    }
+  }
   for (final s in [lnAddress, bolt12, lnurlp, serverWalletId]) {
     if (s != null && s.trim().isNotEmpty) return normalizeDestination(s);
   }
@@ -43,6 +58,7 @@ Future<({String seed, String name})> getOwnAvatarInfo() async {
     getMyBolt12Offer(),
     getMyLnurlpLink(),
     getCurrentWallet(),
+    getMyDefaultContactKind(),
   ]);
   final w = results[3] as WalletAccount?;
   final seed = avatarSeedForWallet(
@@ -51,6 +67,7 @@ Future<({String seed, String name})> getOwnAvatarInfo() async {
     lnurlp: results[2] as String?,
     serverWalletId: w?.serverWalletId,
     fallbackLocalId: w?.id ?? '',
+    defaultKind: results[4] as MyContactKind?,
   );
   return (seed: seed, name: w?.label ?? '');
 }

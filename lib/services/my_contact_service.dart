@@ -1,6 +1,37 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'wallet_account_service.dart';
 
+/// One of the user's static public identities. Public (was the private
+/// `_Kind` in my_contact_screen.dart) so it can be shared by storage and
+/// navigation — see the default-identity preference below and
+/// `MyContactScreen.initialKind`.
+enum MyContactKind { lnAddress, lnurlp, bolt12 }
+
+extension MyContactKindX on MyContactKind {
+  /// Stable storage token — deliberately NOT `.name`, so reordering or
+  /// renaming the enum can't silently corrupt the persisted preference.
+  String get storageKey => switch (this) {
+    MyContactKind.lnAddress => 'lnAddress',
+    MyContactKind.lnurlp => 'lnurlp',
+    MyContactKind.bolt12 => 'bolt12',
+  };
+
+  /// Tab index in MyContactScreen's TabController. Must stay in sync with
+  /// the TabBar / TabBarView ordering (lnAddress, lnurlp, bolt12).
+  int get tabIndex => switch (this) {
+    MyContactKind.lnAddress => 0,
+    MyContactKind.lnurlp => 1,
+    MyContactKind.bolt12 => 2,
+  };
+}
+
+MyContactKind? _parseContactKind(String? s) => switch (s) {
+  'lnAddress' => MyContactKind.lnAddress,
+  'lnurlp' => MyContactKind.lnurlp,
+  'bolt12' => MyContactKind.bolt12,
+  _ => null,
+};
+
 /// Storage + validators for the active wallet's static destinations — a
 /// Lightning address, a BOLT12 offer, and/or an LNURL-pay link that the
 /// user can share with others. Each value is keyed by the active wallet's
@@ -46,6 +77,16 @@ Future<void> setMyBolt12Offer(String? value) =>
 Future<String?> getMyLnurlpLink() => _readScoped(myLnurlpLinkKey);
 Future<void> setMyLnurlpLink(String? value) =>
     _writeScoped(myLnurlpLinkKey, value);
+
+/// The identity the user pinned as their default — seeds the home avatar
+/// (overriding the fixed priority order in `avatarSeedForWallet`) and is the
+/// tab the home avatar jumps to. Null means "no default; use priority".
+Future<MyContactKind?> getMyDefaultContactKind() async =>
+    _parseContactKind(await _readScoped(myDefaultContactKindKey));
+
+/// Persists the default identity; pass null to clear it (back to priority).
+Future<void> setMyDefaultContactKind(MyContactKind? kind) =>
+    _writeScoped(myDefaultContactKindKey, kind?.storageKey);
 
 /// True for strings shaped like a Lightning address (`name@host.tld`):
 /// exactly one `@`, no whitespace, host contains a `.` and doesn't start

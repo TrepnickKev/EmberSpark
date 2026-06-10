@@ -17,35 +17,42 @@ import 'contacts_screen.dart' show contactAvatar;
 /// add/edit/remove dialog. The LNURL-pay and BOLT12 sections can also be
 /// auto-generated via the LNbits `lnurlp` / `bolt12` extensions.
 class MyContactScreen extends StatefulWidget {
-  const MyContactScreen({super.key});
+  const MyContactScreen({super.key, this.initialKind});
+
+  /// When set, the screen opens on this identity's tab (used by the home
+  /// avatar tap to jump straight to the pinned default identity).
+  final MyContactKind? initialKind;
 
   @override
   State<MyContactScreen> createState() => _MyContactScreenState();
 }
-
-enum _Kind { lnAddress, lnurlp, bolt12 }
 
 class _MyContactScreenState extends State<MyContactScreen>
     with SingleTickerProviderStateMixin {
   String? _lnAddress;
   String? _lnurlp;
   String? _bolt12;
+  MyContactKind? _defaultKind;
   bool _loading = true;
 
   // Per-section spinner flag while a server-side generation call is in
-  // flight. Keyed by _Kind so we can disable the right Auto-generate
+  // flight. Keyed by MyContactKind so we can disable the right Auto-generate
   // button without blocking the others.
-  final Map<_Kind, bool> _generating = {
-    _Kind.lnurlp: false,
-    _Kind.bolt12: false,
+  final Map<MyContactKind, bool> _generating = {
+    MyContactKind.lnurlp: false,
+    MyContactKind.bolt12: false,
   };
 
-  late final TabController _tabController =
-      TabController(length: 3, vsync: this);
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: 3,
+      initialIndex: widget.initialKind?.tabIndex ?? 0,
+      vsync: this,
+    );
     _load();
   }
 
@@ -61,33 +68,35 @@ class _MyContactScreenState extends State<MyContactScreen>
       getMyLnurlpLink(),
       getMyBolt12Offer(),
     ]);
+    final defaultKind = await getMyDefaultContactKind();
     if (!mounted) return;
     setState(() {
       _lnAddress = results[0];
       _lnurlp = results[1];
       _bolt12 = results[2];
+      _defaultKind = defaultKind;
       _loading = false;
     });
   }
 
-  String? _valueOf(_Kind kind) => switch (kind) {
-    _Kind.lnAddress => _lnAddress,
-    _Kind.lnurlp => _lnurlp,
-    _Kind.bolt12 => _bolt12,
+  String? _valueOf(MyContactKind kind) => switch (kind) {
+    MyContactKind.lnAddress => _lnAddress,
+    MyContactKind.lnurlp => _lnurlp,
+    MyContactKind.bolt12 => _bolt12,
   };
 
-  Future<void> _setValue(_Kind kind, String? value) async {
+  Future<void> _setValue(MyContactKind kind, String? value) async {
     switch (kind) {
-      case _Kind.lnAddress:
+      case MyContactKind.lnAddress:
         await setMyLightningAddress(value);
-      case _Kind.lnurlp:
+      case MyContactKind.lnurlp:
         await setMyLnurlpLink(value);
-      case _Kind.bolt12:
+      case MyContactKind.bolt12:
         await setMyBolt12Offer(value);
     }
   }
 
-  Future<void> _edit(_Kind kind) async {
+  Future<void> _edit(MyContactKind kind) async {
     final current = _valueOf(kind);
     final result = await showDialog<String?>(
       context: context,
@@ -98,13 +107,29 @@ class _MyContactScreenState extends State<MyContactScreen>
       // Empty sentinel from the dialog: user submitted with an empty field
       // while editing an existing value — treat as "remove".
       await _setValue(kind, null);
+      await _clearDefaultIfMatches(kind);
     } else {
       await _setValue(kind, result);
     }
     if (mounted) await _load();
   }
 
-  Future<void> _remove(_Kind kind) async {
+  /// Drops the stored default when the identity it points at is removed, so
+  /// it never dangles at an empty value (and the star UI stays accurate).
+  Future<void> _clearDefaultIfMatches(MyContactKind kind) async {
+    if (await getMyDefaultContactKind() == kind) {
+      await setMyDefaultContactKind(null);
+    }
+  }
+
+  Future<void> _toggleDefault(MyContactKind kind) async {
+    // Tapping the active default clears it (back to priority order);
+    // otherwise this kind becomes the single default.
+    await setMyDefaultContactKind(_defaultKind == kind ? null : kind);
+    if (mounted) await _load();
+  }
+
+  Future<void> _remove(MyContactKind kind) async {
     final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
@@ -124,16 +149,17 @@ class _MyContactScreenState extends State<MyContactScreen>
     );
     if (ok != true) return;
     await _setValue(kind, null);
+    await _clearDefaultIfMatches(kind);
     if (mounted) _load();
   }
 
-  Future<void> _generate(_Kind kind) async {
+  Future<void> _generate(MyContactKind kind) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _generating[kind] = true);
     try {
       final svc = await LNbitsService.fromStorage();
-      final value = kind == _Kind.lnurlp
+      final value = kind == MyContactKind.lnurlp
           ? await svc.createLnurlpLink()
           : await svc.createBolt12Offer();
       await _setValue(kind, value);
@@ -284,7 +310,7 @@ class _MyContactScreenState extends State<MyContactScreen>
                           children: [
                             _section(
                               l10n: l10n,
-                              kind: _Kind.lnAddress,
+                              kind: MyContactKind.lnAddress,
                               title: l10n.myContactLnAddressSection,
                               useHint: l10n.myContactLnAddressUse,
                               hint: l10n.myContactLnAddressHint,
@@ -299,7 +325,7 @@ class _MyContactScreenState extends State<MyContactScreen>
                           children: [
                             _section(
                               l10n: l10n,
-                              kind: _Kind.lnurlp,
+                              kind: MyContactKind.lnurlp,
                               title: l10n.myContactLnurlpSection,
                               useHint: l10n.myContactLnurlpUse,
                               hint: l10n.myContactLnurlpHint,
@@ -314,7 +340,7 @@ class _MyContactScreenState extends State<MyContactScreen>
                           children: [
                             _section(
                               l10n: l10n,
-                              kind: _Kind.bolt12,
+                              kind: MyContactKind.bolt12,
                               title: l10n.myContactBolt12Section,
                               useHint: l10n.myContactBolt12Use,
                               hint: l10n.myContactBolt12Hint,
@@ -335,7 +361,7 @@ class _MyContactScreenState extends State<MyContactScreen>
 
   Widget _section({
     required AppLocalizations l10n,
-    required _Kind kind,
+    required MyContactKind kind,
     required String title,
     required String useHint,
     required String hint,
@@ -363,6 +389,17 @@ class _MyContactScreenState extends State<MyContactScreen>
                   ),
                 ),
                 if (value != null) ...[
+                  IconButton(
+                    tooltip: _defaultKind == kind
+                        ? l10n.myContactUnsetDefault
+                        : l10n.myContactSetDefault,
+                    icon: Icon(
+                      _defaultKind == kind ? Icons.star : Icons.star_border,
+                      size: 20,
+                      color: _defaultKind == kind ? bitcoinOrange : null,
+                    ),
+                    onPressed: isGenerating ? null : () => _toggleDefault(kind),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.edit, size: 20),
                     onPressed: isGenerating ? null : () => _edit(kind),
@@ -481,7 +518,7 @@ class _MyContactScreenState extends State<MyContactScreen>
 
 class _EditDialog extends StatefulWidget {
   const _EditDialog({required this.kind, this.initialValue});
-  final _Kind kind;
+  final MyContactKind kind;
   final String? initialValue;
 
   @override
@@ -506,15 +543,15 @@ class _EditDialogState extends State<_EditDialog> {
   }
 
   bool _isValid(String value) => switch (widget.kind) {
-    _Kind.lnAddress => isMyLightningAddress(value),
-    _Kind.lnurlp => isMyLnurlpLink(value),
-    _Kind.bolt12 => isMyBolt12Offer(value),
+    MyContactKind.lnAddress => isMyLightningAddress(value),
+    MyContactKind.lnurlp => isMyLnurlpLink(value),
+    MyContactKind.bolt12 => isMyBolt12Offer(value),
   };
 
   String _invalidMessage(AppLocalizations l10n) => switch (widget.kind) {
-    _Kind.lnAddress => l10n.myContactInvalidLnAddress,
-    _Kind.lnurlp => l10n.myContactInvalidLnurlp,
-    _Kind.bolt12 => l10n.myContactInvalidBolt12,
+    MyContactKind.lnAddress => l10n.myContactInvalidLnAddress,
+    MyContactKind.lnurlp => l10n.myContactInvalidLnurlp,
+    MyContactKind.bolt12 => l10n.myContactInvalidBolt12,
   };
 
   void _save() {
@@ -540,21 +577,21 @@ class _EditDialogState extends State<_EditDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final title = switch (widget.kind) {
-      _Kind.lnAddress => l10n.myContactLnAddressSection,
-      _Kind.lnurlp => l10n.myContactLnurlpSection,
-      _Kind.bolt12 => l10n.myContactBolt12Section,
+      MyContactKind.lnAddress => l10n.myContactLnAddressSection,
+      MyContactKind.lnurlp => l10n.myContactLnurlpSection,
+      MyContactKind.bolt12 => l10n.myContactBolt12Section,
     };
     final hint = switch (widget.kind) {
-      _Kind.lnAddress => l10n.myContactLnAddressHint,
-      _Kind.lnurlp => l10n.myContactLnurlpHint,
-      _Kind.bolt12 => l10n.myContactBolt12Hint,
+      MyContactKind.lnAddress => l10n.myContactLnAddressHint,
+      MyContactKind.lnurlp => l10n.myContactLnurlpHint,
+      MyContactKind.bolt12 => l10n.myContactBolt12Hint,
     };
     final hintText = switch (widget.kind) {
-      _Kind.lnAddress => 'user@host.tld',
-      _Kind.lnurlp => 'lnurl1…',
-      _Kind.bolt12 => 'lno1…',
+      MyContactKind.lnAddress => 'user@host.tld',
+      MyContactKind.lnurlp => 'lnurl1…',
+      MyContactKind.bolt12 => 'lno1…',
     };
-    final isSingleLine = widget.kind == _Kind.lnAddress;
+    final isSingleLine = widget.kind == MyContactKind.lnAddress;
     return Dialog(
       child: Stack(
         clipBehavior: Clip.none,
