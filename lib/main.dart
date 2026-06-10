@@ -46,7 +46,25 @@ class _MyAppState extends State<MyApp> {
     _linkSub = _appLinks.uriLinkStream.listen(_handle);
   }
 
+  String? _lastLinkUri;
+  DateTime? _lastLinkAt;
+
   Future<void> _handle(Uri uri) async {
+    // On a cold start (Android singleTask) the launching link arrives via
+    // BOTH getInitialLink() and uriLinkStream, which would push the same
+    // screen twice and require two back taps. Ignore an identical link that
+    // repeats within a short window so one back tap is enough. Set before the
+    // first await so two near-simultaneous invocations are both caught.
+    final s = uri.toString();
+    final now = DateTime.now();
+    if (_lastLinkUri == s &&
+        _lastLinkAt != null &&
+        now.difference(_lastLinkAt!) < const Duration(seconds: 3)) {
+      return;
+    }
+    _lastLinkUri = s;
+    _lastLinkAt = now;
+
     if (!await haveCredentials()) {
       _toast();
       return;
