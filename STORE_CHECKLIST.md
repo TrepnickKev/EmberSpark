@@ -4,10 +4,10 @@ The in-repo work for Play Store readiness is complete (AAB build in CI, backup-e
 
 ## One-time setup
 
-- [ ] **Enable GitHub Pages** at <https://github.com/TrepnickKev/EmberSpark/settings/pages> → Source: deploy from branch → `main` / `/docs`. After ~1 min the privacy policy is live at:
+- [X] **Enable GitHub Pages** at <https://github.com/TrepnickKev/EmberSpark/settings/pages> → Source: deploy from branch → `main` / `/docs`. After ~1 min the privacy policy is live at:
   <https://trepnickkev.github.io/EmberSpark/privacy>
-- [ ] **Register Play Console developer account** at <https://play.google.com/console/signup> ($25 one-time). Verify identity (gov ID + address; ~1–3 day wait). After verification, the dashboard lives at <https://play.google.com/console>.
-- [ ] **Create the app** in Play Console (<https://play.google.com/console>) → All apps → Create app:
+- [X] **Register Play Console developer account** at <https://play.google.com/console/signup> ($25 one-time). Verify identity (gov ID + address; ~1–3 day wait). After verification, the dashboard lives at <https://play.google.com/console>.
+- [X] **Create the app** in Play Console (<https://play.google.com/console>) → All apps → Create app:
   - Package name: `com.emberspark.wallet` *(IRREVERSIBLE — already matches `applicationId`)*
   - App name: `EmberSpark`
   - Category: `Finance`
