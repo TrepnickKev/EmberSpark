@@ -160,8 +160,8 @@ class _MyContactScreenState extends State<MyContactScreen>
     try {
       final svc = await LNbitsService.fromStorage();
       final value = kind == MyContactKind.lnurlp
-          ? await svc.createLnurlpLink()
-          : await svc.createBolt12Offer();
+          ? await svc.getOrCreateLnurlpLink()
+          : await svc.getOrCreateBolt12Offer();
       await _setValue(kind, value);
       if (!mounted) return;
       await _load();

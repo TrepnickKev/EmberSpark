@@ -134,7 +134,7 @@ class LNbitsService implements WalletBackend {
   /// the bech32 `lnurl1…` string. Throws [LnurlpExtensionDisabled] if the
   /// extension isn't installed (404 from the endpoint).
   Future<String> createLnurlpLink({
-    String description = 'EmberSpark',
+    String description = 'EmberSpark LNURL',
     int minSats = 1,
     int maxSats = 1000000,
     int commentChars = 100,
@@ -170,7 +170,7 @@ class LNbitsService implements WalletBackend {
   /// extension isn't installed (404) or the backend doesn't support
   /// BOLT12.
   Future<String> createBolt12Offer({
-    String description = 'EmberSpark',
+    String description = 'EmberSpark BOLT12',
     int? amountSats,
   }) async {
     final res = await _client
@@ -195,6 +195,76 @@ class LNbitsService implements WalletBackend {
       throw const FormatException('Empty offer from createBolt12Offer');
     }
     return offer;
+  }
+
+  /// Lists this wallet's LNURL-pay links (lnurlp extension). Throws
+  /// [LnurlpExtensionDisabled] if the extension isn't installed (404).
+  Future<List<Map<String, dynamic>>> listLnurlpLinks() async {
+    final res = await _client
+        .get(_uri('/lnurlp/api/v1/links'), headers: _headers(adminKey))
+        .timeout(_readTimeout);
+    if (res.statusCode == 404) {
+      throw const LnurlpExtensionDisabled();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final body = jsonDecode(res.body);
+    final List raw = body is List
+        ? body
+        : (body is Map && body['data'] is List ? body['data'] as List : const []);
+    return raw.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// Lists this wallet's BOLT12 offers. Throws [Bolt12NotSupported] if the
+  /// extension/backend isn't available (404).
+  Future<List<Map<String, dynamic>>> listBolt12Offers() async {
+    final res = await _client
+        .get(_uri('/bolt12/api/v1/offers'), headers: _headers(adminKey))
+        .timeout(_readTimeout);
+    if (res.statusCode == 404) {
+      throw const Bolt12NotSupported();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+    final body = jsonDecode(res.body);
+    final List raw = body is List
+        ? body
+        : (body is Map && body['data'] is List ? body['data'] as List : const []);
+    return raw.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// Returns an existing EmberSpark LNURL-pay link for this wallet if the
+  /// server already has one, otherwise creates a fresh one. Matching on the
+  /// `EmberSpark` description prefix (covers links made before the
+  /// `EmberSpark LNURL` rename) avoids piling up duplicates on repeated
+  /// Auto-generate taps.
+  Future<String> getOrCreateLnurlpLink() async {
+    for (final link in await listLnurlpLinks()) {
+      final desc = (link['description'] as String?) ?? '';
+      final lnurl = link['lnurl'] as String?;
+      if (desc.startsWith('EmberSpark') && lnurl != null && lnurl.isNotEmpty) {
+        return lnurl;
+      }
+    }
+    return createLnurlpLink();
+  }
+
+  /// BOLT12 counterpart of [getOrCreateLnurlpLink]. Skips inactive offers so
+  /// a disabled offer isn't reused.
+  Future<String> getOrCreateBolt12Offer() async {
+    for (final o in await listBolt12Offers()) {
+      final desc = (o['description'] as String?) ?? '';
+      final value = (o['offer'] ?? o['bolt12']) as String?;
+      if (desc.startsWith('EmberSpark') &&
+          value != null &&
+          value.isNotEmpty &&
+          o['active'] != false) {
+        return value;
+      }
+    }
+    return createBolt12Offer();
   }
 
   /// Asks the LNbits BOLT12 community extension to fetch a BOLT12 invoice
