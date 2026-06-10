@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'http_client_factory.dart';
+import 'lnurl.dart';
 import 'wallet_account_service.dart';
 import 'wallet_backend.dart';
 
@@ -162,7 +163,7 @@ class LNbitsService implements WalletBackend {
     if (lnurl == null || lnurl.isEmpty) {
       throw const FormatException('Empty lnurl from createLnurlpLink');
     }
-    return lnurl;
+    return canonicalizeLnurl(lnurl);
   }
 
   /// Creates a BOLT12 offer on the LNbits BOLT12 community extension and
@@ -235,19 +236,30 @@ class LNbitsService implements WalletBackend {
     return raw.whereType<Map<String, dynamic>>().toList();
   }
 
-  /// Returns an existing EmberSpark LNURL-pay link for this wallet if the
-  /// server already has one, otherwise creates a fresh one. Matching on the
-  /// `EmberSpark` description prefix (covers links made before the
-  /// `EmberSpark LNURL` rename) avoids piling up duplicates on repeated
-  /// Auto-generate taps.
+  /// Returns an existing LNURL-pay link for this wallet if the server already
+  /// has a suitable one, otherwise creates a fresh one. Reuse priority:
+  /// 1. a link with a `username` set (it backs a Lightning Address, so the
+  ///    LNURL-pay tab resolves to the user's real address);
+  /// 2. a link whose description starts with `EmberSpark` (covers links made
+  ///    before the `EmberSpark LNURL` rename);
+  /// 3. create a new `EmberSpark LNURL` link.
+  /// Reusing avoids piling up duplicate links on repeated Auto-generate taps.
   Future<String> getOrCreateLnurlpLink() async {
+    String? lnAddressLnurl; // link backing a Lightning Address (username set)
+    String? emberLnurl; // generic EmberSpark-created link
     for (final link in await listLnurlpLinks()) {
-      final desc = (link['description'] as String?) ?? '';
       final lnurl = link['lnurl'] as String?;
-      if (desc.startsWith('EmberSpark') && lnurl != null && lnurl.isNotEmpty) {
-        return lnurl;
+      if (lnurl == null || lnurl.isEmpty) continue;
+      final username = (link['username'] as String?)?.trim() ?? '';
+      final desc = (link['description'] as String?) ?? '';
+      if (username.isNotEmpty) {
+        lnAddressLnurl ??= lnurl;
+      } else if (desc.startsWith('EmberSpark')) {
+        emberLnurl ??= lnurl;
       }
     }
+    final chosen = lnAddressLnurl ?? emberLnurl;
+    if (chosen != null) return canonicalizeLnurl(chosen);
     return createLnurlpLink();
   }
 

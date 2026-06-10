@@ -21,6 +21,31 @@ String decodeLnurl(String input) {
   return utf8.decode(bytes);
 }
 
+/// Returns a canonical form of an LNURL string: decodes it, collapses any
+/// accidental duplicate slashes in the URL path (some LNbits setups emit
+/// `…/lnurlp//<id>`), and re-encodes. Returns the input unchanged if it is
+/// not a decodable LNURL or needs no fix, so it can never break a working
+/// value.
+String canonicalizeLnurl(String lnurl) {
+  try {
+    final url = decodeLnurl(lnurl);
+    final uri = Uri.parse(url);
+    final fixedPath = uri.path.replaceAll(RegExp(r'/{2,}'), '/');
+    if (fixedPath == uri.path) return lnurl; // nothing to fix
+    final fixedUrl = uri.replace(path: fixedPath).toString();
+    final data5 = convertBits(utf8.encode(fixedUrl), 8, 5, true);
+    final encoded = const Bech32Codec().encode(Bech32('lnurl', data5), 2048);
+    // Preserve the input's casing (LNURLs are conventionally uppercase).
+    final bare = lnurl.trim().replaceFirst(
+      RegExp(r'^(lightning|lnurl):', caseSensitive: false),
+      '',
+    );
+    return bare == bare.toUpperCase() ? encoded.toUpperCase() : encoded;
+  } catch (_) {
+    return lnurl; // safety: never break a value we can't parse
+  }
+}
+
 /// Converts a Lightning address (`user@host`) to its LNURL-pay URL.
 String lightningAddressToUrl(String address) {
   final parts = address.trim().split('@');
