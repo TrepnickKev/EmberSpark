@@ -73,6 +73,7 @@
   "contactsNoMatches": "No matching contacts",
 
   "receiveTitle": "Receive",
+  "receiveReusableAddress": "Your reusable address",
   "receiveAmount": "Amount",
   "receiveMemo": "Memo",
   "receiveCreateInvoice": "Create invoice",

@@ -206,6 +206,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get receiveTitle => 'Empfangen';
 
   @override
+  String get receiveReusableAddress => 'Deine wiederverwendbare Adresse';
+
+  @override
   String get receiveAmount => 'Betrag';
 
   @override

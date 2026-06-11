@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
+import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
@@ -26,6 +27,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   String? invoice;
   String? error;
   bool busy = false;
+
+  // The wallet's pinned default identity (reusable receive code) and its
+  // value, shown as a static QR above the amount-invoice form. Null when no
+  // default is configured.
+  MyContactKind? _defaultKind;
+  String? _defaultValue;
 
   // Currency selection: 'sats' or one of supportedCurrencies (USD/EUR/...).
   String currency = 'sats';
@@ -74,10 +81,43 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Future<void> _loadInitial() async {
     final results = await Future.wait([getBtcRates(), getSelectedCurrency()]);
+    final kind = await getMyDefaultContactKind();
+    final lnAddr = await getMyLightningAddress();
+    final bolt12 = await getMyBolt12Offer();
+    final lnurlp = await getMyLnurlpLink();
+
+    // Prefer the pinned default identity. When none is pinned (or its value
+    // is gone), fall back to the highest-priority configured identity, the
+    // same order avatarSeedForWallet uses: LN address > BOLT12 > LNURL-pay.
+    // The getters already return null for an empty/unset value.
+    MyContactKind? resolvedKind;
+    String? value;
+    if (kind != null) {
+      resolvedKind = kind;
+      value = switch (kind) {
+        MyContactKind.lnAddress => lnAddr,
+        MyContactKind.lnurlp => lnurlp,
+        MyContactKind.bolt12 => bolt12,
+      };
+    }
+    if (value == null) {
+      if (lnAddr != null) {
+        resolvedKind = MyContactKind.lnAddress;
+        value = lnAddr;
+      } else if (bolt12 != null) {
+        resolvedKind = MyContactKind.bolt12;
+        value = bolt12;
+      } else if (lnurlp != null) {
+        resolvedKind = MyContactKind.lnurlp;
+        value = lnurlp;
+      }
+    }
     if (!mounted) return;
     setState(() {
       rates = results[0] as Map<String, double>?;
       displayCurrency = results[1] as String;
+      _defaultKind = resolvedKind;
+      _defaultValue = value;
       ratesLoading = false;
     });
   }
@@ -163,14 +203,36 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
+  Future<void> _copyIdentity() async {
+    if (_defaultValue == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    await Clipboard.setData(ClipboardData(text: _defaultValue!));
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.myContactCopied)));
+  }
+
+  Future<void> _shareIdentity() async {
+    if (_defaultValue == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    await SharePlus.instance.share(
+      ShareParams(text: _defaultValue!, subject: l10n.myContactShareSubject),
+    );
+  }
+
   Future<void> _writeNfc() async {
     if (invoice == null) return;
+    await _writeNfcFor(invoice!);
+  }
+
+  Future<void> _writeNfcFor(String value) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     NfcSession? session;
     try {
       session = await writeNdefUri(
-        'lightning:${invoice!}',
+        'lightning:$value',
         onSuccess: () {
           if (!mounted) return;
           Navigator.of(context, rootNavigator: true).pop();
@@ -243,6 +305,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (invoice == null) _buildIdentitySection(l10n),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -348,6 +411,77 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  String _kindTitle(AppLocalizations l10n, MyContactKind k) => switch (k) {
+    MyContactKind.lnAddress => l10n.myContactLnAddressSection,
+    MyContactKind.lnurlp => l10n.myContactLnurlpSection,
+    MyContactKind.bolt12 => l10n.myContactBolt12Section,
+  };
+
+  /// The wallet's pinned default identity rendered as a reusable, amount-less
+  /// receive QR above the invoice form. Hidden when no default is configured.
+  Widget _buildIdentitySection(AppLocalizations l10n) {
+    final value = _defaultValue;
+    final kind = _defaultKind;
+    if (value == null || kind == null) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l10n.receiveReusableAddress,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          _kindTitle(l10n, kind),
+          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
+        Center(
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(12),
+            child: QrImageView(
+              data: 'lightning:$value',
+              size: 240,
+              backgroundColor: Colors.white,
+              embeddedImage: const AssetImage('images/Logo_icon.png'),
+              embeddedImageStyle: const QrEmbeddedImageStyle(
+                size: Size(48, 48),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            StackedActionButton(
+              icon: Icons.copy,
+              label: l10n.commonCopy,
+              onPressed: _copyIdentity,
+            ),
+            StackedActionButton(
+              icon: Icons.ios_share,
+              label: l10n.commonShare,
+              onPressed: _shareIdentity,
+            ),
+            StackedActionButton(
+              icon: Icons.nfc,
+              label: l10n.commonNfc,
+              onPressed: () => _writeNfcFor(value),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SelectableText(value, style: const TextStyle(fontSize: 11)),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Divider(),
+        ),
+      ],
     );
   }
 

@@ -476,6 +476,12 @@ abstract class AppLocalizations {
   /// **'Receive'**
   String get receiveTitle;
 
+  /// No description provided for @receiveReusableAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reusable address'**
+  String get receiveReusableAddress;
+
   /// No description provided for @receiveAmount.
   ///
   /// In en, this message translates to:

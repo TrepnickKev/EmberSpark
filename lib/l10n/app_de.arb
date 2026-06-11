@@ -70,6 +70,7 @@
   "contactsNoMatches": "Keine passenden Kontakte",
 
   "receiveTitle": "Empfangen",
+  "receiveReusableAddress": "Deine wiederverwendbare Adresse",
   "receiveAmount": "Betrag",
   "receiveMemo": "Notiz",
   "receiveCreateInvoice": "Rechnung erstellen",

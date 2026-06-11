@@ -205,6 +205,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receiveTitle => 'Receive';
 
   @override
+  String get receiveReusableAddress => 'Your reusable address';
+
+  @override
   String get receiveAmount => 'Amount';
 
   @override
