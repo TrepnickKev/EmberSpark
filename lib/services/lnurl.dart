@@ -9,6 +9,22 @@ String decodeLnurl(String input) {
     RegExp(r'^(lightning|lnurl):', caseSensitive: false),
     '',
   );
+
+  // LUD-17: scheme-prefixed URLs (lnurlw:// for Bolt Cards, plus lnurlp /
+  // lnurlc / keyauth). Map the scheme to https, or http for .onion hosts,
+  // and return the URL directly. Path/query case is preserved because a
+  // Bolt Card's p/c parameters can be case-sensitive.
+  final lud17 = RegExp(
+    r'^(lnurlw|lnurlp|lnurlc|keyauth)://(.+)$',
+    caseSensitive: false,
+  ).firstMatch(s);
+  if (lud17 != null) {
+    final rest = lud17.group(2)!;
+    final host = Uri.parse('https://$rest').host.toLowerCase();
+    final scheme = host.endsWith('.onion') ? 'http' : 'https';
+    return '$scheme://$rest';
+  }
+
   s = s.toLowerCase();
   if (!s.startsWith('lnurl')) {
     throw const FormatException('Not an LNURL bech32 string');

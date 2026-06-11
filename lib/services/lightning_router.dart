@@ -26,6 +26,24 @@ Future<void> routeLightningCode(
   );
   final lower = clean.toLowerCase();
 
+  // LUD-17 scheme URLs (Bolt Cards emit lnurlw://). Keep original case: the
+  // path/query may be case-sensitive. Checked before the bech32 lnurl branch,
+  // since lnurlw:// also starts with "lnurl".
+  if (RegExp(
+    r'^(lnurlw|lnurlp|lnurlc|keyauth)://',
+    caseSensitive: false,
+  ).hasMatch(clean)) {
+    await navigator.push(
+      MaterialPageRoute(
+        builder: (_) => LnurlActionScreen(
+          code: clean,
+          fromContact: fromContact,
+        ),
+      ),
+    );
+    return;
+  }
+
   if (lower.startsWith('lnbc')) {
     await navigator.push(
       MaterialPageRoute(
