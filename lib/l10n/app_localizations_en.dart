@@ -114,6 +114,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeMyContact => 'My contact';
 
   @override
+  String get homeBoltCard => 'Bolt Card';
+
+  @override
   String homeSatsReceived(String amount) {
     return 'Received $amount sats';
   }
@@ -125,6 +128,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeSatsUnit => 'sats';
+
+  @override
+  String get boltCardTitle => 'Bolt Cards';
+
+  @override
+  String get boltCardExtensionMissing =>
+      'The Boltcards extension is not installed on this server.';
+
+  @override
+  String get boltCardNone => 'No Bolt Cards yet. Tap Add to set one up.';
+
+  @override
+  String get boltCardAdd => 'Add Bolt Card';
+
+  @override
+  String get boltCardEdit => 'Edit card';
+
+  @override
+  String get boltCardName => 'Card name';
+
+  @override
+  String get boltCardTxLimit => 'Per-tap limit (sats)';
+
+  @override
+  String get boltCardDailyLimit => 'Daily limit (sats)';
+
+  @override
+  String get boltCardCreate => 'Create';
+
+  @override
+  String get boltCardSave => 'Save';
+
+  @override
+  String get boltCardProgram => 'Program card';
+
+  @override
+  String get boltCardVerify => 'Verify';
+
+  @override
+  String get boltCardWipe => 'Wipe';
+
+  @override
+  String get boltCardDelete => 'Delete';
+
+  @override
+  String get boltCardEnable => 'Enable';
+
+  @override
+  String get boltCardDisable => 'Disable';
+
+  @override
+  String get boltCardEnabled => 'Enabled';
+
+  @override
+  String get boltCardDisabled => 'Disabled';
+
+  @override
+  String boltCardCounter(int count) {
+    return '$count taps';
+  }
+
+  @override
+  String boltCardLimits(int tx, int daily) {
+    return 'Per tap $tx sats, daily $daily sats';
+  }
+
+  @override
+  String get boltCardHoldToProgram =>
+      'Hold your card to the phone to program it. Do not remove it until done.';
+
+  @override
+  String get boltCardHoldToVerify => 'Hold your card to the phone to read it.';
+
+  @override
+  String get boltCardHoldToWipe =>
+      'Hold your card to the phone to reset it. Do not remove it until done.';
+
+  @override
+  String get boltCardProgrammed => 'Card programmed.';
+
+  @override
+  String get boltCardProgramFailed => 'Could not program the card.';
+
+  @override
+  String get boltCardNotBlank =>
+      'This card is already programmed. Wipe it first.';
+
+  @override
+  String get boltCardVerified => 'Card works and points to this wallet.';
+
+  @override
+  String get boltCardVerifyWrongServer =>
+      'This card points to a different server.';
+
+  @override
+  String get boltCardVerifyFailed => 'Could not verify the card.';
+
+  @override
+  String get boltCardWipeConfirm =>
+      'Reset this card to factory keys? It will stop working until you program it again.';
+
+  @override
+  String get boltCardWiped => 'Card reset to factory keys.';
+
+  @override
+  String get boltCardWipeFailed => 'Could not reset the card.';
+
+  @override
+  String get boltCardDeleteConfirm => 'Delete this card from the server?';
 
   @override
   String get loginTitle => 'Setup wallet';

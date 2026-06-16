@@ -114,6 +114,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeMyContact => 'Mein Kontakt';
 
   @override
+  String get homeBoltCard => 'Bolt Card';
+
+  @override
   String homeSatsReceived(String amount) {
     return '$amount Sats empfangen';
   }
@@ -125,6 +128,118 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeSatsUnit => 'Sats';
+
+  @override
+  String get boltCardTitle => 'Bolt Cards';
+
+  @override
+  String get boltCardExtensionMissing =>
+      'Die Boltcards-Erweiterung ist auf diesem Server nicht installiert.';
+
+  @override
+  String get boltCardNone =>
+      'Noch keine Bolt Cards. Tippe auf Hinzufügen, um eine einzurichten.';
+
+  @override
+  String get boltCardAdd => 'Bolt Card hinzufügen';
+
+  @override
+  String get boltCardEdit => 'Karte bearbeiten';
+
+  @override
+  String get boltCardName => 'Kartenname';
+
+  @override
+  String get boltCardTxLimit => 'Limit pro Zahlung (Sats)';
+
+  @override
+  String get boltCardDailyLimit => 'Tageslimit (Sats)';
+
+  @override
+  String get boltCardCreate => 'Erstellen';
+
+  @override
+  String get boltCardSave => 'Speichern';
+
+  @override
+  String get boltCardProgram => 'Karte beschreiben';
+
+  @override
+  String get boltCardVerify => 'Prüfen';
+
+  @override
+  String get boltCardWipe => 'Zurücksetzen';
+
+  @override
+  String get boltCardDelete => 'Löschen';
+
+  @override
+  String get boltCardEnable => 'Aktivieren';
+
+  @override
+  String get boltCardDisable => 'Deaktivieren';
+
+  @override
+  String get boltCardEnabled => 'Aktiv';
+
+  @override
+  String get boltCardDisabled => 'Inaktiv';
+
+  @override
+  String boltCardCounter(int count) {
+    return '$count Zahlungen';
+  }
+
+  @override
+  String boltCardLimits(int tx, int daily) {
+    return 'Pro Zahlung $tx Sats, täglich $daily Sats';
+  }
+
+  @override
+  String get boltCardHoldToProgram =>
+      'Halte die Karte an das Telefon, um sie zu beschreiben. Nicht entfernen, bis es fertig ist.';
+
+  @override
+  String get boltCardHoldToVerify =>
+      'Halte die Karte an das Telefon, um sie zu lesen.';
+
+  @override
+  String get boltCardHoldToWipe =>
+      'Halte die Karte an das Telefon, um sie zurückzusetzen. Nicht entfernen, bis es fertig ist.';
+
+  @override
+  String get boltCardProgrammed => 'Karte beschrieben.';
+
+  @override
+  String get boltCardProgramFailed => 'Karte konnte nicht beschrieben werden.';
+
+  @override
+  String get boltCardNotBlank =>
+      'Diese Karte ist bereits beschrieben. Setze sie zuerst zurück.';
+
+  @override
+  String get boltCardVerified =>
+      'Karte funktioniert und verweist auf diese Wallet.';
+
+  @override
+  String get boltCardVerifyWrongServer =>
+      'Diese Karte verweist auf einen anderen Server.';
+
+  @override
+  String get boltCardVerifyFailed => 'Karte konnte nicht geprüft werden.';
+
+  @override
+  String get boltCardWipeConfirm =>
+      'Karte auf Werksschlüssel zurücksetzen? Sie funktioniert erst wieder, wenn du sie neu beschreibst.';
+
+  @override
+  String get boltCardWiped => 'Karte auf Werksschlüssel zurückgesetzt.';
+
+  @override
+  String get boltCardWipeFailed => 'Karte konnte nicht zurückgesetzt werden.';
+
+  @override
+  String get boltCardDeleteConfirm => 'Diese Karte vom Server löschen?';
 
   @override
   String get loginTitle => 'Wallet einrichten';

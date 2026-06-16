@@ -13,6 +13,7 @@ import '../services/wallet_account_service.dart';
 import '../widgets/flipping_avatar.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'about_screen.dart';
+import 'bolt_card_screen.dart';
 import 'contacts_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
@@ -302,6 +303,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   context,
                   MaterialPageRoute(builder: (_) => const MyContactScreen()),
                 );
+              } else if (v == 'boltcard') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BoltCardScreen()),
+                );
               } else if (v == 'wallets') {
                 _openWallets();
               } else if (v == 'logout') {
@@ -311,6 +317,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             itemBuilder: (_) => [
               _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
               _menuItem('mycontact', Icons.badge_outlined, l10n.homeMyContact),
+              _menuItem(
+                'boltcard',
+                Icons.credit_card_outlined,
+                l10n.homeBoltCard,
+              ),
               _menuItem(
                 'wallets',
                 Icons.account_balance_wallet_outlined,

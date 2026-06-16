@@ -32,6 +32,12 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# Some plugins (e.g. local_auth_windows) still include the deprecated
+# <experimental/coroutine> header. Recent MSVC toolchains turn that into a hard
+# error (STL1011); silence it so those plugins keep building. Defined globally
+# so it reaches the plugin targets added via generated_plugins.cmake below.
+add_definitions(-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by

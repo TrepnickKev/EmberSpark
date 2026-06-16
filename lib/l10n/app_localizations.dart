@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'My contact'**
   String get homeMyContact;
 
+  /// No description provided for @homeBoltCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Bolt Card'**
+  String get homeBoltCard;
+
   /// No description provided for @homeSatsReceived.
   ///
   /// In en, this message translates to:
@@ -325,6 +331,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'sats'**
   String get homeSatsUnit;
+
+  /// No description provided for @boltCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bolt Cards'**
+  String get boltCardTitle;
+
+  /// No description provided for @boltCardExtensionMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'The Boltcards extension is not installed on this server.'**
+  String get boltCardExtensionMissing;
+
+  /// No description provided for @boltCardNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No Bolt Cards yet. Tap Add to set one up.'**
+  String get boltCardNone;
+
+  /// No description provided for @boltCardAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Bolt Card'**
+  String get boltCardAdd;
+
+  /// No description provided for @boltCardEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit card'**
+  String get boltCardEdit;
+
+  /// No description provided for @boltCardName.
+  ///
+  /// In en, this message translates to:
+  /// **'Card name'**
+  String get boltCardName;
+
+  /// No description provided for @boltCardTxLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-tap limit (sats)'**
+  String get boltCardTxLimit;
+
+  /// No description provided for @boltCardDailyLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily limit (sats)'**
+  String get boltCardDailyLimit;
+
+  /// No description provided for @boltCardCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get boltCardCreate;
+
+  /// No description provided for @boltCardSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get boltCardSave;
+
+  /// No description provided for @boltCardProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Program card'**
+  String get boltCardProgram;
+
+  /// No description provided for @boltCardVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get boltCardVerify;
+
+  /// No description provided for @boltCardWipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe'**
+  String get boltCardWipe;
+
+  /// No description provided for @boltCardDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get boltCardDelete;
+
+  /// No description provided for @boltCardEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get boltCardEnable;
+
+  /// No description provided for @boltCardDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get boltCardDisable;
+
+  /// No description provided for @boltCardEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get boltCardEnabled;
+
+  /// No description provided for @boltCardDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get boltCardDisabled;
+
+  /// No description provided for @boltCardCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} taps'**
+  String boltCardCounter(int count);
+
+  /// No description provided for @boltCardLimits.
+  ///
+  /// In en, this message translates to:
+  /// **'Per tap {tx} sats, daily {daily} sats'**
+  String boltCardLimits(int tx, int daily);
+
+  /// No description provided for @boltCardHoldToProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold your card to the phone to program it. Do not remove it until done.'**
+  String get boltCardHoldToProgram;
+
+  /// No description provided for @boltCardHoldToVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold your card to the phone to read it.'**
+  String get boltCardHoldToVerify;
+
+  /// No description provided for @boltCardHoldToWipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold your card to the phone to reset it. Do not remove it until done.'**
+  String get boltCardHoldToWipe;
+
+  /// No description provided for @boltCardProgrammed.
+  ///
+  /// In en, this message translates to:
+  /// **'Card programmed.'**
+  String get boltCardProgrammed;
+
+  /// No description provided for @boltCardProgramFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not program the card.'**
+  String get boltCardProgramFailed;
+
+  /// No description provided for @boltCardNotBlank.
+  ///
+  /// In en, this message translates to:
+  /// **'This card is already programmed. Wipe it first.'**
+  String get boltCardNotBlank;
+
+  /// No description provided for @boltCardVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Card works and points to this wallet.'**
+  String get boltCardVerified;
+
+  /// No description provided for @boltCardVerifyWrongServer.
+  ///
+  /// In en, this message translates to:
+  /// **'This card points to a different server.'**
+  String get boltCardVerifyWrongServer;
+
+  /// No description provided for @boltCardVerifyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not verify the card.'**
+  String get boltCardVerifyFailed;
+
+  /// No description provided for @boltCardWipeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset this card to factory keys? It will stop working until you program it again.'**
+  String get boltCardWipeConfirm;
+
+  /// No description provided for @boltCardWiped.
+  ///
+  /// In en, this message translates to:
+  /// **'Card reset to factory keys.'**
+  String get boltCardWiped;
+
+  /// No description provided for @boltCardWipeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reset the card.'**
+  String get boltCardWipeFailed;
+
+  /// No description provided for @boltCardDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this card from the server?'**
+  String get boltCardDeleteConfirm;
 
   /// No description provided for @loginTitle.
   ///

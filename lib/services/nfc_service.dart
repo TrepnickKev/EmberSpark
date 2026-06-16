@@ -26,6 +26,12 @@ class NfcTagNotWritable implements Exception {
   const NfcTagNotWritable();
 }
 
+/// Thrown when a tapped tag doesn't expose ISO-DEP (ISO 14443-4), i.e. it's
+/// not a DESFire / NTAG424 chip and can't be programmed as a Bolt Card.
+class NfcTagNotIsoDep implements Exception {
+  const NfcTagNotIsoDep();
+}
+
 /// Handle for an in-progress NFC session. Call [stop] to cancel it.
 class NfcSession {
   NfcSession._();
@@ -115,6 +121,36 @@ Future<NfcSession> writeNdefUri(
         await ndef.writeNdefMessage(NdefMessage(records: [record]));
         await session.stop();
         onSuccess();
+      } catch (e) {
+        await session.stop();
+        onError(e);
+      }
+    },
+  );
+  return session;
+}
+
+/// Runs [action] against the first ISO-DEP (ISO 14443-4) tag tapped, used for
+/// DESFire / NTAG424 APDU exchanges (Bolt Card programming, wiping). The chip's
+/// UID (the ISO 14443-3 anticollision id) is passed to [onComplete] after
+/// [action] returns successfully; [onError] fires on any per-tap failure.
+/// Throws [NfcUnavailable] synchronously if NFC is off or absent.
+Future<NfcSession> runIsoDepSession({
+  required Future<void> Function(IsoDepAndroid isoDep) action,
+  required void Function(Uint8List uid) onComplete,
+  required void Function(Object) onError,
+}) async {
+  await _ensureAvailable();
+  final session = NfcSession._();
+  await NfcManager.instance.startSession(
+    pollingOptions: {NfcPollingOption.iso14443},
+    onDiscovered: (NfcTag tag) async {
+      try {
+        final iso = IsoDepAndroid.from(tag);
+        if (iso == null) throw const NfcTagNotIsoDep();
+        await action(iso);
+        await session.stop();
+        onComplete(iso.tag.id);
       } catch (e) {
         await session.stop();
         onError(e);
