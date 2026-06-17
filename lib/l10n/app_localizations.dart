@@ -488,6 +488,12 @@ abstract class AppLocalizations {
   /// **'This card is already programmed. Wipe it first.'**
   String get boltCardNotBlank;
 
+  /// No description provided for @boltCardVerifyNotProgrammed.
+  ///
+  /// In en, this message translates to:
+  /// **'This card is not programmed yet, so there is nothing to verify.'**
+  String get boltCardVerifyNotProgrammed;
+
   /// No description provided for @boltCardVerified.
   ///
   /// In en, this message translates to:

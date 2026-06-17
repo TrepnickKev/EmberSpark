@@ -112,6 +112,28 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// Shows a failure with the underlying technical detail (the failing card
+  /// command + status word) as selectable text, so issues can be diagnosed and
+  /// reported rather than hidden behind a generic message.
+  Future<void> _showErrorDetail(String title, Object err) {
+    return showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: SelectableText(
+          err.toString(),
+          style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ---- Card operations -----------------------------------------------------
 
   Future<void> _addCard() async {
@@ -184,9 +206,11 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     await session.stop();
 
     if (err != null) {
-      _snack(err is CardNotBlank
-          ? l10n.boltCardNotBlank
-          : l10n.boltCardProgramFailed);
+      if (err is CardNotBlank) {
+        _snack(l10n.boltCardNotBlank);
+      } else {
+        await _showErrorDetail(l10n.boltCardProgramFailed, err!);
+      }
       return;
     }
     if (uid == null) return; // cancelled
@@ -239,7 +263,11 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     await session.stop();
 
     if (uri == null) {
-      if (err != null) _snack(l10n.boltCardVerifyFailed);
+      if (err is NfcTagNotNdef) {
+        _snack(l10n.boltCardVerifyNotProgrammed);
+      } else if (err != null) {
+        _snack(l10n.boltCardVerifyFailed);
+      }
       return;
     }
 
@@ -300,7 +328,7 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     await session.stop();
 
     if (err != null) {
-      _snack(l10n.boltCardWipeFailed);
+      await _showErrorDetail(l10n.boltCardWipeFailed, err!);
       return;
     }
     if (done) _snack(l10n.boltCardWiped);

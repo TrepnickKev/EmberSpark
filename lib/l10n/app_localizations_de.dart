@@ -218,6 +218,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Karte ist bereits beschrieben. Setze sie zuerst zurück.';
 
   @override
+  String get boltCardVerifyNotProgrammed =>
+      'Diese Karte ist noch nicht beschrieben, es gibt nichts zu prüfen.';
+
+  @override
   String get boltCardVerified =>
       'Karte funktioniert und verweist auf diese Wallet.';
 

@@ -216,6 +216,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This card is already programmed. Wipe it first.';
 
   @override
+  String get boltCardVerifyNotProgrammed =>
+      'This card is not programmed yet, so there is nothing to verify.';
+
+  @override
   String get boltCardVerified => 'Card works and points to this wallet.';
 
   @override

@@ -140,10 +140,12 @@ class Ntag424 {
   // ---- ISO / native command wrappers --------------------------------------
 
   Future<void> _isoSelectNdefApp() async {
-    // ISO SelectFile by DF name (the NDEF application AID).
+    // ISO SelectFile by DF name (the NDEF application AID). This is an ISO
+    // 7816-4 command, so success is SW 0x9000 (not the DESFire-native 0x9100
+    // that the wrapped commands return).
     final apdu = <int>[0x00, 0xA4, 0x04, 0x0C, _ndefAid.length, ..._ndefAid];
     final resp = await _transceive(Uint8List.fromList(apdu));
-    _ensureStatus(resp, 'select NDEF app');
+    _ensureIsoStatus(resp, 'select NDEF app');
   }
 
   /// WriteData (0x8D) in plain comm mode (no session). Used for the NDEF
@@ -307,17 +309,25 @@ class Ntag424 {
 
   static bool _isSuccess(Uint8List r) => _sw(r) == 0x9100;
   static bool _isAdditionalFrame(Uint8List r) => _sw(r) == 0x91AF;
+  // ISO 7816-4 commands (e.g. SelectFile) report success as 0x9000.
+  static bool _isIsoSuccess(Uint8List r) => _sw(r) == 0x9000 || _sw(r) == 0x9100;
   static int _sw(Uint8List r) =>
       r.length < 2 ? -1 : (r[r.length - 2] << 8) | r[r.length - 1];
   static Uint8List _body(Uint8List r) => r.sublist(0, r.length - 2);
 
   static void _ensureStatus(Uint8List r, String what) {
-    if (!_isSuccess(r)) {
-      final sw = _sw(r);
-      throw Ntag424Exception(
-        'Card error on $what (SW=0x${sw.toRadixString(16).padLeft(4, '0')})',
-      );
-    }
+    if (!_isSuccess(r)) _failStatus(r, what);
+  }
+
+  static void _ensureIsoStatus(Uint8List r, String what) {
+    if (!_isIsoSuccess(r)) _failStatus(r, what);
+  }
+
+  static void _failStatus(Uint8List r, String what) {
+    final sw = _sw(r);
+    throw Ntag424Exception(
+      'Card error on $what (SW=0x${sw.toRadixString(16).padLeft(4, '0')})',
+    );
   }
 
   Uint8List _ctrLe() => Uint8List.fromList([_cmdCtr & 0xFF, (_cmdCtr >> 8) & 0xFF]);

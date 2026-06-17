@@ -142,9 +142,18 @@ Future<NfcSession> runIsoDepSession({
 }) async {
   await _ensureAvailable();
   final session = NfcSession._();
-  await NfcManager.instance.startSession(
-    pollingOptions: {NfcPollingOption.iso14443},
-    onDiscovered: (NfcTag tag) async {
+  // Use Android reader mode with skipNdefCheck so the platform doesn't read
+  // NDEF or interfere while we drive raw DESFire APDUs, and noPlatformSounds to
+  // avoid the scan beep mid-write. Stopping the session (NfcSession.stop ->
+  // stopSession) disables this same reader mode.
+  await NfcManagerAndroid.instance.enableReaderMode(
+    flags: {
+      NfcReaderFlagAndroid.nfcA,
+      NfcReaderFlagAndroid.nfcB,
+      NfcReaderFlagAndroid.skipNdefCheck,
+      NfcReaderFlagAndroid.noPlatformSounds,
+    },
+    onTagDiscovered: (NfcTag tag) async {
       try {
         final iso = IsoDepAndroid.from(tag);
         if (iso == null) throw const NfcTagNotIsoDep();

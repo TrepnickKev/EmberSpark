@@ -71,6 +71,7 @@
   "boltCardProgrammed": "Karte beschrieben.",
   "boltCardProgramFailed": "Karte konnte nicht beschrieben werden.",
   "boltCardNotBlank": "Diese Karte ist bereits beschrieben. Setze sie zuerst zurück.",
+  "boltCardVerifyNotProgrammed": "Diese Karte ist noch nicht beschrieben, es gibt nichts zu prüfen.",
   "boltCardVerified": "Karte funktioniert und verweist auf diese Wallet.",
   "boltCardVerifyWrongServer": "Diese Karte verweist auf einen anderen Server.",
   "boltCardVerifyFailed": "Karte konnte nicht geprüft werden.",
