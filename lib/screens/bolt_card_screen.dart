@@ -511,6 +511,7 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
 
   Widget _cardTile(AppLocalizations l10n, BoltCard card) {
     return ListTile(
+      onTap: () => _edit(card),
       leading: Icon(
         Icons.credit_card,
         color: card.enabled ? null : Theme.of(context).disabledColor,
