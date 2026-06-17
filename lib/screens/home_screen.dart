@@ -286,6 +286,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             onPressed: loading ? null : _load,
           ),
           PopupMenuButton<String>(
+            icon: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                Icons.menu,
+                size: 22,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
+            ),
             onSelected: (v) async {
               if (v == 'contacts') {
                 Navigator.push(
@@ -315,17 +327,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               }
             },
             itemBuilder: (_) => [
-              _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
               _menuItem('mycontact', Icons.badge_outlined, l10n.homeMyContact),
-              _menuItem(
-                'boltcard',
-                Icons.credit_card_outlined,
-                l10n.homeBoltCard,
-              ),
+              _menuItem('contacts', Icons.person_outline, l10n.homeContacts),
               _menuItem(
                 'wallets',
                 Icons.account_balance_wallet_outlined,
                 l10n.walletsMenu,
+              ),
+              _menuItem(
+                'boltcard',
+                Icons.credit_card_outlined,
+                l10n.homeBoltCard,
               ),
               _menuItem('settings', Icons.settings_outlined, l10n.homeSettings),
               _menuItem('logout', Icons.logout, l10n.homeLogout),
