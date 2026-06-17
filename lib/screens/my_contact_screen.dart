@@ -35,6 +35,13 @@ class _MyContactScreenState extends State<MyContactScreen>
   MyContactKind? _defaultKind;
   bool _loading = true;
 
+  // Whether the server's lnurlp / bolt12 extensions are installed. null = not
+  // yet checked (or unknown because the probe couldn't reach the server);
+  // true = installed; false = missing (404). Drives the persistent
+  // "extension not installed" notice in the LNURL-pay / BOLT12 tabs.
+  bool? _lnurlpAvailable;
+  bool? _bolt12Available;
+
   // Per-section spinner flag while a server-side generation call is in
   // flight. Keyed by MyContactKind so we can disable the right Auto-generate
   // button without blocking the others.
@@ -77,7 +84,54 @@ class _MyContactScreenState extends State<MyContactScreen>
       _defaultKind = defaultKind;
       _loading = false;
     });
+    // Detect missing extensions in the background so the screen stays instant.
+    _probeExtensions();
   }
+
+  /// Checks (without blocking the UI) whether the lnurlp / bolt12 extensions
+  /// are installed, so a missing one shows a persistent notice instead of only
+  /// failing when the user taps Auto-generate. Only probes a kind that has no
+  /// stored value yet (otherwise the Auto-generate area isn't shown anyway).
+  Future<void> _probeExtensions() async {
+    final needLnurlp = _lnurlp == null;
+    final needBolt12 = _bolt12 == null;
+    if (!needLnurlp && !needBolt12) return;
+
+    final LNbitsService svc;
+    try {
+      svc = await LNbitsService.fromStorage();
+    } catch (_) {
+      return; // couldn't build the client; leave both unknown
+    }
+
+    if (needLnurlp) {
+      try {
+        await svc.listLnurlpLinks();
+        if (mounted) setState(() => _lnurlpAvailable = true);
+      } on LnurlpExtensionDisabled {
+        if (mounted) setState(() => _lnurlpAvailable = false);
+      } catch (_) {
+        // Network/other error: leave unknown so the button stays optimistic.
+      }
+    }
+    if (needBolt12) {
+      try {
+        await svc.listBolt12Offers();
+        if (mounted) setState(() => _bolt12Available = true);
+      } on Bolt12NotSupported {
+        if (mounted) setState(() => _bolt12Available = false);
+      } catch (_) {
+        // Leave unknown.
+      }
+    }
+  }
+
+  /// Installed-extension flag for [kind] (null for kinds without an extension).
+  bool? _extAvailable(MyContactKind kind) => switch (kind) {
+    MyContactKind.lnurlp => _lnurlpAvailable,
+    MyContactKind.bolt12 => _bolt12Available,
+    MyContactKind.lnAddress => null,
+  };
 
   String? _valueOf(MyContactKind kind) => switch (kind) {
     MyContactKind.lnAddress => _lnAddress,
@@ -359,6 +413,34 @@ class _MyContactScreenState extends State<MyContactScreen>
     );
   }
 
+  /// Persistent inline "extension not installed" notice, styled like the grey
+  /// info row at the top of the screen. Reuses the existing per-kind messages.
+  Widget _extensionMissingNotice(AppLocalizations l10n, MyContactKind kind) {
+    final message = kind == MyContactKind.bolt12
+        ? l10n.myContactBolt12ExtensionMissing
+        : l10n.myContactLnurlpExtensionMissing;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.extension_off, size: 18, color: Colors.grey),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _section({
     required AppLocalizations l10n,
     required MyContactKind kind,
@@ -424,7 +506,17 @@ class _MyContactScreenState extends State<MyContactScreen>
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 12),
-              if (canAutoGenerate)
+              if (canAutoGenerate && _extAvailable(kind) == false) ...[
+                // Extension not installed: surface it up front and drop the
+                // Auto-generate button. Manual Add still works (paste a link).
+                _extensionMissingNotice(l10n, kind),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text(addLabel),
+                  onPressed: () => _edit(kind),
+                ),
+              ] else if (canAutoGenerate)
                 Row(
                   children: [
                     Expanded(
