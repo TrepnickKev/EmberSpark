@@ -29,6 +29,14 @@ void main() {
       expect(hex(Ntag424.cmacForTest(key, m)),
           '070a16b46b4d4144f79bdd9dd04a287c');
     });
+
+    test('20-byte (non-block-aligned) message', () {
+      // The command MAC input is not a multiple of 16 bytes, so verify CMAC on
+      // a non-aligned input too (NIST SP 800-38B example, Mlen=160).
+      final m = hx('6bc1bee2 2e409f96 e93d7e11 7393172a ae2d8a57');
+      expect(hex(Ntag424.cmacForTest(key, m)),
+          '7d85449ea6ea19c823a7bf78837dfade');
+    });
   });
 
   group('EV2 session key derivation (AN12196 worked example)', () {

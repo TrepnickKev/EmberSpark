@@ -70,6 +70,16 @@ class Ntag424 {
   Uint8List? _ti;
   int _cmdCtr = 0;
 
+  /// Diagnostic trace of the APDU exchange + intermediate crypto values,
+  /// captured for debugging the secure-messaging path on real hardware. It is
+  /// appended to a thrown [Ntag424Exception] so the on-screen error dialog can
+  /// surface it. Test-card only (it includes keys / session values).
+  final List<String> trace = [];
+  void _log(String label, [Object? v]) =>
+      trace.add(v == null ? label : '$label: ${v is Uint8List ? _hexOf(v) : v}');
+  static String _hexOf(Uint8List b) =>
+      b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
+
   Ntag424(this._transceive);
 
   /// NDEF application id (D2 76 00 00 85 01 01).
@@ -88,54 +98,72 @@ class Ntag424 {
     required String lnurlwTemplate,
     required BoltCardKeys keys,
   }) async {
-    await _isoSelectNdefApp();
+    try {
+      await _isoSelectNdefApp();
 
-    final fileBytes = _buildNdefFile(lnurlwTemplate);
-    final piccOffset = _valueOffset(fileBytes, 'p=');
-    final macOffset = _valueOffset(fileBytes, 'c=');
+      final fileBytes = _buildNdefFile(lnurlwTemplate);
+      final piccOffset = _valueOffset(fileBytes, 'p=');
+      final macOffset = _valueOffset(fileBytes, 'c=');
 
-    // Write the NDEF template (factory NDEF file allows free write).
-    await _writeDataPlain(_ndefFileNo, 0, fileBytes);
+      // Write the NDEF template (factory NDEF file allows free write).
+      await _writeDataPlain(_ndefFileNo, 0, fileBytes);
 
-    // Authenticate with the factory-default key 0.
-    await _authenticateEV2First(0x00, _defaultKey);
+      // Authenticate with the factory-default key 0.
+      await _authenticateEV2First(0x00, _defaultKey);
 
-    // Turn on SDM/SUN mirroring of the encrypted PICCData + CMAC.
-    await _changeFileSettingsSdm(
-      piccDataOffset: piccOffset,
-      macInputOffset: macOffset,
-      macOffset: macOffset,
-    );
+      // Turn on SDM/SUN mirroring of the encrypted PICCData + CMAC.
+      await _changeFileSettingsSdm(
+        piccDataOffset: piccOffset,
+        macInputOffset: macOffset,
+        macOffset: macOffset,
+      );
 
-    // Rotate the keys. Non-auth keys (1..4) use the diversified XOR+CRC form;
-    // key 0 (the auth key) is changed LAST with the same-key form, after which
-    // the session is invalid.
-    await _changeKey(1, _defaultKey, keys.k1);
-    await _changeKey(2, _defaultKey, keys.k2);
-    await _changeKey(3, _defaultKey, keys.k1); // K3 := K1
-    await _changeKey(4, _defaultKey, keys.k2); // K4 := K2
-    await _changeKey(0, _defaultKey, keys.k0);
+      // Rotate the keys. Non-auth keys (1..4) use the diversified XOR+CRC form;
+      // key 0 (the auth key) is changed LAST with the same-key form, after which
+      // the session is invalid.
+      await _changeKey(1, _defaultKey, keys.k1);
+      await _changeKey(2, _defaultKey, keys.k2);
+      await _changeKey(3, _defaultKey, keys.k1); // K3 := K1
+      await _changeKey(4, _defaultKey, keys.k2); // K4 := K2
+      await _changeKey(0, _defaultKey, keys.k0);
 
-    // Prove the write: re-authenticate with the new key 0.
-    await _authenticateEV2First(0x00, keys.k0);
+      // Prove the write: re-authenticate with the new key 0.
+      await _authenticateEV2First(0x00, keys.k0);
+    } on CardNotBlank {
+      rethrow;
+    } catch (e) {
+      throw _withTrace(e);
+    }
   }
 
   /// Resets a programmed card back to factory keys and disables SDM, so it can
   /// be reused. Needs the card's *current* keys.
   Future<void> wipe(BoltCardKeys keys) async {
-    await _isoSelectNdefApp();
-    await _authenticateEV2First(0x00, keys.k0);
+    try {
+      await _isoSelectNdefApp();
+      await _authenticateEV2First(0x00, keys.k0);
 
-    // Disable SDM and restore plain, free-read/write NDEF file settings.
-    await _changeFileSettingsPlain();
+      // Disable SDM and restore plain, free-read/write NDEF file settings.
+      await _changeFileSettingsPlain();
 
-    // Restore default keys. Change key 0 last.
-    await _changeKey(1, keys.k1, _defaultKey);
-    await _changeKey(2, keys.k2, _defaultKey);
-    await _changeKey(3, keys.k1, _defaultKey);
-    await _changeKey(4, keys.k2, _defaultKey);
-    await _changeKey(0, keys.k0, _defaultKey);
+      // Restore default keys. Change key 0 last.
+      await _changeKey(1, keys.k1, _defaultKey);
+      await _changeKey(2, keys.k2, _defaultKey);
+      await _changeKey(3, keys.k1, _defaultKey);
+      await _changeKey(4, keys.k2, _defaultKey);
+      await _changeKey(0, keys.k0, _defaultKey);
+    } on CardNotBlank {
+      rethrow;
+    } catch (e) {
+      throw _withTrace(e);
+    }
   }
+
+  /// Wraps a failure with the captured APDU/crypto trace so it surfaces in the
+  /// on-screen error dialog for debugging.
+  Ntag424Exception _withTrace(Object e) => Ntag424Exception(
+        '$e\n\n--- trace ---\n${trace.join('\n')}',
+      );
 
   // ---- ISO / native command wrappers --------------------------------------
 
@@ -143,8 +171,11 @@ class Ntag424 {
     // ISO SelectFile by DF name (the NDEF application AID). This is an ISO
     // 7816-4 command, so success is SW 0x9000 (not the DESFire-native 0x9100
     // that the wrapped commands return).
-    final apdu = <int>[0x00, 0xA4, 0x04, 0x0C, _ndefAid.length, ..._ndefAid];
-    final resp = await _transceive(Uint8List.fromList(apdu));
+    final apdu = Uint8List.fromList(
+        <int>[0x00, 0xA4, 0x04, 0x0C, _ndefAid.length, ..._ndefAid]);
+    final resp = await _transceive(apdu);
+    _log('select TX', apdu);
+    _log('select RX', resp);
     _ensureIsoStatus(resp, 'select NDEF app');
   }
 
@@ -156,7 +187,10 @@ class Ntag424 {
       ..._int3le(offset),
       ..._int3le(data.length),
     ];
-    final resp = await _transceive(_wrap(0x8D, header, data));
+    final apdu = _wrap(0x8D, header, data);
+    final resp = await _transceive(apdu);
+    _log('writeNDEF TX', apdu);
+    _log('writeNDEF RX', resp);
     // A blank card's NDEF file has free write access. A 0x91AE (authentication
     // error) here means the file is key-locked, i.e. the card is already
     // configured — surface that as the friendly "not blank" case rather than a
@@ -168,22 +202,28 @@ class Ntag424 {
   // ---- AuthenticateEV2First (AN12196 §6.6) ---------------------------------
 
   Future<void> _authenticateEV2First(int keyNo, Uint8List key) async {
+    _log('auth keyNo', '$keyNo');
+    _log('auth key', key);
     // Part 1: send key number; card returns E(K, RndB).
     final r1 = await _transceive(_wrap(0x71, [keyNo, 0x00], Uint8List(0)));
+    _log('auth1 RX', r1);
     if (!_isAdditionalFrame(r1)) {
       // The card rejected auth with this key.
       throw const CardNotBlank();
     }
     final ekRndB = _body(r1);
     final rndB = _aesCbcDecrypt(key, Uint8List(16), ekRndB);
+    _log('RndB', rndB);
 
     final rndA = _randomBytes(16);
+    _log('RndA', rndA);
     final rndBRot = _rotateLeft(rndB);
     final plain = Uint8List.fromList([...rndA, ...rndBRot]);
     final ekData = _aesCbcEncrypt(key, Uint8List(16), plain);
 
     // Part 2: send E(K, RndA || RndB'); card returns E(K, TI || RndA' || caps).
     final r2 = await _transceive(_wrap(0xAF, const [], ekData));
+    _log('auth2 RX', r2);
     if (!_isSuccess(r2)) {
       throw const CardNotBlank();
     }
@@ -201,6 +241,9 @@ class Ntag424 {
     _sesEnc = _aesCmac(key, sv2);
     _ti = ti;
     _cmdCtr = 0;
+    _log('TI', ti);
+    _log('SesEnc', _sesEnc!);
+    _log('SesMac', _sesMac!);
   }
 
   /// SV = [c0, c1, 0x00, 0x01, 0x00, 0x80] + RndA[0:2]
@@ -288,7 +331,16 @@ class Ntag424 {
     final macInput = Uint8List.fromList([cmd, ...ctr, ...ti, ...header, ...encData]);
     final mact = _truncateMac(_aesCmac(mac, macInput));
 
-    final resp = await _transceive(_wrap(cmd, header, Uint8List.fromList([...encData, ...mact])));
+    final apdu = _wrap(cmd, header, Uint8List.fromList([...encData, ...mact]));
+    _log('full cmd=0x${cmd.toRadixString(16)} ctr=$_cmdCtr hdr', Uint8List.fromList(header));
+    _log('  plain', data);
+    _log('  iv', iv);
+    _log('  encData', encData);
+    _log('  macInput', macInput);
+    _log('  mact', mact);
+    _log('  TX', apdu);
+    final resp = await _transceive(apdu);
+    _log('  RX', resp);
     _cmdCtr++; // advance for the next command in this session
     return resp;
   }
