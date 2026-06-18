@@ -395,7 +395,10 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     bool done = false;
     NfcSession? session;
     try {
+      // Keep the reader session open through the result dialog so the Android
+      // tag-dispatch chooser doesn't grab the still-present card.
       session = await runIsoDepSession(
+        stopAfterAction: false,
         action: (iso) => Ntag424(iso.transceive).wipe(keys),
         onComplete: (_) {
           done = true;
@@ -413,23 +416,23 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
       _snack(friendlyError(l10n, e));
       return;
     }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    if (!done && err == null) {
-      await _showHoldDialog(l10n.boltCardHoldToWipe);
-    }
-    await session.stop();
 
-    if (err != null) {
-      await _showErrorDetail(l10n.boltCardWipeFailed, err!);
-      return;
-    }
-    if (done) {
-      await unmarkCardVerified(card.externalId);
-      if (mounted) setState(() => _verifiedIds.remove(card.externalId));
-      _snack(l10n.boltCardWiped);
+    try {
+      if (!mounted) return;
+      if (!done && err == null) {
+        await _showHoldDialog(l10n.boltCardHoldToWipe);
+      }
+      if (err != null) {
+        await _showErrorDetail(l10n.boltCardWipeFailed, err!);
+        return;
+      }
+      if (done) {
+        await unmarkCardVerified(card.externalId);
+        if (mounted) setState(() => _verifiedIds.remove(card.externalId));
+        await _showInfoDialog(l10n.boltCardWiped);
+      }
+    } finally {
+      await session.stop();
     }
   }
 
