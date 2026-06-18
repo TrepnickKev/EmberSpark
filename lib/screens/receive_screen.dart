@@ -10,7 +10,7 @@ import '../services/friendly_error.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
-import '../services/nfc_service.dart';
+import '../widgets/nfc_flow.dart';
 import '../services/price_service.dart';
 import '../widgets/stacked_action_button.dart';
 
@@ -227,65 +227,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Future<void> _writeNfcFor(String value) async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    NfcSession? session;
-    try {
-      session = await writeNdefUri(
-        'lightning:$value',
-        onSuccess: () {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteSuccess)));
-        },
-        onError: (_) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
-        },
-      );
-    } on NfcUnavailable {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
-      return;
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
-      return;
-    }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    await _showNfcDialog(session);
-  }
-
-  Future<void> _showNfcDialog(NfcSession session) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(child: Text(l10n.nfcHoldTag)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        ],
-      ),
-    );
-    // Dialog was popped one way or another — make sure no NFC session is left
-    // running.
-    await session.stop();
+    await writeNfcUriWithConfirm(context, 'lightning:$value');
   }
 
   @override

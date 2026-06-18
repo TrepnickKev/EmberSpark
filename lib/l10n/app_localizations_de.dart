@@ -84,6 +84,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nfcReadFailed => 'Tag konnte nicht gelesen werden';
 
   @override
+  String get nfcTagRead => 'Tag gelesen';
+
+  @override
   String get nfcUnavailable => 'NFC auf diesem Gerät nicht verfügbar';
 
   @override

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
-import '../services/nfc_service.dart';
+import '../widgets/nfc_flow.dart';
 import '../widgets/stacked_action_button.dart';
 
 class QrScanScreen extends StatefulWidget {
@@ -56,68 +56,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   Future<void> _readNfc() async {
     if (_handled) return;
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    NfcSession? session;
-    try {
-      session = await readNdefText(
-        onRead: (payload) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          final text = payload.trim();
-          if (text.isEmpty) {
-            messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-            return;
-          }
-          _handled = true;
-          Navigator.pop(context, text);
-        },
-        onError: (_) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-        },
-      );
-    } on NfcUnavailable {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
-      return;
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-      return;
-    }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    await _showNfcDialog(session);
-  }
-
-  Future<void> _showNfcDialog(NfcSession session) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(child: Text(l10n.nfcHoldTag)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        ],
-      ),
-    );
-    await session.stop();
+    final code = await readNfcTagWithConfirm(context);
+    if (code == null || !mounted) return;
+    _handled = true;
+    Navigator.pop(context, code);
   }
 
   Future<void> _pickImage() async {
