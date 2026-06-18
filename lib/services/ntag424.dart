@@ -157,6 +157,11 @@ class Ntag424 {
       ..._int3le(data.length),
     ];
     final resp = await _transceive(_wrap(0x8D, header, data));
+    // A blank card's NDEF file has free write access. A 0x91AE (authentication
+    // error) here means the file is key-locked, i.e. the card is already
+    // configured — surface that as the friendly "not blank" case rather than a
+    // raw status.
+    if (_sw(resp) == 0x91AE) throw const CardNotBlank();
     _ensureStatus(resp, 'write NDEF');
   }
 

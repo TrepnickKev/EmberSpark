@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -143,14 +142,17 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     final form = await _showCardForm(l10n);
     if (form == null) return;
 
+    // Read the chip's real UID first so the server record stores it. LNbits
+    // rejects any scan whose decrypted UID doesn't match the stored one, so a
+    // placeholder UID would make every tap fail with "Card UID mis-match".
+    final uidHex = await _readUid();
+    if (uidHex == null) return;
+
     BoltCard card;
     try {
-      // Create with a temporary, NXP-looking UID; the real chip UID is read
-      // during programming and pushed back to the server afterwards. A random
-      // placeholder avoids colliding with another not-yet-programmed card.
       card = await svc.createCard(
         name: form.name,
-        uid: _placeholderUid(),
+        uid: uidHex,
         txLimitSats: form.txLimit,
         dailyLimitSats: form.dailyLimit,
       );
@@ -163,6 +165,43 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     }
     await _load();
     await _program(card);
+  }
+
+  /// Taps the card only to read its UID (no authentication), returned as
+  /// uppercase hex. Used before creating the server record.
+  Future<String?> _readUid() async {
+    final l10n = AppLocalizations.of(context)!;
+    Uint8List? uid;
+    Object? err;
+    NfcSession? session;
+    try {
+      session = await runIsoDepSession(
+        action: (_) async {},
+        onComplete: (u) {
+          uid = u;
+          _closeDialog();
+        },
+        onError: (e) {
+          err = e;
+          _closeDialog();
+        },
+      );
+    } on NfcUnavailable {
+      _snack(l10n.nfcUnavailable);
+      return null;
+    } catch (e) {
+      _snack(friendlyError(l10n, e));
+      return null;
+    }
+    if (!mounted) {
+      await session.stop();
+      return null;
+    }
+    if (uid == null && err == null) {
+      await _showHoldDialog(l10n.boltCardHoldToVerify);
+    }
+    await session.stop();
+    return uid != null ? _hex(uid!) : null;
   }
 
   Future<void> _program(BoltCard card) async {
@@ -282,8 +321,10 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
       // Resolving the withdraw request confirms the card is live on the server.
       await fetchLnurl(decoded);
       _snack(l10n.boltCardVerified);
-    } catch (_) {
-      _snack(l10n.boltCardVerifyFailed);
+    } catch (e) {
+      // Show the server's actual reason (e.g. "LNURL error: Card UID mis-match")
+      // rather than a generic failure.
+      await _showErrorDetail(l10n.boltCardVerifyFailed, e);
     }
     await _load();
   }
@@ -390,18 +431,6 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
 
   static String _hex(Uint8List b) =>
       b.map((x) => x.toRadixString(16).padLeft(2, '0')).join().toUpperCase();
-
-  static final Random _rng = Random.secure();
-
-  static String _placeholderUid() {
-    // 7-byte NXP-style UID (starts with 0x04) with a random tail; overwritten
-    // with the real chip UID after programming.
-    final tail = List<int>.generate(6, (_) => _rng.nextInt(256))
-        .map((x) => x.toRadixString(16).padLeft(2, '0'))
-        .join()
-        .toUpperCase();
-    return '04$tail';
-  }
 
   Future<bool?> _confirm(AppLocalizations l10n, String message, String action) {
     return showDialog<bool>(

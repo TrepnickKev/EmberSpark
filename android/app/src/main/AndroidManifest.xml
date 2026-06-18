@@ -56,6 +56,16 @@
                 <data android:scheme="lnurlc"/>
                 <data android:scheme="keyauth"/>
             </intent-filter>
+            <!-- NFC tap: appear in the chooser when a Bolt Card (NDEF URI
+                 lnurlw://…, or lnurlp/lnurlc/keyauth) is held to the phone. -->
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="lnurlw"/>
+                <data android:scheme="lnurlp"/>
+                <data android:scheme="lnurlc"/>
+                <data android:scheme="keyauth"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
