@@ -216,6 +216,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This card is already programmed. Wipe it first.';
 
   @override
+  String get boltCardUidAlreadyRegistered =>
+      'A Bolt Card with this UID is already registered on the server. Delete the existing card entry and try again.';
+
+  @override
   String get boltCardVerifyNotProgrammed =>
       'This card is not programmed yet, so there is nothing to verify.';
 
@@ -556,7 +560,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lnurlAmountPositive => 'Enter a positive amount';
 
   @override
-  String get lnurlGetAndPay => 'Get invoice & pay';
+  String get lnurlGetAndPay => 'Send';
 
   @override
   String get lnurlWithdraw => 'Withdraw';

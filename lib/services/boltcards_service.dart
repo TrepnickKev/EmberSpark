@@ -68,6 +68,14 @@ class BoltcardsExtensionDisabled implements Exception {
   String toString() => 'Boltcards extension not installed';
 }
 
+/// Thrown by [BoltcardsService.createCard] when the server rejects the card
+/// because its chip UID is already registered to another card record.
+class BoltcardUidAlreadyRegistered implements Exception {
+  const BoltcardUidAlreadyRegistered();
+  @override
+  String toString() => 'Card UID already registered';
+}
+
 /// Thin client for the LNbits `boltcards` extension REST API.
 ///
 /// Construction mirrors [LNbitsService]: a [baseUrl] + admin [apiKey] + an
@@ -167,6 +175,9 @@ class BoltcardsService {
         .timeout(_timeout);
     if (res.statusCode == 404) throw const BoltcardsExtensionDisabled();
     if (res.statusCode >= 400) {
+      if (res.body.toLowerCase().contains('already registered')) {
+        throw const BoltcardUidAlreadyRegistered();
+      }
       throw Exception('LNbits ${res.statusCode}: ${res.body}');
     }
     return BoltCard.fromJson(jsonDecode(res.body) as Map<String, dynamic>);

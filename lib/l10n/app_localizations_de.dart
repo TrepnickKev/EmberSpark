@@ -218,6 +218,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Karte ist bereits beschrieben. Setze sie zuerst zurück.';
 
   @override
+  String get boltCardUidAlreadyRegistered =>
+      'Eine Bolt Card mit dieser UID ist auf dem Server bereits registriert. Lösche den vorhandenen Karteneintrag und versuche es erneut.';
+
+  @override
   String get boltCardVerifyNotProgrammed =>
       'Diese Karte ist noch nicht beschrieben, es gibt nichts zu prüfen.';
 
@@ -562,7 +566,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lnurlAmountPositive => 'Gib einen positiven Betrag ein';
 
   @override
-  String get lnurlGetAndPay => 'Rechnung holen & bezahlen';
+  String get lnurlGetAndPay => 'Senden';
 
   @override
   String get lnurlWithdraw => 'Abheben';

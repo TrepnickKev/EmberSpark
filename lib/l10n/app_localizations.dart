@@ -488,6 +488,12 @@ abstract class AppLocalizations {
   /// **'This card is already programmed. Wipe it first.'**
   String get boltCardNotBlank;
 
+  /// No description provided for @boltCardUidAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'A Bolt Card with this UID is already registered on the server. Delete the existing card entry and try again.'**
+  String get boltCardUidAlreadyRegistered;
+
   /// No description provided for @boltCardVerifyNotProgrammed.
   ///
   /// In en, this message translates to:
@@ -1097,7 +1103,7 @@ abstract class AppLocalizations {
   /// No description provided for @lnurlGetAndPay.
   ///
   /// In en, this message translates to:
-  /// **'Get invoice & pay'**
+  /// **'Send'**
   String get lnurlGetAndPay;
 
   /// No description provided for @lnurlWithdraw.

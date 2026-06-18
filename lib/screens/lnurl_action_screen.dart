@@ -188,7 +188,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
 
   Future<void> _submitWithdraw(LnurlWithdrawInfo i) async {
     final l10n = AppLocalizations.of(context)!;
-    final sats = int.tryParse(amountCtrl.text.trim());
+    final sats = _resolveSats();
     if (sats == null || sats <= 0) {
       setState(() => error = l10n.lnurlAmountPositive);
       return;
@@ -351,9 +351,10 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     return sats > 0 ? sats : null;
   }
 
-  /// Conversion preview under the pay amount field: shows the fiat equivalent
-  /// when entering sats, or the sats equivalent when entering fiat.
-  Widget _buildPayPreview(AppLocalizations l10n) {
+  /// Conversion preview under the amount field (pay or withdraw): shows the
+  /// fiat equivalent when entering sats, or the sats equivalent when entering
+  /// fiat.
+  Widget _buildAmountPreview(AppLocalizations l10n) {
     const style = TextStyle(color: Colors.grey, fontSize: 12);
     if (ratesLoading) {
       return const SizedBox(
@@ -425,61 +426,44 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             style: const TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 12),
-          if (i is LnurlPayInfo) ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: amountCtrl,
-                    keyboardType: currency == 'sats'
-                        ? TextInputType.number
-                        : const TextInputType.numberWithOptions(decimal: true),
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    decoration: InputDecoration(labelText: l10n.commonAmount),
-                  ),
+          // Amount input with a sats/fiat selector (same for pay and withdraw):
+          // the user can type in sats or in a fiat currency, converted to sats.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: amountCtrl,
+                  keyboardType: currency == 'sats'
+                      ? TextInputType.number
+                      : const TextInputType.numberWithOptions(decimal: true),
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(labelText: l10n.commonAmount),
                 ),
-                const SizedBox(width: 12),
-                DropdownButton<String>(
-                  value: currency,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'sats',
-                      child: Text(l10n.receiveCurrencySats),
-                    ),
-                    for (final c in supportedCurrencies)
-                      DropdownMenuItem(value: c, child: Text(c)),
-                  ],
-                  onChanged: (next) {
-                    if (next == null) return;
-                    setState(() => currency = next);
-                  },
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: _buildPayPreview(l10n),
-            ),
-          ] else ...[
-            TextField(
-              controller: amountCtrl,
-              keyboardType: TextInputType.number,
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: InputDecoration(labelText: l10n.commonAmount),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: _FiatPreview(
-                sats: int.tryParse(amountCtrl.text.trim()) ?? 0,
-                rates: rates,
-                currency: displayCurrency,
-                loading: ratesLoading,
               ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              DropdownButton<String>(
+                value: currency,
+                items: [
+                  DropdownMenuItem(
+                    value: 'sats',
+                    child: Text(l10n.receiveCurrencySats),
+                  ),
+                  for (final c in supportedCurrencies)
+                    DropdownMenuItem(value: c, child: Text(c)),
+                ],
+                onChanged: (next) {
+                  if (next == null) return;
+                  setState(() => currency = next);
+                },
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: _buildAmountPreview(l10n),
+          ),
           if (i is LnurlPayInfo && i.commentAllowed > 0) ...[
             const SizedBox(height: 12),
             TextField(
@@ -522,41 +506,3 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   }
 }
 
-class _FiatPreview extends StatelessWidget {
-  const _FiatPreview({
-    required this.sats,
-    required this.rates,
-    required this.currency,
-    required this.loading,
-  });
-
-  final int sats;
-  final Map<String, double>? rates;
-  final String currency;
-  final bool loading;
-
-  @override
-  Widget build(BuildContext context) {
-    if (sats <= 0) return const SizedBox.shrink();
-    if (loading) {
-      return const SizedBox(
-        height: 14,
-        width: 14,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
-    }
-    final rate = rates?[currency];
-    if (rate == null) {
-      final l10n = AppLocalizations.of(context)!;
-      return Text(
-        l10n.receiveRatesUnavailable,
-        style: const TextStyle(color: Colors.grey),
-      );
-    }
-    final fiat = sats / 1e8 * rate;
-    return Text(
-      formatFiatApprox(fiat, currency),
-      style: const TextStyle(color: Colors.grey),
-    );
-  }
-}

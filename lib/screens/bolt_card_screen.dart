@@ -199,6 +199,9 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     } on BoltcardsExtensionDisabled {
       _snack(l10n.boltCardExtensionMissing);
       return;
+    } on BoltcardUidAlreadyRegistered {
+      await _showInfoDialog(l10n.boltCardUidAlreadyRegistered);
+      return;
     } catch (e) {
       _snack(friendlyError(l10n, e));
       return;
