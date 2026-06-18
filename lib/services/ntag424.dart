@@ -260,11 +260,12 @@ class Ntag424 {
       throw const Ntag424Exception('RndA mismatch (authentication failed)');
     }
 
-    // Derive session keys (AN12196 §6.6.2). SV1 -> MAC key, SV2 -> ENC key.
+    // Derive session keys (AN12196 §6.6.2): SV1 (A5 5A) -> SesAuthENC,
+    // SV2 (5A A5) -> SesAuthMAC.
     final sv1 = _sessionVector(0xA5, 0x5A, rndA, rndB);
     final sv2 = _sessionVector(0x5A, 0xA5, rndA, rndB);
-    _sesMac = _aesCmac(key, sv1);
-    _sesEnc = _aesCmac(key, sv2);
+    _sesEnc = _aesCmac(key, sv1);
+    _sesMac = _aesCmac(key, sv2);
     _ti = ti;
     _cmdCtr = 0;
     _log('TI', ti);
@@ -325,7 +326,6 @@ class Ntag424 {
   /// only advances the counter on success (so a rejected probe doesn't desync).
   Future<void> _probeGetCardUid() async {
     final mac = _sesMac!, ti = _ti!;
-    _cmdCtr++; // increment before, like every secured command
     final ctr = _ctrLe();
     final macInput = Uint8List.fromList([0x51, ...ctr, ...ti]);
     final mact = _truncateMac(_aesCmac(mac, macInput));
@@ -333,6 +333,7 @@ class Ntag424 {
     _log('getUID ctr=$_cmdCtr TX', apdu);
     final resp = await _transceive(apdu);
     _log('getUID RX', resp);
+    if (_isSuccess(resp)) _cmdCtr++;
   }
 
   // ---- ChangeKey (CommMode.Full, AN12196 §6.5) -----------------------------
@@ -363,11 +364,9 @@ class Ntag424 {
   /// command header (e.g. file/key number); [data] is the plaintext payload.
   Future<Uint8List> _transceiveFull(int cmd, List<int> header, Uint8List data) async {
     final enc = _sesEnc!, mac = _sesMac!, ti = _ti!;
-    // CmdCtr is incremented BEFORE each secured command is processed (NTAG424
-    // datasheet); both PICC and PCD do this, so the first secured command after
-    // AuthenticateEV2First uses 1 (not 0). The same value is used for the IV and
-    // the command MAC.
-    _cmdCtr++;
+    // CmdCtr is 0 for the first secured command after AuthenticateEV2First and
+    // is incremented after each command/response (matches the working
+    // ntag424-java reference). The same value feeds the IV and the command MAC.
     final ctr = _ctrLe();
 
     // IVc = E(KSesEnc, A5 5A || TI || CmdCtr || 0^8)
@@ -389,6 +388,7 @@ class Ntag424 {
     _log('  TX', apdu);
     final resp = await _transceive(apdu);
     _log('  RX', resp);
+    _cmdCtr++; // advance for the next command in this session
     return resp;
   }
 
@@ -567,14 +567,16 @@ class Ntag424 {
   /// Derives `(SesAuthMACKey, SesAuthENCKey)` from a card key and the two
   /// randoms, per AN12196 §6.6.2. Exposed so tests can check it against the
   /// application-note worked example.
+  /// Returns `(SesAuthMAC, SesAuthENC)`: per AN12196, SesAuthENC = CMAC(SV1,
+  /// A5 5A) and SesAuthMAC = CMAC(SV2, 5A A5).
   static (Uint8List, Uint8List) sessionKeysForTest(
     Uint8List key,
     Uint8List rndA,
     Uint8List rndB,
   ) =>
       (
-        _aesCmac(key, _sessionVector(0xA5, 0x5A, rndA, rndB)),
-        _aesCmac(key, _sessionVector(0x5A, 0xA5, rndA, rndB)),
+        _aesCmac(key, _sessionVector(0x5A, 0xA5, rndA, rndB)), // SesAuthMAC
+        _aesCmac(key, _sessionVector(0xA5, 0x5A, rndA, rndB)), // SesAuthENC
       );
 
   static Uint8List cmacForTest(Uint8List key, Uint8List data) =>

@@ -46,9 +46,10 @@ void main() {
     final rndB = hx('9204E862 0EBD30DF 52E91E41 E9AC499E');
 
     test('derives the documented SesAuthMAC / SesAuthENC keys', () {
+      // AN12196: SesAuthENC = CMAC(SV1, A5 5A); SesAuthMAC = CMAC(SV2, 5A A5).
       final (mac, enc) = Ntag424.sessionKeysForTest(key, rndA, rndB);
-      expect(hex(mac), '3890a8e11762d784715608e811b37a81');
-      expect(hex(enc), '42b9997d6513a602e9ce2ddd1bfe042d');
+      expect(hex(enc), '3890a8e11762d784715608e811b37a81');
+      expect(hex(mac), '42b9997d6513a602e9ce2ddd1bfe042d');
     });
   });
 
@@ -69,10 +70,11 @@ void main() {
           hex(Ntag424.rotateLeftForTest(rndA)));
     });
 
-    test('session keys match the logged SesEnc / SesMac', () {
+    test('session keys derive consistently (AN12196 mapping)', () {
+      // CMAC(SV1)=975fee… is SesAuthENC; CMAC(SV2)=e4fb41… is SesAuthMAC.
       final (mac, enc) = Ntag424.sessionKeysForTest(key, rndA, rndB);
-      expect(hex(enc), 'e4fb41fcd0f23e2ab58fae66e74eede8');
-      expect(hex(mac), '975fee05b07be524119beb35e55be407');
+      expect(hex(enc), '975fee05b07be524119beb35e55be407');
+      expect(hex(mac), 'e4fb41fcd0f23e2ab58fae66e74eede8');
     });
   });
 
