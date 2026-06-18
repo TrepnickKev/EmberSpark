@@ -59,9 +59,14 @@ Future<void> _ensureAvailable() async {
 /// first tag tapped. `onRead` fires with the decoded string; `onError`
 /// fires for any per-tap failure (non-NDEF tag, unsupported record, etc.).
 /// Throws [NfcUnavailable] synchronously if NFC is off or absent.
+/// When [stopAfterRead] is false, the session is left active after a read (or
+/// error) and the caller is responsible for calling [NfcSession.stop]. Keeping
+/// reader mode on suppresses the Android tag-dispatch chooser, so the OS won't
+/// grab the still-present card while a result is being shown.
 Future<NfcSession> readNdefText({
   required void Function(String) onRead,
   required void Function(Object) onError,
+  bool stopAfterRead = true,
 }) async {
   await _ensureAvailable();
   final session = NfcSession._();
@@ -82,14 +87,14 @@ Future<NfcSession> readNdefText({
           payload = _decodeRecord(r);
           if (payload != null) break;
         }
-        await session.stop();
+        if (stopAfterRead) await session.stop();
         if (payload == null) {
           onError(const NfcTagNotNdef());
         } else {
           onRead(payload);
         }
       } catch (e) {
-        await session.stop();
+        if (stopAfterRead) await session.stop();
         onError(e);
       }
     },
@@ -135,10 +140,16 @@ Future<NfcSession> writeNdefUri(
 /// UID (the ISO 14443-3 anticollision id) is passed to [onComplete] after
 /// [action] returns successfully; [onError] fires on any per-tap failure.
 /// Throws [NfcUnavailable] synchronously if NFC is off or absent.
+///
+/// When [stopAfterAction] is false, the session is left active after the action
+/// (or error) and the caller must call [NfcSession.stop]. Keeping reader mode on
+/// suppresses the Android tag-dispatch chooser so the OS won't grab the
+/// still-present card while a result is being shown.
 Future<NfcSession> runIsoDepSession({
   required Future<void> Function(IsoDepAndroid isoDep) action,
   required void Function(Uint8List uid) onComplete,
   required void Function(Object) onError,
+  bool stopAfterAction = true,
 }) async {
   await _ensureAvailable();
   final session = NfcSession._();
@@ -158,10 +169,10 @@ Future<NfcSession> runIsoDepSession({
         final iso = IsoDepAndroid.from(tag);
         if (iso == null) throw const NfcTagNotIsoDep();
         await action(iso);
-        await session.stop();
+        if (stopAfterAction) await session.stop();
         onComplete(iso.tag.id);
       } catch (e) {
-        await session.stop();
+        if (stopAfterAction) await session.stop();
         onError(e);
       }
     },

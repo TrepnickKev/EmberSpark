@@ -226,6 +226,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Karte funktioniert und verweist auf diese Wallet.';
 
   @override
+  String get boltCardVerifiedBadge => 'Verifiziert';
+
+  @override
   String get boltCardVerifyWrongServer =>
       'Diese Karte verweist auf einen anderen Server.';
 

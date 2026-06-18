@@ -500,6 +500,12 @@ abstract class AppLocalizations {
   /// **'Card works and points to this wallet.'**
   String get boltCardVerified;
 
+  /// No description provided for @boltCardVerifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get boltCardVerifiedBadge;
+
   /// No description provided for @boltCardVerifyWrongServer.
   ///
   /// In en, this message translates to:

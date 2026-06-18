@@ -75,6 +75,7 @@
   "boltCardNotBlank": "This card is already programmed. Wipe it first.",
   "boltCardVerifyNotProgrammed": "This card is not programmed yet, so there is nothing to verify.",
   "boltCardVerified": "Card works and points to this wallet.",
+  "boltCardVerifiedBadge": "Verified",
   "boltCardVerifyWrongServer": "This card points to a different server.",
   "boltCardVerifyFailed": "Could not verify the card.",
   "boltCardWipeConfirm": "Reset this card to factory keys? It will stop working until you program it again.",
