@@ -267,12 +267,16 @@ class Ntag424 {
 
   // ---- Secure-messaging transport (CommMode.Full) --------------------------
 
-  /// Sends a command whose data is encrypted (CommMode.Full) and MAC'd, and
-  /// verifies the response MAC. [header] is the plaintext command header
-  /// (e.g. file/key number); [data] is the plaintext payload to encrypt.
+  /// Sends a command whose data is encrypted (CommMode.Full) and MAC'd. The
+  /// caller checks the returned status word ([_ensureStatus]); the response MAC
+  /// is not verified (none of our commands return data we depend on, and the
+  /// status word already reports success/failure). [header] is the plaintext
+  /// command header (e.g. file/key number); [data] is the plaintext payload.
   Future<Uint8List> _transceiveFull(int cmd, List<int> header, Uint8List data) async {
     final enc = _sesEnc!, mac = _sesMac!, ti = _ti!;
-    _cmdCtr++; // incremented before the command is processed (AN12196)
+    // The command counter is 0 for the first secured command after
+    // AuthenticateEV2First and is used as-is for the command IV and MAC; it is
+    // incremented only after the command/response exchange (AN12196 / NTAG424).
     final ctr = _ctrLe();
 
     // IVc = E(KSesEnc, A5 5A || TI || CmdCtr || 0^8)
@@ -285,21 +289,7 @@ class Ntag424 {
     final mact = _truncateMac(_aesCmac(mac, macInput));
 
     final resp = await _transceive(_wrap(cmd, header, Uint8List.fromList([...encData, ...mact])));
-
-    // Verify response MAC: RC(0x00) || CmdCtr || TI || RespData.
-    if (_isSuccess(resp)) {
-      final body = _body(resp);
-      if (body.length >= 8) {
-        final respData = body.sublist(0, body.length - 8);
-        final respMac = body.sublist(body.length - 8);
-        final expected = _truncateMac(
-          _aesCmac(mac, Uint8List.fromList([0x00, ...ctr, ...ti, ...respData])),
-        );
-        if (!_bytesEqual(respMac, expected)) {
-          throw const Ntag424Exception('Response MAC mismatch');
-        }
-      }
-    }
+    _cmdCtr++; // advance for the next command in this session
     return resp;
   }
 
