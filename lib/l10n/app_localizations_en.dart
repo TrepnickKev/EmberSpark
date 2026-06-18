@@ -84,9 +84,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcReadFailed => 'Couldn\'t read tag';
 
   @override
-  String get nfcTagRead => 'Tag read';
-
-  @override
   String get nfcUnavailable => 'NFC unavailable on this device';
 
   @override

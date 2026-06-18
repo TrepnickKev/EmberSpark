@@ -105,15 +105,10 @@ Future<NfcSession> readNdefText({
 /// Writes a single URI NDEF record (`uri`, e.g. "lightning:lnbc…") to the
 /// first writable tag tapped. Throws [NfcUnavailable] synchronously if NFC
 /// is off or absent.
-///
-/// When [stopAfterWrite] is false, the session is left active after the write
-/// (or error) and the caller must call [NfcSession.stop]. Keeping reader mode
-/// on suppresses the Android tag-dispatch chooser while a result is shown.
 Future<NfcSession> writeNdefUri(
   String uri, {
   required void Function() onSuccess,
   required void Function(Object) onError,
-  bool stopAfterWrite = true,
 }) async {
   await _ensureAvailable();
   final session = NfcSession._();
@@ -129,10 +124,10 @@ Future<NfcSession> writeNdefUri(
           throw const NfcTagNotWritable();
         }
         await ndef.writeNdefMessage(NdefMessage(records: [record]));
-        if (stopAfterWrite) await session.stop();
+        await session.stop();
         onSuccess();
       } catch (e) {
-        if (stopAfterWrite) await session.stop();
+        await session.stop();
         onError(e);
       }
     },

@@ -248,12 +248,6 @@ abstract class AppLocalizations {
   /// **'Couldn\'t read tag'**
   String get nfcReadFailed;
 
-  /// No description provided for @nfcTagRead.
-  ///
-  /// In en, this message translates to:
-  /// **'Tag read'**
-  String get nfcTagRead;
-
   /// No description provided for @nfcUnavailable.
   ///
   /// In en, this message translates to:

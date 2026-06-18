@@ -27,7 +27,6 @@
   "nfcWriteSuccess": "Auf Tag geschrieben",
   "nfcWriteFailed": "Tag konnte nicht beschrieben werden",
   "nfcReadFailed": "Tag konnte nicht gelesen werden",
-  "nfcTagRead": "Tag gelesen",
   "nfcUnavailable": "NFC auf diesem Gerät nicht verfügbar",
   "imageNoQr": "Kein QR-Code im Bild gefunden",
   "clipboardEmpty": "Zwischenablage ist leer",

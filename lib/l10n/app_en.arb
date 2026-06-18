@@ -27,7 +27,6 @@
   "nfcWriteSuccess": "Written to tag",
   "nfcWriteFailed": "Couldn't write to tag",
   "nfcReadFailed": "Couldn't read tag",
-  "nfcTagRead": "Tag read",
   "nfcUnavailable": "NFC unavailable on this device",
   "imageNoQr": "No QR code found in the image",
   "clipboardEmpty": "Clipboard is empty",
