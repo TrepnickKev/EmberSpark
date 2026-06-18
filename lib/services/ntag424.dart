@@ -273,7 +273,10 @@ class Ntag424 {
       0x40, // FileOption: SDM enabled, CommMode = Plain
       0x00, 0xE0, // AccessRights: Read=free, Write/RW/Change=key0
       0xC1, // SDMOptions: UID + ReadCtr + ASCII encoding
-      0xF1, 0x21, // SDMAccessRights: MetaRead=key1, FileRead=key2
+      // SDMAccessRights, sent high byte first: 0xFF = RFU(F) + CtrRet(none, F);
+      // 0x12 = SDMMetaRead=key1, SDMFileRead=key2. (A wrong CtrRet here with the
+      // read counter enabled makes the card reject ChangeFileSettings, SW=0x911E.)
+      0xFF, 0x12,
       ..._int3le(piccDataOffset), // PICCDataOffset
       ..._int3le(macInputOffset), // SDMMACInputOffset
       ..._int3le(macOffset), // SDMMACOffset
