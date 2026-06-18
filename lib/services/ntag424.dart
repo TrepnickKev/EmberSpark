@@ -325,6 +325,7 @@ class Ntag424 {
   /// only advances the counter on success (so a rejected probe doesn't desync).
   Future<void> _probeGetCardUid() async {
     final mac = _sesMac!, ti = _ti!;
+    _cmdCtr++; // increment before, like every secured command
     final ctr = _ctrLe();
     final macInput = Uint8List.fromList([0x51, ...ctr, ...ti]);
     final mact = _truncateMac(_aesCmac(mac, macInput));
@@ -332,7 +333,6 @@ class Ntag424 {
     _log('getUID ctr=$_cmdCtr TX', apdu);
     final resp = await _transceive(apdu);
     _log('getUID RX', resp);
-    if (_isSuccess(resp)) _cmdCtr++;
   }
 
   // ---- ChangeKey (CommMode.Full, AN12196 §6.5) -----------------------------
@@ -363,9 +363,11 @@ class Ntag424 {
   /// command header (e.g. file/key number); [data] is the plaintext payload.
   Future<Uint8List> _transceiveFull(int cmd, List<int> header, Uint8List data) async {
     final enc = _sesEnc!, mac = _sesMac!, ti = _ti!;
-    // The command counter is 0 for the first secured command after
-    // AuthenticateEV2First and is used as-is for the command IV and MAC; it is
-    // incremented only after the command/response exchange (AN12196 / NTAG424).
+    // CmdCtr is incremented BEFORE each secured command is processed (NTAG424
+    // datasheet); both PICC and PCD do this, so the first secured command after
+    // AuthenticateEV2First uses 1 (not 0). The same value is used for the IV and
+    // the command MAC.
+    _cmdCtr++;
     final ctr = _ctrLe();
 
     // IVc = E(KSesEnc, A5 5A || TI || CmdCtr || 0^8)
@@ -387,7 +389,6 @@ class Ntag424 {
     _log('  TX', apdu);
     final resp = await _transceive(apdu);
     _log('  RX', resp);
-    _cmdCtr++; // advance for the next command in this session
     return resp;
   }
 
