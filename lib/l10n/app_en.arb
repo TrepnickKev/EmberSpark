@@ -78,6 +78,7 @@
   "boltCardVerified": "Card works and points to this wallet.",
   "boltCardVerifiedBadge": "Verified",
   "boltCardVerifyWrongServer": "This card points to a different server.",
+  "boltCardVerifyUidMismatch": "This card's chip ID does not match the server record. Wipe the card, then add and program it again so the correct ID is stored.",
   "boltCardVerifyFailed": "Could not verify the card.",
   "boltCardWipeConfirm": "Reset this card to factory keys? It will stop working until you program it again.",
   "boltCardWiped": "Card reset to factory keys.",

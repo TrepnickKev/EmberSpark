@@ -234,6 +234,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This card points to a different server.';
 
   @override
+  String get boltCardVerifyUidMismatch =>
+      'This card\'s chip ID does not match the server record. Wipe the card, then add and program it again so the correct ID is stored.';
+
+  @override
   String get boltCardVerifyFailed => 'Could not verify the card.';
 
   @override

@@ -351,8 +351,16 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
           iconColor: Colors.green,
         );
       } catch (e) {
-        // Show the server's actual reason (e.g. "LNURL error: Card UID mis-match").
-        await _showErrorDetail(l10n.boltCardVerifyFailed, e);
+        final msg = e.toString().toLowerCase();
+        if (msg.contains('uid mis') || msg.contains('uid mismatch')) {
+          // The chip works (the server processed the tap) but the UID stored in
+          // the server record doesn't match the chip. Give an actionable hint
+          // instead of the raw "LNURL error: Card UID mis-match".
+          await _showInfoDialog(l10n.boltCardVerifyUidMismatch);
+        } else {
+          // Show the server's actual reason for other failures.
+          await _showErrorDetail(l10n.boltCardVerifyFailed, e);
+        }
       }
     } finally {
       await session.stop();

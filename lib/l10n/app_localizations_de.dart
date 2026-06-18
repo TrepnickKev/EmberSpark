@@ -237,6 +237,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Karte verweist auf einen anderen Server.';
 
   @override
+  String get boltCardVerifyUidMismatch =>
+      'Die Chip-ID dieser Karte stimmt nicht mit dem Servereintrag überein. Setze die Karte zurück und füge sie neu hinzu und beschreibe sie erneut, damit die richtige ID gespeichert wird.';
+
+  @override
   String get boltCardVerifyFailed => 'Karte konnte nicht geprüft werden.';
 
   @override

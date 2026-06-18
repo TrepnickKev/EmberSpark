@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'This card points to a different server.'**
   String get boltCardVerifyWrongServer;
 
+  /// No description provided for @boltCardVerifyUidMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This card\'s chip ID does not match the server record. Wipe the card, then add and program it again so the correct ID is stored.'**
+  String get boltCardVerifyUidMismatch;
+
   /// No description provided for @boltCardVerifyFailed.
   ///
   /// In en, this message translates to:
