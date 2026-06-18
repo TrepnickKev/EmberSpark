@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -183,42 +182,79 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     final form = await _showCardForm(l10n);
     if (form == null) return;
 
-    // Create with a temporary UID, then program in a single tap. The program
-    // tap reads the chip's real UID and writes it back to the server record on
-    // success, so a separate "read UID" tap (which would stop the reader and
-    // let Android's tag chooser grab the card) isn't needed.
-    BoltCard card;
+    BoltCard? created;
+    Object? err;
+    var done = false;
+    NfcSession? session;
     try {
-      card = await svc.createCard(
-        name: form.name,
-        uid: _placeholderUid(),
-        txLimitSats: form.txLimit,
-        dailyLimitSats: form.dailyLimit,
+      // One continuous tap: read the chip's real UID, create the server record
+      // with it, then program the chip. The createCard network call happens
+      // while the card is held. Keeping the reader session open avoids the
+      // Android tag chooser, and storing the real UID up front avoids a later
+      // "Card UID mis-match".
+      session = await runIsoDepSession(
+        stopAfterAction: false,
+        action: (iso) async {
+          final card = await svc.createCard(
+            name: form.name,
+            uid: _hex(iso.tag.id),
+            txLimitSats: form.txLimit,
+            dailyLimitSats: form.dailyLimit,
+          );
+          created = card;
+          await Ntag424(iso.transceive).programBoltcard(
+            lnurlwTemplate: _lnurlwTemplate(svc, card.externalId),
+            keys: BoltCardKeys.fromHex(card.k0, card.k1, card.k2),
+          );
+        },
+        onComplete: (_) {
+          done = true;
+          _closeDialog();
+        },
+        onError: (e) {
+          err = e;
+          _closeDialog();
+        },
       );
-    } on BoltcardsExtensionDisabled {
-      _snack(l10n.boltCardExtensionMissing);
-      return;
-    } on BoltcardUidAlreadyRegistered {
-      await _showInfoDialog(l10n.boltCardUidAlreadyRegistered);
+    } on NfcUnavailable {
+      _snack(l10n.nfcUnavailable);
       return;
     } catch (e) {
       _snack(friendlyError(l10n, e));
       return;
     }
+
+    try {
+      if (!mounted) return;
+      if (!done && err == null) {
+        await _showHoldDialog(l10n.boltCardHoldToProgram);
+      }
+      if (err != null) {
+        if (err is BoltcardsExtensionDisabled) {
+          _snack(l10n.boltCardExtensionMissing);
+        } else if (err is BoltcardUidAlreadyRegistered) {
+          await _showInfoDialog(l10n.boltCardUidAlreadyRegistered);
+        } else if (err is CardNotBlank) {
+          await _showInfoDialog(l10n.boltCardNotBlank);
+        } else {
+          await _showErrorDetail(l10n.boltCardProgramFailed, err!);
+        }
+        // Remove the record if it was created before a later failure, so no
+        // orphan (with an unprogrammed chip) lingers on the server.
+        final c = created;
+        if (c != null) {
+          try {
+            await svc.deleteCard(c.id);
+          } catch (_) {}
+        }
+        return;
+      }
+      if (!done) return; // cancelled before the card was tapped
+      await _showInfoDialog(l10n.boltCardProgrammed);
+    } finally {
+      await session.stop();
+    }
     await _load();
-    await _program(card);
-  }
-
-  static final Random _rng = Random.secure();
-
-  /// A temporary NXP-style UID (starts with 0x04) used only until the real chip
-  /// UID is read during programming and written back to the server record.
-  static String _placeholderUid() {
-    final tail = List<int>.generate(6, (_) => _rng.nextInt(256))
-        .map((x) => x.toRadixString(16).padLeft(2, '0'))
-        .join()
-        .toUpperCase();
-    return '04$tail';
   }
 
   Future<void> _program(BoltCard card) async {

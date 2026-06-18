@@ -141,19 +141,45 @@ class Ntag424 {
   Future<void> wipe(BoltCardKeys keys) async {
     try {
       await _isoSelectNdefApp();
-      await _authenticateEV2First(0x00, keys.k0);
+
+      // Authenticate with the stored key 0; if that fails, the card may already
+      // be at factory keys (only partially programmed, or already reset), so try
+      // the default key.
+      var keysAreDefault = false;
+      try {
+        await _authenticateEV2First(0x00, keys.k0);
+      } on CardNotBlank {
+        try {
+          await _authenticateEV2First(0x00, _defaultKey);
+          keysAreDefault = true;
+        } on CardNotBlank {
+          throw const Ntag424Exception(
+            'Could not authenticate with the saved or default keys; the card was '
+            'likely programmed with different keys.',
+          );
+        }
+      }
+
+      // DIAGNOSTIC: probe the command-MAC path (no encrypted data) to isolate a
+      // MAC-side failure from an encrypted-data one. Logged into the trace.
+      try {
+        await _probeGetCardUid();
+      } catch (e) {
+        _log('getUID error', '$e');
+      }
 
       // Disable SDM and restore plain, free-read/write NDEF file settings.
       await _changeFileSettingsPlain();
 
-      // Restore default keys. Change key 0 last.
-      await _changeKey(1, keys.k1, _defaultKey);
-      await _changeKey(2, keys.k2, _defaultKey);
-      await _changeKey(3, keys.k1, _defaultKey);
-      await _changeKey(4, keys.k2, _defaultKey);
-      await _changeKey(0, keys.k0, _defaultKey);
-    } on CardNotBlank {
-      rethrow;
+      // Only the stored-key case needs the keys reset to default; a card that
+      // already authenticated with the default key is at factory keys already.
+      if (!keysAreDefault) {
+        await _changeKey(1, keys.k1, _defaultKey);
+        await _changeKey(2, keys.k2, _defaultKey);
+        await _changeKey(3, keys.k1, _defaultKey);
+        await _changeKey(4, keys.k2, _defaultKey);
+        await _changeKey(0, keys.k0, _defaultKey);
+      }
     } catch (e) {
       throw _withTrace(e);
     }
@@ -290,6 +316,23 @@ class Ntag424 {
     final data = <int>[0x00, 0xE0, 0xEE];
     final resp = await _transceiveFull(0x5F, [_ndefFileNo], Uint8List.fromList(data));
     _ensureStatus(resp, 'disable SDM');
+  }
+
+  /// DIAGNOSTIC: GetCardUID (0x51) is CommMode.Full with no command data, so it
+  /// exercises only the command-MAC path (session MAC key + counter + TI),
+  /// independent of any encrypted command data. Logging its result isolates a
+  /// MAC-side failure from an encryption/settings-side one. Non-destructive;
+  /// only advances the counter on success (so a rejected probe doesn't desync).
+  Future<void> _probeGetCardUid() async {
+    final mac = _sesMac!, ti = _ti!;
+    final ctr = _ctrLe();
+    final macInput = Uint8List.fromList([0x51, ...ctr, ...ti]);
+    final mact = _truncateMac(_aesCmac(mac, macInput));
+    final apdu = _wrap(0x51, const [], mact);
+    _log('getUID ctr=$_cmdCtr TX', apdu);
+    final resp = await _transceive(apdu);
+    _log('getUID RX', resp);
+    if (_isSuccess(resp)) _cmdCtr++;
   }
 
   // ---- ChangeKey (CommMode.Full, AN12196 §6.5) -----------------------------
@@ -538,6 +581,11 @@ class Ntag424 {
   static Uint8List crc32ForTest(Uint8List data) => _crc32Le(data);
   static Uint8List truncateMacForTest(Uint8List mac) => _truncateMac(mac);
   static Uint8List ndefFileForTest(String uri) => _buildNdefFile(uri);
+  /// AES-CBC decrypt with a zero IV (as used to decrypt the AuthenticateEV2First
+  /// part-2 response). Exposed so a test can validate a real card's auth trace.
+  static Uint8List aesCbcDecryptZeroIvForTest(Uint8List key, Uint8List data) =>
+      _aesCbcDecrypt(key, Uint8List(16), data);
+  static Uint8List rotateLeftForTest(Uint8List b) => _rotateLeft(b);
   static int valueOffsetForTest(Uint8List file, String marker) =>
       _valueOffset(file, marker);
 

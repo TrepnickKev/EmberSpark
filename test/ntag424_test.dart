@@ -52,6 +52,30 @@ void main() {
     });
   });
 
+  group('real-card wipe trace (auth validation)', () {
+    // Captured from a real NTAG424 (card programmed by the official Bolt Card
+    // app); used to independently confirm EmberSpark's auth decryption.
+    final key = hx('c5aa63e93c9001ada1b9984d055f8ea6');
+    final rndA = hx('32b49b91f4c94cc469d10237206971fe');
+    final rndB = hx('f2c80ea71188c08c91b5b75f5af488dc');
+    final auth2 = hx(
+        'd847d7b49eb4c4c90342295d19e0f6bf113ff6186fb986663c6dc8752f42bd0a');
+
+    test('decrypting auth2 yields the logged TI and RndA prime', () {
+      final dec = Ntag424.aesCbcDecryptZeroIvForTest(key, auth2);
+      // TI is the first 4 bytes; the next 16 are RndA rotated left by one byte.
+      expect(hex(dec.sublist(0, 4)), 'd49cb631');
+      expect(hex(dec.sublist(4, 20)),
+          hex(Ntag424.rotateLeftForTest(rndA)));
+    });
+
+    test('session keys match the logged SesEnc / SesMac', () {
+      final (mac, enc) = Ntag424.sessionKeysForTest(key, rndA, rndB);
+      expect(hex(enc), 'e4fb41fcd0f23e2ab58fae66e74eede8');
+      expect(hex(mac), '975fee05b07be524119beb35e55be407');
+    });
+  });
+
   group('DESFire CRC32 (JAMCRC)', () {
     test('check value of "123456789" is 0x340BC6D9 (little-endian bytes)', () {
       final crc = Ntag424.crc32ForTest(
