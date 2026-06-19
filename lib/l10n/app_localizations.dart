@@ -524,6 +524,12 @@ abstract class AppLocalizations {
   /// **'This card\'s chip ID does not match the server record. Wipe the card, then add and program it again so the correct ID is stored.'**
   String get boltCardVerifyUidMismatch;
 
+  /// No description provided for @boltCardVerifyCounterBehind.
+  ///
+  /// In en, this message translates to:
+  /// **'This card\'s tap counter is behind the server. Re-program the card to reset it.'**
+  String get boltCardVerifyCounterBehind;
+
   /// No description provided for @boltCardVerifyFailed.
   ///
   /// In en, this message translates to:

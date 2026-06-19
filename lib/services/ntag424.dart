@@ -160,16 +160,13 @@ class Ntag424 {
         }
       }
 
-      // DIAGNOSTIC: probe the command-MAC path (no encrypted data) to isolate a
-      // MAC-side failure from an encrypted-data one. Logged into the trace.
-      try {
-        await _probeGetCardUid();
-      } catch (e) {
-        _log('getUID error', '$e');
-      }
-
       // Disable SDM and restore plain, free-read/write NDEF file settings.
       await _changeFileSettingsPlain();
+
+      // Blank the NDEF record so the wiped card reads as empty: NLEN=0 plus
+      // zeros over the old URL bytes. _changeFileSettingsPlain restored free
+      // write access, so the plain WriteData succeeds without a session.
+      await _writeDataPlain(_ndefFileNo, 0, Uint8List(160));
 
       // Only the stored-key case needs the keys reset to default; a card that
       // already authenticated with the default key is at factory keys already.
@@ -229,7 +226,6 @@ class Ntag424 {
 
   Future<void> _authenticateEV2First(int keyNo, Uint8List key) async {
     _log('auth keyNo', '$keyNo');
-    _log('auth key', key);
     // Part 1: send key number; card returns E(K, RndB).
     final r1 = await _transceive(_wrap(0x71, [keyNo, 0x00], Uint8List(0)));
     _log('auth1 RX', r1);
@@ -239,10 +235,8 @@ class Ntag424 {
     }
     final ekRndB = _body(r1);
     final rndB = _aesCbcDecrypt(key, Uint8List(16), ekRndB);
-    _log('RndB', rndB);
 
     final rndA = _randomBytes(16);
-    _log('RndA', rndA);
     final rndBRot = _rotateLeft(rndB);
     final plain = Uint8List.fromList([...rndA, ...rndBRot]);
     final ekData = _aesCbcEncrypt(key, Uint8List(16), plain);
@@ -269,8 +263,6 @@ class Ntag424 {
     _ti = ti;
     _cmdCtr = 0;
     _log('TI', ti);
-    _log('SesEnc', _sesEnc!);
-    _log('SesMac', _sesMac!);
   }
 
   /// SV = [c0, c1, 0x00, 0x01, 0x00, 0x80] + RndA[0:2]
@@ -317,23 +309,6 @@ class Ntag424 {
     final data = <int>[0x00, 0xE0, 0xEE];
     final resp = await _transceiveFull(0x5F, [_ndefFileNo], Uint8List.fromList(data));
     _ensureStatus(resp, 'disable SDM');
-  }
-
-  /// DIAGNOSTIC: GetCardUID (0x51) is CommMode.Full with no command data, so it
-  /// exercises only the command-MAC path (session MAC key + counter + TI),
-  /// independent of any encrypted command data. Logging its result isolates a
-  /// MAC-side failure from an encryption/settings-side one. Non-destructive;
-  /// only advances the counter on success (so a rejected probe doesn't desync).
-  Future<void> _probeGetCardUid() async {
-    final mac = _sesMac!, ti = _ti!;
-    final ctr = _ctrLe();
-    final macInput = Uint8List.fromList([0x51, ...ctr, ...ti]);
-    final mact = _truncateMac(_aesCmac(mac, macInput));
-    final apdu = _wrap(0x51, const [], mact);
-    _log('getUID ctr=$_cmdCtr TX', apdu);
-    final resp = await _transceive(apdu);
-    _log('getUID RX', resp);
-    if (_isSuccess(resp)) _cmdCtr++;
   }
 
   // ---- ChangeKey (CommMode.Full, AN12196 §6.5) -----------------------------

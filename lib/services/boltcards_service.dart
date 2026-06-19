@@ -193,6 +193,7 @@ class BoltcardsService {
     int? txLimitSats,
     int? dailyLimitSats,
     bool? enabled,
+    int? counter,
   }) async {
     final res = await _client
         .put(
@@ -201,7 +202,7 @@ class BoltcardsService {
           body: jsonEncode({
             'card_name': name ?? card.name,
             'uid': (uid ?? card.uid).toUpperCase(),
-            'counter': card.counter,
+            'counter': counter ?? card.counter,
             'tx_limit': txLimitSats ?? card.txLimitSats,
             'daily_limit': dailyLimitSats ?? card.dailyLimitSats,
             'enable': enabled ?? card.enabled,

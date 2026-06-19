@@ -77,6 +77,7 @@
   "boltCardVerifiedBadge": "Verifiziert",
   "boltCardVerifyWrongServer": "Diese Karte verweist auf einen anderen Server.",
   "boltCardVerifyUidMismatch": "Die Chip-ID dieser Karte stimmt nicht mit dem Servereintrag überein. Setze die Karte zurück und füge sie neu hinzu und beschreibe sie erneut, damit die richtige ID gespeichert wird.",
+  "boltCardVerifyCounterBehind": "Der Tap-Zähler dieser Karte liegt hinter dem Server. Programmiere die Karte neu, um ihn zurückzusetzen.",
   "boltCardVerifyFailed": "Karte konnte nicht geprüft werden.",
   "boltCardWipeConfirm": "Karte auf Werksschlüssel zurücksetzen? Sie funktioniert erst wieder, wenn du sie neu beschreibst.",
   "boltCardWiped": "Karte auf Werksschlüssel zurückgesetzt.",

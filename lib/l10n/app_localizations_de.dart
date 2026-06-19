@@ -241,6 +241,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Chip-ID dieser Karte stimmt nicht mit dem Servereintrag überein. Setze die Karte zurück und füge sie neu hinzu und beschreibe sie erneut, damit die richtige ID gespeichert wird.';
 
   @override
+  String get boltCardVerifyCounterBehind =>
+      'Der Tap-Zähler dieser Karte liegt hinter dem Server. Programmiere die Karte neu, um ihn zurückzusetzen.';
+
+  @override
   String get boltCardVerifyFailed => 'Karte konnte nicht geprüft werden.';
 
   @override

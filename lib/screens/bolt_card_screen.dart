@@ -310,9 +310,10 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
 
       try {
         final uidHex = _hex(uid!);
-        if (uidHex.toUpperCase() != card.uid.toUpperCase()) {
-          await svc.updateCard(card, uid: uidHex);
-        }
+        // (Re)programming restarts the chip's SDM read counter, so reset the
+        // server counter to 0 to match; otherwise LNbits rejects scans as
+        // replays ("This link is already used"). Also store the real UID.
+        await svc.updateCard(card, uid: uidHex, counter: 0);
         // The chip was (re)written, so any prior verification no longer applies.
         await unmarkCardVerified(card.externalId);
         await _showInfoDialog(l10n.boltCardProgrammed);
@@ -393,6 +394,10 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
           // the server record doesn't match the chip. Give an actionable hint
           // instead of the raw "LNURL error: Card UID mis-match".
           await _showInfoDialog(l10n.boltCardVerifyUidMismatch);
+        } else if (msg.contains('already used')) {
+          // The server's read counter is ahead of the (re)programmed chip, so
+          // the scan looks like a replay. Re-programming resets the counter.
+          await _showInfoDialog(l10n.boltCardVerifyCounterBehind);
         } else {
           // Show the server's actual reason for other failures.
           await _showErrorDetail(l10n.boltCardVerifyFailed, e);

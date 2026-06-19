@@ -238,6 +238,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This card\'s chip ID does not match the server record. Wipe the card, then add and program it again so the correct ID is stored.';
 
   @override
+  String get boltCardVerifyCounterBehind =>
+      'This card\'s tap counter is behind the server. Re-program the card to reset it.';
+
+  @override
   String get boltCardVerifyFailed => 'Could not verify the card.';
 
   @override
