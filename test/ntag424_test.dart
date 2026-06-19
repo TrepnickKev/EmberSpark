@@ -115,5 +115,15 @@ void main() {
       expect(String.fromCharCode(file[pOff]), '0');
       expect(String.fromCharCode(file[cOff]), '0');
     });
+
+    test('empty NDEF file is a valid empty record (NLEN=3, D0 00 00)', () {
+      final file = Ntag424.emptyNdefFileForTest();
+      // 2-byte big-endian NLEN = 0x0003, then a single TNF=Empty record.
+      expect(file[0], 0x00);
+      expect(file[1], 0x03);
+      expect(file[2], 0xD0); // MB|ME|SR, TNF=Empty
+      expect(file[3], 0x00); // type length
+      expect(file[4], 0x00); // payload length
+    });
   });
 }

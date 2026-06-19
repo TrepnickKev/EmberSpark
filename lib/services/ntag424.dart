@@ -173,13 +173,13 @@ class Ntag424 {
         await _changeKey(0, keys.k0, _defaultKey);
       }
 
-      // Blank the NDEF record last so the wiped card reads as empty (NLEN=0 plus
-      // zeros over the old URL). Done after the secured ChangeKey commands: the
-      // card counts every command in the session toward its CmdCtr, and this
-      // plain WriteData would otherwise desync the counter the ChangeKey MACs
-      // rely on. _changeFileSettingsPlain left the NDEF file free-write, so this
-      // succeeds without an active session.
-      await _writeDataPlain(_ndefFileNo, 0, Uint8List(160));
+      // Blank the NDEF record last so the wiped card reads as empty (a valid
+      // empty NDEF message plus zeros over the old URL). Done after the secured
+      // ChangeKey commands: the card counts every command in the session toward
+      // its CmdCtr, and this plain WriteData would otherwise desync the counter
+      // the ChangeKey MACs rely on. _changeFileSettingsPlain left the NDEF file
+      // free-write, so this succeeds without an active session.
+      await _writeDataPlain(_ndefFileNo, 0, _emptyNdefFile());
     } catch (e) {
       throw _withTrace(e);
     }
@@ -423,6 +423,19 @@ class Ntag424 {
     return Uint8List.fromList([(nlen >> 8) & 0xFF, nlen & 0xFF, ...message]);
   }
 
+  /// A valid empty NDEF file used when wiping: a 2-byte NLEN of 0x0003 followed
+  /// by a single TNF=Empty record (D0 00 00), padded with zeros to scrub any
+  /// previous URL. A zero-length message (NLEN=0x0000) is technically "empty"
+  /// but makes some readers (the official Bolt Card app) throw, so write a
+  /// parseable empty record instead.
+  static Uint8List _emptyNdefFile() {
+    final out = Uint8List(160);
+    out[1] = 0x03; // NLEN = 0x0003
+    out[2] = 0xD0; // empty record: MB|ME|SR, TNF=Empty
+    // out[3] (type length) and out[4] (payload length) stay 0x00.
+    return out;
+  }
+
   /// File offset of the first byte of the value following [marker] (e.g. the
   /// 32 zero hex chars after `p=`). Throws if the marker is absent.
   static int _valueOffset(Uint8List file, String marker) {
@@ -562,6 +575,7 @@ class Ntag424 {
   static Uint8List crc32ForTest(Uint8List data) => _crc32Le(data);
   static Uint8List truncateMacForTest(Uint8List mac) => _truncateMac(mac);
   static Uint8List ndefFileForTest(String uri) => _buildNdefFile(uri);
+  static Uint8List emptyNdefFileForTest() => _emptyNdefFile();
   /// AES-CBC decrypt with a zero IV (as used to decrypt the AuthenticateEV2First
   /// part-2 response). Exposed so a test can validate a real card's auth trace.
   static Uint8List aesCbcDecryptZeroIvForTest(Uint8List key, Uint8List data) =>
