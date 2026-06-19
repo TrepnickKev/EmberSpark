@@ -163,11 +163,6 @@ class Ntag424 {
       // Disable SDM and restore plain, free-read/write NDEF file settings.
       await _changeFileSettingsPlain();
 
-      // Blank the NDEF record so the wiped card reads as empty: NLEN=0 plus
-      // zeros over the old URL bytes. _changeFileSettingsPlain restored free
-      // write access, so the plain WriteData succeeds without a session.
-      await _writeDataPlain(_ndefFileNo, 0, Uint8List(160));
-
       // Only the stored-key case needs the keys reset to default; a card that
       // already authenticated with the default key is at factory keys already.
       if (!keysAreDefault) {
@@ -177,6 +172,14 @@ class Ntag424 {
         await _changeKey(4, keys.k2, _defaultKey);
         await _changeKey(0, keys.k0, _defaultKey);
       }
+
+      // Blank the NDEF record last so the wiped card reads as empty (NLEN=0 plus
+      // zeros over the old URL). Done after the secured ChangeKey commands: the
+      // card counts every command in the session toward its CmdCtr, and this
+      // plain WriteData would otherwise desync the counter the ChangeKey MACs
+      // rely on. _changeFileSettingsPlain left the NDEF file free-write, so this
+      // succeeds without an active session.
+      await _writeDataPlain(_ndefFileNo, 0, Uint8List(160));
     } catch (e) {
       throw _withTrace(e);
     }
