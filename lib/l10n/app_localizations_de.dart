@@ -245,6 +245,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Tap-Zähler dieser Karte liegt hinter dem Server. Programmiere die Karte neu, um ihn zurückzusetzen.';
 
   @override
+  String get boltCardTagLost =>
+      'Die Karte wurde zu früh entfernt. Halte sie flach an die Rückseite des Telefons und ruhig, bis der Vorgang abgeschlossen ist, und versuche es erneut.';
+
+  @override
   String get boltCardVerifyFailed => 'Karte konnte nicht geprüft werden.';
 
   @override

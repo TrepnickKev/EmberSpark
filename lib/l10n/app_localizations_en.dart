@@ -242,6 +242,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This card\'s tap counter is behind the server. Re-program the card to reset it.';
 
   @override
+  String get boltCardTagLost =>
+      'The card moved away too soon. Hold it flat against the back of the phone and keep it still until the operation finishes, then try again.';
+
+  @override
   String get boltCardVerifyFailed => 'Could not verify the card.';
 
   @override

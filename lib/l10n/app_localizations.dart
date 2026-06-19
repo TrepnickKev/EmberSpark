@@ -530,6 +530,12 @@ abstract class AppLocalizations {
   /// **'This card\'s tap counter is behind the server. Re-program the card to reset it.'**
   String get boltCardVerifyCounterBehind;
 
+  /// No description provided for @boltCardTagLost.
+  ///
+  /// In en, this message translates to:
+  /// **'The card moved away too soon. Hold it flat against the back of the phone and keep it still until the operation finishes, then try again.'**
+  String get boltCardTagLost;
+
   /// No description provided for @boltCardVerifyFailed.
   ///
   /// In en, this message translates to:

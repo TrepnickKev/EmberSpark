@@ -140,6 +140,18 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
     );
   }
 
+  /// Shows the technical detail for a failed NFC card operation, except for a
+  /// lost-tag error (the card moved out of the field mid-operation), which is
+  /// transient and warrants a "hold it still and try again" hint instead of a
+  /// raw stack trace.
+  Future<void> _showNfcError(String title, Object err) {
+    final s = err.toString().toLowerCase();
+    if (s.contains('tag was lost') || s.contains('taglost')) {
+      return _showInfoDialog(AppLocalizations.of(context)!.boltCardTagLost);
+    }
+    return _showErrorDetail(title, err);
+  }
+
   /// A result dialog that stays until the user taps OK (used for outcomes that
   /// must not be missed, unlike a transient snackbar).
   Future<void> _showInfoDialog(
@@ -237,7 +249,7 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
         } else if (err is CardNotBlank) {
           await _showInfoDialog(l10n.boltCardNotBlank);
         } else {
-          await _showErrorDetail(l10n.boltCardProgramFailed, err!);
+          await _showNfcError(l10n.boltCardProgramFailed, err!);
         }
         // Remove the record if it was created before a later failure, so no
         // orphan (with an unprogrammed chip) lingers on the server.
@@ -302,7 +314,7 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
         if (err is CardNotBlank) {
           await _showInfoDialog(l10n.boltCardNotBlank);
         } else {
-          await _showErrorDetail(l10n.boltCardProgramFailed, err!);
+          await _showNfcError(l10n.boltCardProgramFailed, err!);
         }
         return;
       }
@@ -449,7 +461,7 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
         await _showHoldDialog(l10n.boltCardHoldToWipe);
       }
       if (err != null) {
-        await _showErrorDetail(l10n.boltCardWipeFailed, err!);
+        await _showNfcError(l10n.boltCardWipeFailed, err!);
         return;
       }
       if (done) {
