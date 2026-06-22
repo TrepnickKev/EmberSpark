@@ -70,6 +70,26 @@ Future<String?> getMyLightningAddress() => _readScoped(myLnAddressKey);
 Future<void> setMyLightningAddress(String? value) =>
     _writeScoped(myLnAddressKey, value);
 
+/// Reads/writes a wallet's Lightning Address by explicit id, for wallets that
+/// may not be the active one (e.g. detecting it for a wallet being added or
+/// edited from the setup screen). The scoped helpers above only touch the
+/// active wallet.
+Future<String?> getMyLightningAddressFor(String walletId) async {
+  const storage = FlutterSecureStorage();
+  final v = await storage.read(key: myLnAddressKey(walletId));
+  final t = v?.trim() ?? '';
+  return t.isEmpty ? null : t;
+}
+
+Future<void> setMyLightningAddressFor(String walletId, String? value) async {
+  const storage = FlutterSecureStorage();
+  if (value == null || value.trim().isEmpty) {
+    await storage.delete(key: myLnAddressKey(walletId));
+  } else {
+    await storage.write(key: myLnAddressKey(walletId), value: value.trim());
+  }
+}
+
 Future<String?> getMyBolt12Offer() => _readScoped(myBolt12OfferKey);
 Future<void> setMyBolt12Offer(String? value) =>
     _writeScoped(myBolt12OfferKey, value);

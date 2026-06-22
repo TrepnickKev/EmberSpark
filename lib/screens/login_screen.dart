@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/http_client_factory.dart';
 import '../services/lnbits_service.dart';
 import '../services/my_contact_service.dart';
 import '../services/wallet_account_service.dart';
@@ -107,19 +108,36 @@ class _LoginScreenState extends State<LoginScreen> {
     final name = nameController.text.trim();
     final labelArg = name.isEmpty ? null : name;
     if (_isEdit) {
+      final connChanged =
+          url != widget.initial!.url || admin != widget.initial!.adminKey;
       await updateWallet(
         widget.initial!.id,
         url: url,
         adminKey: admin,
         label: labelArg,
       );
+      // Re-detect the Lightning Address only when the connection changed, so a
+      // label-only edit doesn't clobber a manually set address.
+      if (connChanged) {
+        await _importLightningAddress(
+          walletId: widget.initial!.id,
+          url: url,
+          adminKey: admin,
+          overwrite: true,
+        );
+      }
       if (!mounted) return;
       Navigator.pop(context, true);
       return;
     }
     final account = await addWallet(url: url, adminKey: admin, label: labelArg);
     await setCurrentWalletId(account.id);
-    await _importLightningAddress(url);
+    await _importLightningAddress(
+      walletId: account.id,
+      url: url,
+      adminKey: admin,
+      overwrite: false,
+    );
     if (!mounted) return;
     if (widget.addFlow) {
       Navigator.pop(context, true);
@@ -131,16 +149,39 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// One-time at wallet setup: if the server's lnurlp extension already has a
-  /// pay link with a username, adopt it as this wallet's Lightning Address so
-  /// the user doesn't have to type it. Bounded and silent on any failure
-  /// (extension missing, network, timeout); never overwrites an existing value.
-  Future<void> _importLightningAddress(String url) async {
+  /// Detects an existing Lightning Address for the given wallet: if the server's
+  /// lnurlp extension has a pay link with a username, adopt it as that wallet's
+  /// Lightning Address so the user doesn't have to type it. Runs when a wallet
+  /// is created and when its connection is edited.
+  ///
+  /// With [overwrite] false (create) it never clobbers an existing value. With
+  /// [overwrite] true (connection-changed edit) it replaces the stored address,
+  /// and if the now-reachable server has no Lightning Address it clears the
+  /// stale one. Bounded and silent on an unreachable server / timeout, which
+  /// leaves the stored value untouched.
+  Future<void> _importLightningAddress({
+    required String walletId,
+    required String url,
+    required String adminKey,
+    required bool overwrite,
+  }) async {
     try {
-      if ((await getMyLightningAddress())?.isNotEmpty ?? false) return;
-      final svc = await LNbitsService.fromStorage();
-      final links =
-          await svc.listLnurlpLinks().timeout(const Duration(seconds: 6));
+      if (!overwrite &&
+          ((await getMyLightningAddressFor(walletId))?.isNotEmpty ?? false)) {
+        return;
+      }
+      final svc = LNbitsService(
+        baseUrl: url,
+        adminKey: adminKey,
+        client: await getHttpClient(),
+      );
+      List<Map<String, dynamic>> links;
+      try {
+        links =
+            await svc.listLnurlpLinks().timeout(const Duration(seconds: 6));
+      } on LnurlpExtensionDisabled {
+        links = const []; // reachable server, just no lnurlp extension
+      }
       String? username;
       for (final l in links) {
         final u = (l['username'] as String?)?.trim() ?? '';
@@ -149,12 +190,16 @@ class _LoginScreenState extends State<LoginScreen> {
           break;
         }
       }
-      if (username == null) return;
       final host = Uri.parse(url).host;
-      if (host.isEmpty) return;
-      await setMyLightningAddress('$username@$host');
+      if (username != null && host.isNotEmpty) {
+        await setMyLightningAddressFor(walletId, '$username@$host');
+      } else if (overwrite) {
+        // Connection changed and the reachable server has no Lightning Address:
+        // drop the stale one so the identity reflects the current wallet.
+        await setMyLightningAddressFor(walletId, null);
+      }
     } catch (_) {
-      // Extension missing / network / timeout: skip, user can set it manually.
+      // Unreachable server / timeout / other: leave the stored value untouched.
     }
   }
 

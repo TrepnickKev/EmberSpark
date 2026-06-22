@@ -192,7 +192,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
+      setState(() {
+        error = friendlyError(AppLocalizations.of(context)!, e);
+        // Endpoint unreachable: show the placeholder avatar, not the previous
+        // wallet's (stale) one.
+        avatarSeed = null;
+      });
     } finally {
       if (mounted) setState(() => loading = false);
     }
