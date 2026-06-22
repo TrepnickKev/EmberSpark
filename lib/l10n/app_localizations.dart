@@ -620,6 +620,24 @@ abstract class AppLocalizations {
   /// **'Find the QR code in LNbits → wallet → \"API info\" → Admin key.'**
   String get loginHint;
 
+  /// No description provided for @disclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is EmberSpark for?'**
+  String get disclaimerTitle;
+
+  /// No description provided for @disclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'EmberSpark is a client for self-hosted LNbits Lightning wallets. It is for people who run their own LNbits server, or who were given wallet access by someone who does. If that is not you, this app is not suitable for you.'**
+  String get disclaimerBody;
+
+  /// No description provided for @disclaimerAck.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get disclaimerAck;
+
   /// No description provided for @sendTitle.
   ///
   /// In en, this message translates to:

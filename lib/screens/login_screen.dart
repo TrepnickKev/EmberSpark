@@ -28,8 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController urlController;
   late final TextEditingController adminKeyController;
   String? error;
+  bool _disclaimerShown = false;
 
   bool get _isEdit => widget.initial != null;
+
+  /// True only for the first-install onboarding instance (no wallet yet), not
+  /// when adding another wallet or editing one.
+  bool get _isOnboarding => !widget.addFlow && widget.initial == null;
 
   @override
   void initState() {
@@ -38,6 +43,32 @@ class _LoginScreenState extends State<LoginScreen> {
     urlController = TextEditingController(text: widget.initial?.url ?? '');
     adminKeyController = TextEditingController(
       text: widget.initial?.adminKey ?? '',
+    );
+    if (_isOnboarding) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showDisclaimer());
+    }
+  }
+
+  /// Sets expectations on first install: EmberSpark is only useful to someone
+  /// with their own LNbits server (or given access to one). Shown once over the
+  /// setup screen; must be acknowledged.
+  Future<void> _showDisclaimer() async {
+    if (_disclaimerShown || !mounted) return;
+    _disclaimerShown = true;
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.disclaimerTitle),
+        content: Text(l10n.disclaimerBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.disclaimerAck),
+          ),
+        ],
+      ),
     );
   }
 

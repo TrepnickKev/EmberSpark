@@ -96,6 +96,9 @@
   "loginScanUrlTitle": "Scan LNbits URL",
   "loginScanAdminTitle": "Scan admin key",
   "loginHint": "Find the QR code in LNbits → wallet → \"API info\" → Admin key.",
+  "disclaimerTitle": "Who is EmberSpark for?",
+  "disclaimerBody": "EmberSpark is a client for self-hosted LNbits Lightning wallets. It is for people who run their own LNbits server, or who were given wallet access by someone who does. If that is not you, this app is not suitable for you.",
+  "disclaimerAck": "I understand",
 
   "sendTitle": "Send",
   "sendBolt11Label": "BOLT11 invoice",

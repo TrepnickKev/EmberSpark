@@ -294,6 +294,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Den QR-Code findest du in LNbits → Wallet → „API info“ → Admin-Schlüssel.';
 
   @override
+  String get disclaimerTitle => 'Für wen ist EmberSpark?';
+
+  @override
+  String get disclaimerBody =>
+      'EmberSpark ist eine App für selbst gehostete LNbits Lightning Wallets. Sie ist für Personen gedacht, die einen eigenen LNbits-Server betreiben oder von jemandem mit einem LNbits-Server Zugang erhalten haben. Trifft das nicht zu, ist diese App für dich nicht geeignet.';
+
+  @override
+  String get disclaimerAck => 'Ich verstehe';
+
+  @override
   String get sendTitle => 'Senden';
 
   @override

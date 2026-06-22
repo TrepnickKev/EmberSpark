@@ -290,6 +290,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Find the QR code in LNbits → wallet → \"API info\" → Admin key.';
 
   @override
+  String get disclaimerTitle => 'Who is EmberSpark for?';
+
+  @override
+  String get disclaimerBody =>
+      'EmberSpark is a client for self-hosted LNbits Lightning wallets. It is for people who run their own LNbits server, or who were given wallet access by someone who does. If that is not you, this app is not suitable for you.';
+
+  @override
+  String get disclaimerAck => 'I understand';
+
+  @override
   String get sendTitle => 'Send';
 
   @override
