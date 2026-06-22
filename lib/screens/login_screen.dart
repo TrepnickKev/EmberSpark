@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/lnbits_service.dart';
+import '../services/my_contact_service.dart';
 import '../services/wallet_account_service.dart';
 import 'home_screen.dart';
 import 'qr_scan_screen.dart';
@@ -87,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     final account = await addWallet(url: url, adminKey: admin, label: labelArg);
     await setCurrentWalletId(account.id);
+    await _importLightningAddress(url);
     if (!mounted) return;
     if (widget.addFlow) {
       Navigator.pop(context, true);
@@ -95,6 +97,33 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
+    }
+  }
+
+  /// One-time at wallet setup: if the server's lnurlp extension already has a
+  /// pay link with a username, adopt it as this wallet's Lightning Address so
+  /// the user doesn't have to type it. Bounded and silent on any failure
+  /// (extension missing, network, timeout); never overwrites an existing value.
+  Future<void> _importLightningAddress(String url) async {
+    try {
+      if ((await getMyLightningAddress())?.isNotEmpty ?? false) return;
+      final svc = await LNbitsService.fromStorage();
+      final links =
+          await svc.listLnurlpLinks().timeout(const Duration(seconds: 6));
+      String? username;
+      for (final l in links) {
+        final u = (l['username'] as String?)?.trim() ?? '';
+        if (u.isNotEmpty) {
+          username = u;
+          break;
+        }
+      }
+      if (username == null) return;
+      final host = Uri.parse(url).host;
+      if (host.isEmpty) return;
+      await setMyLightningAddress('$username@$host');
+    } catch (_) {
+      // Extension missing / network / timeout: skip, user can set it manually.
     }
   }
 

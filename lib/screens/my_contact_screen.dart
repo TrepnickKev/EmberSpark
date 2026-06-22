@@ -162,10 +162,58 @@ class _MyContactScreenState extends State<MyContactScreen>
       // while editing an existing value — treat as "remove".
       await _setValue(kind, null);
       await _clearDefaultIfMatches(kind);
+    } else if (kind == MyContactKind.lnAddress) {
+      // A Lightning Address pointing at this wallet's own server is pushed to
+      // the lnurlp extension so the server actually serves it; external
+      // addresses are stored locally unchanged.
+      final synced = await _syncLnAddressToServer(result);
+      if (synced == null) return; // server update failed; keep the old value
+      await _setValue(kind, synced);
     } else {
       await _setValue(kind, result);
     }
     if (mounted) await _load();
+  }
+
+  /// When the edited Lightning Address's host matches this wallet's server,
+  /// pushes the username to the lnurlp extension so the server serves that
+  /// address. Returns the address to store locally, or null if a server update
+  /// was attempted but failed (the caller then keeps the previous value).
+  /// Addresses on a different host are returned unchanged for local storage.
+  Future<String?> _syncLnAddressToServer(String address) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final clean = address.trim().replaceFirst(
+          RegExp(r'^(lightning|lnurl):', caseSensitive: false),
+          '',
+        );
+    final parts = clean.split('@');
+    if (parts.length != 2) return clean;
+    final username = parts[0];
+    final host = parts[1].toLowerCase();
+    final LNbitsService svc;
+    try {
+      svc = await LNbitsService.fromStorage();
+    } catch (_) {
+      return clean; // no client; store locally
+    }
+    final serverHost = Uri.parse(svc.baseUrl).host.toLowerCase();
+    if (host != serverHost) return clean; // external address; local only
+    try {
+      await svc.setLnurlpUsername(username);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.myContactLnAddressServerUpdated)),
+      );
+      return '$username@$serverHost';
+    } on LnurlpExtensionDisabled {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.myContactLnurlpExtensionMissing)),
+      );
+      return null;
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(friendlyError(l10n, e))));
+      return null;
+    }
   }
 
   /// Drops the stored default when the identity it points at is removed, so
@@ -625,7 +673,6 @@ class _EditDialogState extends State<_EditDialog> {
   void initState() {
     super.initState();
     ctrl = TextEditingController(text: widget.initialValue ?? '');
-    ctrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -743,7 +790,10 @@ class _EditDialogState extends State<_EditDialog> {
           ),
           Positioned(
             top: -44,
-            child: contactAvatar(ctrl.text, size: 88),
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: ctrl,
+              builder: (_, value, __) => contactAvatar(value.text, size: 88),
+            ),
           ),
         ],
       ),

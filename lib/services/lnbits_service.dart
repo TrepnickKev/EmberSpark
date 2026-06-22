@@ -263,6 +263,72 @@ class LNbitsService implements WalletBackend {
     return createLnurlpLink();
   }
 
+  /// Sets (or changes) the `username` on this wallet's LNURL-pay link so the
+  /// server serves the Lightning Address `username@<domain>`. Reuses the link
+  /// that already backs a Lightning Address, else an `EmberSpark` link, else
+  /// creates a fresh link carrying the username. Throws
+  /// [LnurlpExtensionDisabled] if the extension isn't installed (404), or an
+  /// Exception carrying the server's message (e.g. the username is already
+  /// taken or invalid).
+  Future<void> setLnurlpUsername(String username) async {
+    final links = await listLnurlpLinks();
+    Map<String, dynamic>? target;
+    for (final l in links) {
+      if (((l['username'] as String?)?.trim() ?? '').isNotEmpty) {
+        target = l;
+        break;
+      }
+    }
+    if (target == null) {
+      for (final l in links) {
+        if (((l['description'] as String?) ?? '').startsWith('EmberSpark')) {
+          target = l;
+          break;
+        }
+      }
+    }
+
+    final http.Response res;
+    if (target == null) {
+      // No reusable link: create one carrying the username.
+      res = await _client
+          .post(
+            _uri('/lnurlp/api/v1/links'),
+            headers: _headers(adminKey),
+            body: jsonEncode({
+              'description': 'EmberSpark LNURL',
+              'min': 1,
+              'max': 1000000,
+              'comment_chars': 100,
+              'username': username,
+            }),
+          )
+          .timeout(_readTimeout);
+    } else {
+      // Update the existing link, preserving its amounts/description.
+      final id = (target['id'] ?? '').toString();
+      res = await _client
+          .put(
+            _uri('/lnurlp/api/v1/links/$id'),
+            headers: _headers(adminKey),
+            body: jsonEncode({
+              'description': target['description'] ?? 'EmberSpark LNURL',
+              'min': target['min'] ?? 1,
+              'max': target['max'] ?? 1000000,
+              'comment_chars': target['comment_chars'] ?? 100,
+              'username': username,
+            }),
+          )
+          .timeout(_readTimeout);
+    }
+    if (res.statusCode == 404) {
+      throw const LnurlpExtensionDisabled();
+    }
+    if (res.statusCode >= 400) {
+      throw Exception('LNbits ${res.statusCode}: ${res.body}');
+    }
+  }
+
   /// BOLT12 counterpart of [getOrCreateLnurlpLink]. Skips inactive offers so
   /// a disabled offer isn't reused.
   Future<String> getOrCreateBolt12Offer() async {

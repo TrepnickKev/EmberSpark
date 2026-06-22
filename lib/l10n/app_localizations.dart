@@ -1445,7 +1445,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorLnurlInsecureCallback.
   ///
   /// In en, this message translates to:
-  /// **'Your LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.'**
+  /// **'The LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.'**
   String get errorLnurlInsecureCallback;
 
   /// No description provided for @errorServerGeneric.
@@ -1547,7 +1547,7 @@ abstract class AppLocalizations {
   /// No description provided for @myContactLnAddressHint.
   ///
   /// In en, this message translates to:
-  /// **'user@your.domain — must already exist on a server you control.'**
+  /// **'user@domain. If the domain is the LNbits server, EmberSpark sets it there; otherwise it is saved as is.'**
   String get myContactLnAddressHint;
 
   /// No description provided for @myContactBolt12Hint.
@@ -1607,7 +1607,7 @@ abstract class AppLocalizations {
   /// No description provided for @myContactLnurlpHint.
   ///
   /// In en, this message translates to:
-  /// **'lnurl1… — paste your link or auto-generate one from your LNbits server.'**
+  /// **'lnurl1… — paste your link or auto-generate one from the LNbits server.'**
   String get myContactLnurlpHint;
 
   /// No description provided for @myContactInvalidLnurlp.
@@ -1627,6 +1627,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LNbits doesn\'t have the LNURL-pay extension installed.'**
   String get myContactLnurlpExtensionMissing;
+
+  /// No description provided for @myContactLnAddressServerUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning Address updated on the server.'**
+  String get myContactLnAddressServerUpdated;
 
   /// No description provided for @myContactBolt12ExtensionMissing.
   ///

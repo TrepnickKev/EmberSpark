@@ -767,7 +767,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorLnurlInsecureCallback =>
-      'Dein LNbits-Server hat eine unsichere (http://) Callback-URL zurückgegeben. Wahrscheinlich steht LNbits hinter einem Reverse Proxy und kennt seine öffentliche HTTPS-Adresse nicht. Setze auf dem LNbits-Server LNBITS_BASE_URL=https://dein-host in der .env und starte ihn neu. Alternativ konfiguriere den Proxy so, dass X-Forwarded-Proto: https weitergereicht wird.';
+      'Der LNbits-Server hat eine unsichere (http://) Callback-URL zurückgegeben. Wahrscheinlich steht LNbits hinter einem Reverse Proxy und kennt seine öffentliche HTTPS-Adresse nicht. Setze auf dem LNbits-Server LNBITS_BASE_URL=https://dein-host in der .env und starte ihn neu. Alternativ konfiguriere den Proxy so, dass X-Forwarded-Proto: https weitergereicht wird.';
 
   @override
   String errorServerGeneric(String code) {
@@ -827,7 +827,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get myContactLnAddressHint =>
-      'user@deine.domain — muss bereits auf einem von dir kontrollierten Server existieren.';
+      'user@domain. Liegt die Domain auf dem LNbits-Server, legt EmberSpark sie dort an; sonst wird sie unverändert gespeichert.';
 
   @override
   String get myContactBolt12Hint =>
@@ -859,7 +859,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get myContactLnurlpHint =>
-      'lnurl1… — füge einen Link ein oder erstelle einen automatisch über deinen LNbits-Server.';
+      'lnurl1… — füge einen Link ein oder erstelle einen automatisch über den LNbits-Server.';
 
   @override
   String get myContactInvalidLnurlp => 'Kein gültiger LNURL-Pay-Link.';
@@ -869,11 +869,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get myContactLnurlpExtensionMissing =>
-      'Auf deinem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.';
+      'Auf dem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.';
+
+  @override
+  String get myContactLnAddressServerUpdated =>
+      'Lightning-Adresse auf dem Server aktualisiert.';
 
   @override
   String get myContactBolt12ExtensionMissing =>
-      'Auf deinem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.';
+      'Auf dem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.';
 
   @override
   String get myContactAvatarPriority =>

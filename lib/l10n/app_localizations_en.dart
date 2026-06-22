@@ -759,7 +759,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLnurlInsecureCallback =>
-      'Your LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.';
+      'The LNbits server returned an insecure (http://) callback URL. This usually means LNbits sits behind a reverse proxy and doesn\'t know its public HTTPS address. On the LNbits host, set LNBITS_BASE_URL=https://your-host in .env and restart. Alternatively, configure the proxy to pass X-Forwarded-Proto: https.';
 
   @override
   String errorServerGeneric(String code) {
@@ -819,7 +819,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myContactLnAddressHint =>
-      'user@your.domain — must already exist on a server you control.';
+      'user@domain. If the domain is the LNbits server, EmberSpark sets it there; otherwise it is saved as is.';
 
   @override
   String get myContactBolt12Hint =>
@@ -851,7 +851,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myContactLnurlpHint =>
-      'lnurl1… — paste your link or auto-generate one from your LNbits server.';
+      'lnurl1… — paste your link or auto-generate one from the LNbits server.';
 
   @override
   String get myContactInvalidLnurlp => 'Not a valid LNURL-pay link.';
@@ -862,6 +862,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get myContactLnurlpExtensionMissing =>
       'LNbits doesn\'t have the LNURL-pay extension installed.';
+
+  @override
+  String get myContactLnAddressServerUpdated =>
+      'Lightning Address updated on the server.';
 
   @override
   String get myContactBolt12ExtensionMissing =>
