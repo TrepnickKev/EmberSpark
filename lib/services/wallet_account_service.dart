@@ -183,8 +183,9 @@ Future<void> updateWallet(
 }
 
 /// Removes the wallet and its per-wallet "My Contact" entries. If it was
-/// the active wallet, leaves `current_wallet_id` unset (caller decides
-/// whether to navigate to the Wallets screen or Login).
+/// the active wallet, auto-selects the first remaining wallet as active so
+/// the rest of the app always has a usable wallet; if none remain, leaves
+/// `current_wallet_id` unset (caller routes to the setup screen).
 Future<void> removeWallet(String id) async {
   const storage = FlutterSecureStorage();
   final wallets = await listWallets();
@@ -196,7 +197,11 @@ Future<void> removeWallet(String id) async {
   await storage.delete(key: myDefaultContactKindKey(id));
   final currentId = await getCurrentWalletId();
   if (currentId == id) {
-    await storage.delete(key: _currentIdKey);
+    if (next.isNotEmpty) {
+      await storage.write(key: _currentIdKey, value: next.first.id);
+    } else {
+      await storage.delete(key: _currentIdKey);
+    }
   }
 }
 

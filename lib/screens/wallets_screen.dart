@@ -94,6 +94,19 @@ class _WalletsScreenState extends State<WalletsScreen> {
     if (confirmed != true) return;
     await removeWallet(w.id);
     if (!mounted) return;
+    final remaining = await listWallets();
+    if (!mounted) return;
+    if (remaining.isEmpty) {
+      // No wallets left: jump to the setup screen, clearing the stack so there
+      // is no Home behind it trying to load a now-missing wallet.
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+      return;
+    }
+    // removeWallet auto-selected the next wallet if we deleted the active one.
     await _reload();
   }
 
