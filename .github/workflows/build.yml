@@ -106,7 +106,7 @@ jobs:
           ls -lh
 
       - name: Upload AAB as workflow artifact (Play Console source)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: EmberSpark-v${{ inputs.version }}-aab
           path: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
@@ -115,7 +115,7 @@ jobs:
 
       - name: Generate App installation token
         id: app_token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
