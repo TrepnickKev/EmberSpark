@@ -3,9 +3,10 @@ name: Build & release Android APKs + AAB
 # Manual only. Click "Run workflow" in the Actions tab, fill in the version.
 # APKs are published as a GitHub Release on the PUBLIC TrepnickKev/EmberSpark
 # repo (cross-repo write authenticated via a short-lived GitHub App
-# installation token) for sideloaders. The AAB is uploaded as an Actions
-# workflow artifact (7-day retention) so only the repo owner can fetch it
-# from the workflow run page for Play Console uploads.
+# installation token) for sideloaders. The AAB is uploaded straight to the
+# Google Play internal-testing track via a service account (secret
+# PLAY_SERVICE_ACCOUNT_JSON), so it is not stored as an Actions artifact. If
+# that secret is unset the upload step is skipped.
 on:
   workflow_dispatch:
     inputs:
@@ -105,13 +106,17 @@ jobs:
           mv app-release.aab "EmberSpark-v${{ inputs.version }}.aab"
           ls -lh
 
-      - name: Upload AAB as workflow artifact (Play Console source)
-        uses: actions/upload-artifact@v7
+      - name: Upload AAB to Google Play (internal track)
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        if: ${{ env.PLAY_JSON != '' }}
+        uses: r0adkll/upload-google-play@v1
         with:
-          name: EmberSpark-v${{ inputs.version }}-aab
-          path: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
-          retention-days: 7
-          if-no-files-found: error
+          serviceAccountJsonPlainText: ${{ env.PLAY_JSON }}
+          packageName: com.emberspark.wallet
+          releaseFiles: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
+          track: internal
+          status: completed
 
       - name: Generate App installation token
         id: app_token
