@@ -4,7 +4,7 @@ name: Build & release Android APKs + AAB
 # APKs are published as a GitHub Release on the PUBLIC TrepnickKev/EmberSpark
 # repo (cross-repo write authenticated via a short-lived GitHub App
 # installation token) for sideloaders. The AAB is uploaded as an Actions
-# workflow artifact (90-day retention) so only the repo owner can fetch it
+# workflow artifact (7-day retention) so only the repo owner can fetch it
 # from the workflow run page for Play Console uploads.
 on:
   workflow_dispatch:
@@ -110,7 +110,7 @@ jobs:
         with:
           name: EmberSpark-v${{ inputs.version }}-aab
           path: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
-          retention-days: 90
+          retention-days: 7
           if-no-files-found: error
 
       - name: Generate App installation token
