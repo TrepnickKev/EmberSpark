@@ -1,19 +1,21 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/export.dart';
 import 'http_client_factory.dart';
 import 'lnurl.dart';
-
-const _seedStorageKey = 'lnurl_auth_seed_v1';
+import 'wallet_account_service.dart';
 
 final ECDomainParameters _curve = ECDomainParameters('secp256k1');
 
 /// Signs the LNURL-auth k1 challenge with this device's per-domain linking
 /// key and submits the response. Throws on protocol or HTTP errors.
 Future<void> performLnurlAuth(LnurlAuthInfo info) async {
-  final seed = await _getOrCreateSeed();
+  final wallet = await getCurrentWallet();
+  final secret = wallet?.adminKey.trim() ?? '';
+  if (secret.isEmpty) {
+    throw Exception('No wallet configured for LNURL-auth');
+  }
+  final seed = _walletSeed(secret);
   final priv = _deriveLinkingPrivKey(seed, info.host);
   final k1Bytes = _hexDecode(info.k1);
   final sigDer = _signLowS(priv, k1Bytes);
@@ -38,17 +40,23 @@ Future<void> performLnurlAuth(LnurlAuthInfo info) async {
   }
 }
 
-Future<Uint8List> _getOrCreateSeed() async {
-  const storage = FlutterSecureStorage();
-  final existing = await storage.read(key: _seedStorageKey);
-  if (existing != null) return _hexDecode(existing);
-  final r = Random.secure();
-  final seed = Uint8List.fromList(
-    List.generate(32, (_) => r.nextInt(256)),
+/// Master seed for LNURL-auth, derived deterministically from the wallet's
+/// admin key so the identity survives a reinstall and matches on any device
+/// that uses the same wallet (the user re-enters the same admin key). The
+/// per-domain [_deriveLinkingPrivKey] step below still gives each service a
+/// distinct key, preserving LUD-04 anti-correlation.
+Uint8List _walletSeed(String walletSecret) {
+  final hmac = HMac(SHA256Digest(), 64)
+    ..init(KeyParameter(Uint8List.fromList(utf8.encode(walletSecret))));
+  return hmac.process(
+    Uint8List.fromList(utf8.encode('emberspark-lnurl-auth-seed-v1')),
   );
-  await storage.write(key: _seedStorageKey, value: _hexEncode(seed));
-  return seed;
 }
+
+/// Test hook: the compressed public key EmberSpark presents to [host] for a
+/// wallet whose secret is [walletSecret]. Deterministic.
+Uint8List lnurlAuthPubKeyForTest(String walletSecret, String host) =>
+    _publicKeyCompressed(_deriveLinkingPrivKey(_walletSeed(walletSecret), host));
 
 /// Per-domain linking key. Simple HMAC-derived (not BIP-32-compatible),
 /// deterministic for the same seed + host pair.

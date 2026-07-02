@@ -147,5 +147,5 @@ images/                              # source artwork (Logo.png, Logo_icon.png)
 
 - **Debug APKs are large** (~88 MB) because they bundle the Dart VM, debug symbols, and JIT. Release builds are 25–35 MB.
 - **No cloud backup or device-to-device transfer.** LNbits API credentials are intentionally excluded from Android Auto Backup so they cannot leak to Google Drive. Set up your connection again on a new device the same way you did the first time.
-- **LNURL-auth** uses a simplified HMAC derivation, not BIP-32. This means your identity doesn't roam to other LNURL-auth wallets. Each install generates a fresh master seed; sites you've logged into will see you as a new user after a reinstall.
+- **LNURL-auth** uses a simplified HMAC derivation, not BIP-32, so your identity doesn't roam to other LNURL-auth wallets. The linking key is derived from the wallet's admin key, so it is stable across reinstalls and matches on any device that uses the same wallet. Changing the admin key or logging in under a different wallet produces a different identity (sites will see a new user).
 - The **invoice key alone** is enough for receive + history; the **admin key** is required only for send. If you only paste the invoice key, paying will fail with a 401 until you add the admin key.
