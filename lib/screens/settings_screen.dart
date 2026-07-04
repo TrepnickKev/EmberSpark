@@ -99,6 +99,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const DropdownMenuItem(value: 'en', child: Text('English')),
                   const DropdownMenuItem(value: 'de', child: Text('Deutsch')),
+                  const DropdownMenuItem(value: 'es', child: Text('Español')),
+                  const DropdownMenuItem(value: 'pt', child: Text('Português')),
+                  const DropdownMenuItem(value: 'fr', child: Text('Français')),
                 ],
                 onChanged: (next) async {
                   if (next == null) return;
