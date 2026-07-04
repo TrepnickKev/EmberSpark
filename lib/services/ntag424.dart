@@ -70,15 +70,11 @@ class Ntag424 {
   Uint8List? _ti;
   int _cmdCtr = 0;
 
-  /// Diagnostic trace of the APDU exchange + intermediate crypto values,
-  /// captured for debugging the secure-messaging path on real hardware. It is
-  /// appended to a thrown [Ntag424Exception] so the on-screen error dialog can
-  /// surface it. Test-card only (it includes keys / session values).
-  final List<String> trace = [];
-  void _log(String label, [Object? v]) =>
-      trace.add(v == null ? label : '$label: ${v is Uint8List ? _hexOf(v) : v}');
-  static String _hexOf(Uint8List b) =>
-      b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
+  /// No-op: the secure-messaging path used to capture an APDU/crypto trace for
+  /// on-hardware debugging, but it included key-derived material and was
+  /// surfaced in error dialogs, so it is intentionally discarded now that
+  /// program/wipe/verify are stable. Call sites are kept for cheap re-enabling.
+  void _log(String label, [Object? v]) {}
 
   Ntag424(this._transceive);
 
@@ -185,11 +181,11 @@ class Ntag424 {
     }
   }
 
-  /// Wraps a failure with the captured APDU/crypto trace so it surfaces in the
-  /// on-screen error dialog for debugging.
-  Ntag424Exception _withTrace(Object e) => Ntag424Exception(
-        '$e\n\n--- trace ---\n${trace.join('\n')}',
-      );
+  /// Normalizes a failure into an [Ntag424Exception] carrying only its concise
+  /// message (e.g. "Card error on change key 1 (SW=0x911e)"). No APDU/crypto
+  /// trace is attached, so key-derived material can't leak into error dialogs.
+  Ntag424Exception _withTrace(Object e) =>
+      e is Ntag424Exception ? e : Ntag424Exception('$e');
 
   // ---- ISO / native command wrappers --------------------------------------
 
