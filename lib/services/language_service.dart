@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const supportedLanguageCodes = ['system', 'en', 'de', 'es', 'pt', 'fr'];
+const supportedLanguageCodes = [
+  'system',
+  'en',
+  'de',
+  'es',
+  'pt',
+  'fr',
+  'tr',
+  'ru',
+  'zh',
+];
 const _languageKey = 'app_language';
 
 /// `null` = follow the device locale.
