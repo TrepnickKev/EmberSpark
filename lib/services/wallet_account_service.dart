@@ -70,6 +70,7 @@ String myBolt12OfferKey(String walletId) => 'my_bolt12_offer__$walletId';
 String myLnurlpLinkKey(String walletId) => 'my_lnurlp_link__$walletId';
 String myDefaultContactKindKey(String walletId) =>
     'my_default_contact_kind__$walletId';
+String lastSeenBalanceKey(String walletId) => 'last_seen_balance__$walletId';
 
 Future<List<WalletAccount>> listWallets() async {
   const storage = FlutterSecureStorage();
@@ -195,6 +196,7 @@ Future<void> removeWallet(String id) async {
   await storage.delete(key: myBolt12OfferKey(id));
   await storage.delete(key: myLnurlpLinkKey(id));
   await storage.delete(key: myDefaultContactKindKey(id));
+  await storage.delete(key: lastSeenBalanceKey(id));
   final currentId = await getCurrentWalletId();
   if (currentId == id) {
     if (next.isNotEmpty) {

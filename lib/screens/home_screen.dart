@@ -9,6 +9,7 @@ import '../services/price_service.dart';
 import '../services/avatar_seed.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
+import '../services/unseen_incoming_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/flipping_avatar.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -40,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   WalletAccount? currentWallet;
   String? avatarSeed;
   MyContactKind? _defaultContactKind;
+  bool _hasUnseenIncoming = false;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -95,11 +97,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         balance = b;
         if (error != null) error = null;
       });
+      await _reconcileUnseen(b, currentWallet?.id);
     } catch (_) {
       // Stay quiet on poll errors so transient network blips don't spam.
     } finally {
       _polling = false;
     }
+  }
+
+  /// Updates the "payment received while away" badge from a freshly fetched
+  /// [balance]. Compares against the wallet's persisted acknowledged-balance
+  /// baseline (see unseen_incoming_service): shows the badge when the balance
+  /// is above it, and lowers the baseline on spends so a send can't mask a
+  /// later receive. Persists the baseline only when it changes.
+  Future<void> _reconcileUnseen(int balance, String? walletId) async {
+    if (walletId == null) return;
+    final baseline = await getLastSeenBalanceFor(walletId);
+    final r = evaluateUnseen(balance, baseline);
+    if (r.baseline != baseline) {
+      await setLastSeenBalanceFor(walletId, r.baseline);
+    }
+    if (mounted) setState(() => _hasUnseenIncoming = r.unseen);
   }
 
   void _showPaymentNotification(int delta) {
@@ -190,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         avatarSeed = seed.isEmpty ? null : seed;
         _defaultContactKind = defaultKind;
       });
+      await _reconcileUnseen(b, w?.id);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -280,11 +299,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         title: Text(l10n.appTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            ),
+            icon: _hasUnseenIncoming
+                ? const Badge(
+                    backgroundColor: Colors.greenAccent,
+                    child: Icon(Icons.history),
+                  )
+                : const Icon(Icons.history),
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final id = currentWallet?.id;
+              final b = balance;
+              if (id != null && b != null) {
+                await setLastSeenBalanceFor(id, b);
+              }
+              if (mounted) setState(() => _hasUnseenIncoming = false);
+              navigator.push(
+                MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
