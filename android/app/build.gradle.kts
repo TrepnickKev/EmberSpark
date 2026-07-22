@@ -20,7 +20,9 @@ val hasReleaseSigning = keystorePropertiesFile.exists().also { exists ->
 
 android {
     namespace = "com.emberspark.wallet"
-    compileSdk = flutter.compileSdkVersion
+    // Pinned to 36 so the build stays valid regardless of Flutter's default
+    // (targetSdk must be <= compileSdk).
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -35,9 +37,10 @@ android {
     defaultConfig {
         applicationId = "com.emberspark.wallet"
         minSdk = flutter.minSdkVersion
-        // Pinned for Play Store (floor since Aug 2025) rather than tracking
-        // Flutter's default, which lags behind the deadline.
-        targetSdk = 35
+        // Pinned for Play Store rather than tracking Flutter's default, which
+        // lags behind the deadline. Google Play requires targeting Android 16
+        // (API 36) for app updates from 31 Aug 2026.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
