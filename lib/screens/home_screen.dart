@@ -297,22 +297,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (_wallets.length <= 1 || _avatarPage == null) {
       return _avatarBubble(avatarSeed, paymentSuccessTrigger);
     }
-    return SizedBox(
-      width: 88,
-      height: 88,
-      child: PageView.builder(
-        scrollDirection: Axis.vertical,
-        controller: _avatarPage,
-        onPageChanged: _onWalletPageChanged,
-        itemCount: _wallets.length,
-        itemBuilder: (_, i) {
-          final w = _wallets[i];
-          final seed = _walletSeeds[w.id];
-          return _avatarBubble(
-            (seed == null || seed.isEmpty) ? null : seed,
-            i == _walletIndex ? paymentSuccessTrigger : _noFlip,
-          );
-        },
+    // Swallow the carousel's scroll notifications so they never reach the
+    // Scaffold's ScrollNotificationObserver — otherwise the AppBar treats a
+    // non-zero page offset as "content scrolled under" and tints itself,
+    // making the top bar's colour depend on the selected wallet's page index.
+    return NotificationListener<ScrollNotification>(
+      onNotification: (_) => true,
+      child: SizedBox(
+        width: 88,
+        height: 88,
+        child: PageView.builder(
+          scrollDirection: Axis.vertical,
+          controller: _avatarPage,
+          onPageChanged: _onWalletPageChanged,
+          itemCount: _wallets.length,
+          itemBuilder: (_, i) {
+            final w = _wallets[i];
+            final seed = _walletSeeds[w.id];
+            return _avatarBubble(
+              (seed == null || seed.isEmpty) ? null : seed,
+              i == _walletIndex ? paymentSuccessTrigger : _noFlip,
+            );
+          },
+        ),
       ),
     );
   }
@@ -398,6 +405,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
+        // Pin the bar colour hard so it can't drift between wallets: fixed
+        // background, no surface tint, and no elevation change when the avatar
+        // carousel (a PageView) reports a non-zero scroll offset.
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: InkWell(
           customBorder: const CircleBorder(),
           onTap: () => Navigator.push(
@@ -539,64 +553,75 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ],
             const SizedBox(height: 20),
-            if (loading)
-              const CircularProgressIndicator()
-            else if (error != null)
-              Text(
-                error!,
-                style: const TextStyle(color: Colors.redAccent),
-                textAlign: TextAlign.center,
-              )
-            else
-              ValueListenableBuilder<AmountDisplayMode>(
-                valueListenable: amountDisplayMode,
-                builder: (context, mode, _) {
-                  final fiatAvailable = balance != null && fiatRate != null;
-                  final showFiat =
-                      mode == AmountDisplayMode.fiat && fiatAvailable;
-                  final satsText =
-                      '${formatThousands(balance ?? 0)} ${l10n.homeSatsUnit}';
-                  final fiatText = fiatAvailable
-                      ? formatFiat(
-                          (balance! / 100000000) * fiatRate!,
-                          fiatCurrency,
-                        )
-                      : null;
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: fiatAvailable
-                        ? () => toggleAmountDisplayMode()
-                        : null,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            showFiat ? fiatText! : satsText,
-                            style: const TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                            ),
+            // Fixed height so the amount area doesn't reflow (which would
+            // shove the buttons around in this centered Column) when it swaps
+            // between the loading spinner, an error, or the balance — e.g. the
+            // brief `loading` state while swiping to switch wallets. Sized to
+            // fit the tallest state (the two-line sats + fiat amount).
+            SizedBox(
+              height: 100,
+              child: Center(
+                child: loading
+                    ? const CircularProgressIndicator()
+                    : error != null
+                        ? Text(
+                            error!,
+                            style: const TextStyle(color: Colors.redAccent),
+                            textAlign: TextAlign.center,
+                          )
+                        : ValueListenableBuilder<AmountDisplayMode>(
+                            valueListenable: amountDisplayMode,
+                            builder: (context, mode, _) {
+                              final fiatAvailable =
+                                  balance != null && fiatRate != null;
+                              final showFiat = mode == AmountDisplayMode.fiat &&
+                                  fiatAvailable;
+                              final satsText =
+                                  '${formatThousands(balance ?? 0)} ${l10n.homeSatsUnit}';
+                              final fiatText = fiatAvailable
+                                  ? formatFiat(
+                                      (balance! / 100000000) * fiatRate!,
+                                      fiatCurrency,
+                                    )
+                                  : null;
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: fiatAvailable
+                                    ? () => toggleAmountDisplayMode()
+                                    : null,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        showFiat ? fiatText! : satsText,
+                                        style: const TextStyle(
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (fiatAvailable) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          showFiat ? satsText : fiatText!,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                          if (fiatAvailable) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              showFiat ? satsText : fiatText!,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                },
               ),
+            ),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
