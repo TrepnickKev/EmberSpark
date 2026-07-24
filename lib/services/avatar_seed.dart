@@ -47,6 +47,28 @@ String avatarSeedForWallet({
   return fallbackLocalId;
 }
 
+/// Computes the avatar seed for a specific [w] (not necessarily the active
+/// wallet), reading that wallet's stored identities by id. Uses the same
+/// priority as the active-wallet seed in Home, so a wallet's avatar looks the
+/// same whether it's shown in the swipe-to-switch carousel or after it becomes
+/// active. Returns '' when nothing seeds it.
+Future<String> avatarSeedForAccount(WalletAccount w) async {
+  final results = await Future.wait([
+    getMyLightningAddressFor(w.id),
+    getMyBolt12OfferFor(w.id),
+    getMyLnurlpLinkFor(w.id),
+    getMyDefaultContactKindFor(w.id),
+  ]);
+  return avatarSeedForWallet(
+    lnAddress: results[0] as String?,
+    bolt12: results[1] as String?,
+    lnurlp: results[2] as String?,
+    serverWalletId: w.serverWalletId,
+    fallbackLocalId: w.id,
+    defaultKind: results[3] as MyContactKind?,
+  );
+}
+
 /// Loads the current wallet's avatar seed and display name. The seed uses
 /// the same priority order as the home-screen profile bubble; the name is
 /// the wallet's `label` (also what home shows under the profile bubble).

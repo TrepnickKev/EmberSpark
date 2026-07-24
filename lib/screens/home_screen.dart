@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
@@ -43,6 +44,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   MyContactKind? _defaultContactKind;
   bool _hasUnseenIncoming = false;
 
+  // Swipe-to-switch avatar carousel: all wallets, their avatar seeds, and the
+  // active wallet's index. The controller is created lazily once the multi-
+  // wallet view first shows, at the active index.
+  List<WalletAccount> _wallets = const [];
+  Map<String, String> _walletSeeds = const {};
+  int _walletIndex = 0;
+  PageController? _avatarPage;
+  // A never-firing flip trigger for the non-active carousel pages.
+  final ValueNotifier<int> _noFlip = ValueNotifier<int>(0);
+
   Timer? _pollTimer;
   bool _polling = false;
   static const _pollInterval = Duration(seconds: 5);
@@ -59,6 +70,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _stopPolling();
+    _avatarPage?.dispose();
+    _noFlip.dispose();
     super.dispose();
   }
 
@@ -199,7 +212,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         defaultKind: defaultKind,
       );
 
+      // All wallets + their avatar seeds for the swipe-to-switch carousel.
+      final wallets = await listWallets();
+      final computedSeeds = await Future.wait(
+        wallets.map(avatarSeedForAccount),
+      );
+      final seeds = <String, String>{
+        for (var i = 0; i < wallets.length; i++)
+          wallets[i].id: computedSeeds[i],
+      };
+      final idx = wallets.indexWhere((x) => x.id == w?.id);
+      final walletIndex = idx < 0 ? 0 : idx;
+
       if (!mounted) return;
+      final oldCount = _wallets.length;
       setState(() {
         balance = b;
         fiatCurrency = cur;
@@ -207,7 +233,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         currentWallet = w;
         avatarSeed = seed.isEmpty ? null : seed;
         _defaultContactKind = defaultKind;
+        _wallets = wallets;
+        _walletSeeds = seeds;
+        _walletIndex = walletIndex;
       });
+      _syncAvatarPage(oldCount, wallets.length, walletIndex);
       await _reconcileUnseen(b, w?.id);
     } catch (e) {
       if (!mounted) return;
@@ -220,6 +250,89 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } finally {
       if (mounted) setState(() => loading = false);
     }
+  }
+
+  /// Keeps the avatar PageController in step with the loaded wallet set.
+  /// Creates it (at the active index) the first time the multi-wallet carousel
+  /// shows and recreates it only when the wallet count changes; otherwise, for
+  /// an external switch, jumps to the active index without animation.
+  void _syncAvatarPage(int oldCount, int newCount, int index) {
+    if (newCount <= 1) return;
+    if (_avatarPage == null || oldCount != newCount) {
+      _avatarPage?.dispose();
+      _avatarPage = PageController(initialPage: index);
+      return;
+    }
+    final controller = _avatarPage!;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !controller.hasClients) return;
+      if (controller.page?.round() != index) {
+        controller.jumpToPage(index);
+      }
+    });
+  }
+
+  Future<void> _onWalletPageChanged(int i) async {
+    if (i < 0 || i >= _wallets.length) return;
+    final target = _wallets[i];
+    if (target.id == currentWallet?.id) return;
+    await setCurrentWalletId(target.id);
+    if (mounted) await _load();
+  }
+
+  void _openMyContact() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MyContactScreen(initialKind: _defaultContactKind),
+      ),
+    ).then((_) {
+      if (mounted) _load();
+    });
+  }
+
+  /// The 88x88 avatar: a vertical wallet carousel when there's more than one
+  /// wallet (swipe up/down to switch), otherwise the single avatar.
+  Widget _buildAvatarSwitcher() {
+    if (_wallets.length <= 1 || _avatarPage == null) {
+      return _avatarBubble(avatarSeed, paymentSuccessTrigger);
+    }
+    return SizedBox(
+      width: 88,
+      height: 88,
+      child: PageView.builder(
+        scrollDirection: Axis.vertical,
+        controller: _avatarPage,
+        onPageChanged: _onWalletPageChanged,
+        itemCount: _wallets.length,
+        itemBuilder: (_, i) {
+          final w = _wallets[i];
+          final seed = _walletSeeds[w.id];
+          return _avatarBubble(
+            (seed == null || seed.isEmpty) ? null : seed,
+            i == _walletIndex ? paymentSuccessTrigger : _noFlip,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _avatarBubble(String? seed, ValueListenable<int> trigger) {
+    return Material(
+      color: seed == null ? bitcoinOrange : Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: _openMyContact,
+        child: SizedBox(
+          width: 88,
+          height: 88,
+          child: seed == null
+              ? const Icon(Icons.person, size: 48, color: Colors.white)
+              : FlippingAvatar(seed: seed, trigger: trigger),
+        ),
+      ),
+    );
   }
 
   Future<void> _refreshFiat() async {
@@ -387,33 +500,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Material(
-              color: avatarSeed == null ? bitcoinOrange : Colors.transparent,
-              shape: const CircleBorder(),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () =>
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            MyContactScreen(initialKind: _defaultContactKind),
-                      ),
-                    ).then((_) {
-                      if (mounted) _load();
-                    }),
-                child: SizedBox(
-                  width: 88,
-                  height: 88,
-                  child: avatarSeed == null
-                      ? const Icon(Icons.person, size: 48, color: Colors.white)
-                      : FlippingAvatar(
-                          seed: avatarSeed!,
-                          trigger: paymentSuccessTrigger,
-                        ),
-                ),
-              ),
-            ),
+            _buildAvatarSwitcher(),
             if (currentWallet != null) ...[
               const SizedBox(height: 8),
               InkWell(

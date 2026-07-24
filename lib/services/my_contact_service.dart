@@ -98,6 +98,28 @@ Future<String?> getMyLnurlpLink() => _readScoped(myLnurlpLinkKey);
 Future<void> setMyLnurlpLink(String? value) =>
     _writeScoped(myLnurlpLinkKey, value);
 
+/// Explicit-id reads of a wallet's identities/default, for wallets that may
+/// not be the active one (e.g. seeding every wallet's home avatar for the
+/// swipe-to-switch carousel). Mirror [getMyLightningAddressFor].
+Future<String?> _readScopedFor(
+  String walletId,
+  String Function(String walletId) keyFor,
+) async {
+  const storage = FlutterSecureStorage();
+  final v = await storage.read(key: keyFor(walletId));
+  final t = v?.trim() ?? '';
+  return t.isEmpty ? null : t;
+}
+
+Future<String?> getMyBolt12OfferFor(String walletId) =>
+    _readScopedFor(walletId, myBolt12OfferKey);
+
+Future<String?> getMyLnurlpLinkFor(String walletId) =>
+    _readScopedFor(walletId, myLnurlpLinkKey);
+
+Future<MyContactKind?> getMyDefaultContactKindFor(String walletId) async =>
+    _parseContactKind(await _readScopedFor(walletId, myDefaultContactKindKey));
+
 /// The identity the user pinned as their default — seeds the home avatar
 /// (overriding the fixed priority order in `avatarSeedForWallet`) and is the
 /// tab the home avatar jumps to. Null means "no default; use priority".
