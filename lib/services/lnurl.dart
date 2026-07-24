@@ -26,6 +26,13 @@ String decodeLnurl(String input) {
     return '$scheme://$rest';
   }
 
+  // A plain http(s) URL (some LNURL providers, e.g. LNbits reusable withdraw
+  // QRs, encode the endpoint URL directly). Return it unchanged so the caller
+  // can fetch it; case is preserved because the path/query may be significant.
+  if (RegExp(r'^https?://', caseSensitive: false).hasMatch(s)) {
+    return s;
+  }
+
   s = s.toLowerCase();
   if (!s.startsWith('lnurl')) {
     throw const FormatException('Not an LNURL bech32 string');

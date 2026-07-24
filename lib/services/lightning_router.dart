@@ -44,6 +44,23 @@ Future<void> routeLightningCode(
     return;
   }
 
+  // A plain http(s) URL — treat it as a candidate LNURL endpoint (some
+  // providers, e.g. LNbits reusable withdraw QRs, encode the URL directly).
+  // Keep original case: the path/query may be case-sensitive. LnurlActionScreen
+  // fetches it and dispatches on the returned tag, or errors cleanly if it's
+  // not an LNURL endpoint.
+  if (lower.startsWith('http://') || lower.startsWith('https://')) {
+    await navigator.push(
+      MaterialPageRoute(
+        builder: (_) => LnurlActionScreen(
+          code: clean,
+          fromContact: fromContact,
+        ),
+      ),
+    );
+    return;
+  }
+
   if (lower.startsWith('lnbc')) {
     await navigator.push(
       MaterialPageRoute(
