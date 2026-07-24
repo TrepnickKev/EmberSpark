@@ -1,9 +1,15 @@
 import '../l10n/app_localizations.dart';
+import 'lnbits_service.dart' show SelfPaymentException;
 
 /// Maps a thrown exception to a short user-readable message. Tries to
 /// recognise the most common failure modes (TLS, network, common HTTP
 /// statuses) and falls back to a cleaned-up version of the original text.
 String friendlyError(AppLocalizations l10n, Object e) {
+  // Paying your own wallet — a deliberate, recognisable cancellation.
+  if (e is SelfPaymentException) {
+    return l10n.errorSelfPayment;
+  }
+
   final s = e.toString();
 
   // --- TLS / certificate issues -----------------------------------------

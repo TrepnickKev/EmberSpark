@@ -1,9 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'bolt11.dart';
 import 'http_client_factory.dart';
 import 'lnurl.dart';
 import 'wallet_account_service.dart';
 import 'wallet_backend.dart';
+
+/// Thrown by [LNbitsService.payInvoice] when the invoice being paid was created
+/// by the same wallet — paying yourself is a no-op and is cancelled.
+class SelfPaymentException implements Exception {
+  const SelfPaymentException();
+  @override
+  String toString() => 'Self-payment: the invoice belongs to this wallet';
+}
 
 class LNbitsService implements WalletBackend {
   final String baseUrl;
@@ -96,6 +105,19 @@ class LNbitsService implements WalletBackend {
 
   @override
   Future<void> payInvoice(String bolt11) async {
+    // Refuse to pay an invoice this same wallet created (paying yourself is a
+    // no-op). Best-effort: if the ownership check can't be determined, proceed
+    // so a transient glitch never blocks a legitimate payment.
+    final hash = decodeBolt11(bolt11)?.paymentHash ?? '';
+    if (hash.isNotEmpty) {
+      bool owns;
+      try {
+        owns = await _walletOwnsInvoice(hash);
+      } catch (_) {
+        owns = false; // fail open
+      }
+      if (owns) throw const SelfPaymentException();
+    }
     final res = await _client
         .post(
           _uri('/api/v1/payments'),
@@ -106,6 +128,16 @@ class LNbitsService implements WalletBackend {
     if (res.statusCode >= 400) {
       throw Exception('Payment failed (${res.statusCode}): ${res.body}');
     }
+  }
+
+  /// Whether an invoice with [paymentHash] exists in THIS wallet — i.e. this
+  /// wallet created it. The endpoint is scoped to the wallet key, so it returns
+  /// 200 only for own invoices and 404 for anything external.
+  Future<bool> _walletOwnsInvoice(String paymentHash) async {
+    final res = await _client
+        .get(_uri('/api/v1/payments/$paymentHash'), headers: _headers(adminKey))
+        .timeout(_readTimeout);
+    return res.statusCode == 200;
   }
 
   @override

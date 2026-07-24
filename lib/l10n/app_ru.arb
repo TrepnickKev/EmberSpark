@@ -244,6 +244,7 @@
   "error503": "LNbits временно недоступен.",
   "error520": "В LNbits не настроен бэкенд Lightning (VoidWallet). Подключи узел Lightning в LNbits → Server → Funding.",
   "errorInsufficientFunds": "В твоём кошельке недостаточно sats для этого платежа.",
+  "errorSelfPayment": "Этот счёт создан этим же кошельком. Нельзя платить самому себе.",
   "errorLnurlInsecureCallback": "Сервер LNbits вернул небезопасный (http://) callback-URL. Обычно это значит, что LNbits находится за обратным прокси и не знает свой публичный HTTPS-адрес. На хосте LNbits задай LNBITS_BASE_URL=https://твой-host в .env и перезапусти. Либо настрой прокси на передачу X-Forwarded-Proto: https.",
   "errorServerGeneric": "Ошибка сервера ({code}).",
   "lnurlAuthErrorKeyInUse": "Этот ключ аутентификации уже используется для этого сайта. Подожди немного и повтори, или обнови QR-код входа.",

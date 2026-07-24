@@ -1484,6 +1484,12 @@ abstract class AppLocalizations {
   /// **'Not enough sats in your wallet for this payment.'**
   String get errorInsufficientFunds;
 
+  /// No description provided for @errorSelfPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'This invoice is from this wallet. You can\'t pay yourself.'**
+  String get errorSelfPayment;
+
   /// No description provided for @errorLnurlInsecureCallback.
   ///
   /// In en, this message translates to:

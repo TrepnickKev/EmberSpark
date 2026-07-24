@@ -785,6 +785,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay suficientes sats en tu billetera para este pago.';
 
   @override
+  String get errorSelfPayment =>
+      'Esta factura es de esta billetera. No puedes pagarte a ti mismo.';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'El servidor LNbits devolvió una URL de callback insegura (http://). Esto suele significar que LNbits está detrás de un proxy inverso y no conoce su dirección HTTPS pública. En el host de LNbits, define LNBITS_BASE_URL=https://tu-host en .env y reinícialo. Como alternativa, configura el proxy para que pase X-Forwarded-Proto: https.';
 

@@ -784,6 +784,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nicht genug Sats in deiner Wallet für diese Zahlung.';
 
   @override
+  String get errorSelfPayment =>
+      'Diese Rechnung stammt aus dieser Wallet. Du kannst nicht an dich selbst zahlen.';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'Der LNbits-Server hat eine unsichere (http://) Callback-URL zurückgegeben. Wahrscheinlich steht LNbits hinter einem Reverse Proxy und kennt seine öffentliche HTTPS-Adresse nicht. Setze auf dem LNbits-Server LNBITS_BASE_URL=https://dein-host in der .env und starte ihn neu. Alternativ konfiguriere den Proxy so, dass X-Forwarded-Proto: https weitergereicht wird.';
 

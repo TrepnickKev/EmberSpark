@@ -780,6 +780,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'В твоём кошельке недостаточно sats для этого платежа.';
 
   @override
+  String get errorSelfPayment =>
+      'Этот счёт создан этим же кошельком. Нельзя платить самому себе.';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'Сервер LNbits вернул небезопасный (http://) callback-URL. Обычно это значит, что LNbits находится за обратным прокси и не знает свой публичный HTTPS-адрес. На хосте LNbits задай LNBITS_BASE_URL=https://твой-host в .env и перезапусти. Либо настрой прокси на передачу X-Forwarded-Proto: https.';
 

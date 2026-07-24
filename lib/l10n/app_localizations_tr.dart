@@ -778,6 +778,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu ödeme için cüzdanında yeterli sats yok.';
 
   @override
+  String get errorSelfPayment =>
+      'Bu fatura bu cüzdana ait. Kendine ödeme yapamazsın.';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'LNbits sunucusu güvensiz bir (http://) geri çağırma URL\'si döndürdü. Bu genellikle LNbits\'in ters proxy arkasında olduğu ve genel HTTPS adresini bilmediği anlamına gelir. LNbits ana bilgisayarında .env içinde LNBITS_BASE_URL=https://senin-host ayarla ve yeniden başlat. Alternatif olarak, proxy\'yi X-Forwarded-Proto: https iletecek şekilde yapılandır.';
 
