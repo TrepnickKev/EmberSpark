@@ -120,6 +120,8 @@
   "receiveCreateInvoice": "创建发票",
   "receiveInvoiceCopied": "发票已复制",
   "receiveAmountError": "请输入一个正数金额",
+  "receiveEnterAmountFirst": "请先输入金额",
+  "receiveCardCharged": "已从卡中收取 {sats} sats",
   "receiveSatsApprox": "≈ {amount} sats",
   "receiveRatesUnavailable": "实时汇率不可用 — 仅显示 sats",
   "receiveCurrencySats": "sats",

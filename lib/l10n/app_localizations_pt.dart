@@ -372,6 +372,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get receiveAmountError => 'Insira um valor positivo';
 
   @override
+  String get receiveEnterAmountFirst => 'Insira um valor primeiro';
+
+  @override
+  String receiveCardCharged(int sats) {
+    return 'Cobrados $sats sats do cartão';
+  }
+
+  @override
   String receiveSatsApprox(String amount) {
     return '≈ $amount sats';
   }

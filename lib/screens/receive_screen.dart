@@ -10,7 +10,9 @@ import '../services/friendly_error.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
+import '../services/lnurl.dart';
 import '../services/nfc_service.dart';
+import '../services/nfc_coordinator.dart';
 import '../services/price_service.dart';
 import '../widgets/stacked_action_button.dart';
 
@@ -45,15 +47,23 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   // home with the coin-flip when it's paid.
   Timer? _paidPollTimer;
 
+  // Ambient NFC tap handler: charge a tapped Bolt Card for the entered amount,
+  // or write the invoice/identity to a blank tag.
+  late final NfcTapHandler _nfcHandler;
+  bool _charging = false;
+
   @override
   void initState() {
     super.initState();
     amountCtrl.addListener(_onInputChanged);
+    _nfcHandler = _onNfcTap;
+    NfcCoordinator.instance.pushHandler(_nfcHandler);
     _loadInitial();
   }
 
   @override
   void dispose() {
+    NfcCoordinator.instance.removeHandler(_nfcHandler);
     _paidPollTimer?.cancel();
     amountCtrl.removeListener(_onInputChanged);
     amountCtrl.dispose();
@@ -221,71 +231,103 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
-  Future<void> _writeNfc() async {
-    if (invoice == null) return;
-    await _writeNfcFor(invoice!);
+  /// Prompts the user to hold a card to the phone. The actual work happens in
+  /// [_onNfcTap], which the app-wide NFC coordinator invokes on the next tap.
+  void _armNfc() {
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.nfcHoldTag)));
   }
 
-  Future<void> _writeNfcFor(String value) async {
+  /// App-wide NFC tap handler while this screen is active:
+  /// - a Bolt Card (`lnurlw://`) is charged the entered amount (into the wallet);
+  /// - a blank writable tag gets the invoice / reusable identity written to it;
+  /// - anything else falls through to default routing.
+  Future<bool> _onNfcTap(NfcAmbientTag tag) async {
+    if (!mounted || _charging) return false;
+    final code = (tag.payload ?? '').trim();
+    final isWithdraw =
+        RegExp(r'^lnurlw://', caseSensitive: false).hasMatch(code);
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
-    NfcSession? session;
-    try {
-      session = await writeNdefUri(
-        'lightning:$value',
-        onSuccess: () {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteSuccess)));
-        },
-        onError: (_) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
-        },
-      );
-    } on NfcUnavailable {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
-      return;
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
-      return;
-    }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    await _showNfcDialog(session);
-  }
 
-  Future<void> _showNfcDialog(NfcSession session) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(child: Text(l10n.nfcHoldTag)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        ],
-      ),
-    );
-    // Dialog was popped one way or another — make sure no NFC session is left
-    // running.
-    await session.stop();
+    if (isWithdraw) {
+      final sats = _resolveSats();
+      if (sats == null || sats <= 0) {
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(l10n.receiveEnterAmountFirst)),
+          );
+        return true;
+      }
+      setState(() {
+        _charging = true;
+        busy = true;
+        error = null;
+      });
+      try {
+        await chargeViaLnurlWithdraw(code, sats, memo: memoCtrl.text.trim());
+        if (!mounted) return true;
+        signalPaymentSuccess();
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(l10n.receiveCardCharged(sats))),
+          );
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      } on LnurlWithdrawRangeError catch (e) {
+        if (mounted) {
+          setState(() {
+            _charging = false;
+            busy = false;
+          });
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(l10n.lnurlAmountOutOfRange(e.minSats, e.maxSats)),
+              ),
+            );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _charging = false;
+            busy = false;
+          });
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text(friendlyError(l10n, e))),
+            );
+        }
+      }
+      return true;
+    }
+
+    // Not a Bolt Card: offer to write the invoice / reusable identity to a
+    // blank writable tag (the sharing feature).
+    final writeValue = invoice ?? _defaultValue;
+    if (writeValue != null && tag.writable) {
+      try {
+        await tag.writeUri('lightning:$writeValue');
+        if (mounted) {
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(l10n.nfcWriteSuccess)));
+        }
+      } catch (_) {
+        if (mounted) {
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(l10n.nfcWriteFailed)));
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -396,7 +438,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                       StackedActionButton(
                         icon: Icons.nfc,
                         label: l10n.commonNfc,
-                        onPressed: _writeNfc,
+                        onPressed: _armNfc,
                       ),
                     ],
                   ),
@@ -471,7 +513,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             StackedActionButton(
               icon: Icons.nfc,
               label: l10n.commonNfc,
-              onPressed: () => _writeNfcFor(value),
+              onPressed: _armNfc,
             ),
           ],
         ),

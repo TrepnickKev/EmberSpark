@@ -120,6 +120,8 @@
   "receiveCreateInvoice": "Создать счёт",
   "receiveInvoiceCopied": "Счёт скопирован",
   "receiveAmountError": "Введи положительную сумму",
+  "receiveEnterAmountFirst": "Сначала введи сумму",
+  "receiveCardCharged": "Списано {sats} sats с карты",
   "receiveSatsApprox": "≈ {amount} sats",
   "receiveRatesUnavailable": "Актуальные курсы недоступны — только sats",
   "receiveCurrencySats": "sats",

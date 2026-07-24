@@ -359,6 +359,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get receiveAmountError => '请输入一个正数金额';
 
   @override
+  String get receiveEnterAmountFirst => '请先输入金额';
+
+  @override
+  String receiveCardCharged(int sats) {
+    return '已从卡中收取 $sats sats';
+  }
+
+  @override
   String receiveSatsApprox(String amount) {
     return '≈ $amount sats';
   }

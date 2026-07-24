@@ -122,6 +122,8 @@
   "receiveCreateInvoice": "Rechnung erstellen",
   "receiveInvoiceCopied": "Rechnung kopiert",
   "receiveAmountError": "Gib einen positiven Betrag ein",
+  "receiveEnterAmountFirst": "Zuerst einen Betrag eingeben",
+  "receiveCardCharged": "{sats} sats von der Karte abgebucht",
   "receiveSatsApprox": "≈ {amount} Sats",
   "receiveRatesUnavailable": "Wechselkurs nicht verfügbar — nur Sats",
   "receiveCurrencySats": "Sats",

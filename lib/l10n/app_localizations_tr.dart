@@ -369,6 +369,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get receiveAmountError => 'Pozitif bir tutar gir';
 
   @override
+  String get receiveEnterAmountFirst => 'Önce bir tutar girin';
+
+  @override
+  String receiveCardCharged(int sats) {
+    return 'Karttan $sats sats çekildi';
+  }
+
+  @override
   String receiveSatsApprox(String amount) {
     return '≈ $amount sats';
   }

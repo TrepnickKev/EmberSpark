@@ -7,6 +7,7 @@ import '../services/boltcard_verified_store.dart';
 import '../services/boltcards_service.dart';
 import '../services/friendly_error.dart';
 import '../services/lnurl.dart';
+import '../services/nfc_coordinator.dart';
 import '../services/nfc_service.dart';
 import '../services/ntag424.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -39,7 +40,16 @@ class _BoltCardScreenState extends State<BoltCardScreen> {
   @override
   void initState() {
     super.initState();
+    // This screen owns NFC exclusively (raw DESFire reader mode for
+    // programming/wiping), so suspend the app-wide ambient reader while it's up.
+    NfcCoordinator.instance.suspend();
     _load();
+  }
+
+  @override
+  void dispose() {
+    NfcCoordinator.instance.resume();
+    super.dispose();
   }
 
   Future<void> _load() async {

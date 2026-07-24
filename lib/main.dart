@@ -9,6 +9,7 @@ import 'screens/wallets_screen.dart';
 import 'services/language_service.dart';
 import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
+import 'services/nfc_coordinator.dart';
 import 'services/price_service.dart';
 import 'services/wallet_account_service.dart';
 import 'widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -30,14 +31,30 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _appLinks = AppLinks();
   StreamSubscription<Uri>? _linkSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Route ambient NFC taps through the app's navigator, and start capturing
+    // while foregrounded so a tapped card is handled in-app (no OS chooser).
+    NfcCoordinator.instance.configure(
+      navigator: () => navigatorKey.currentState,
+    );
+    NfcCoordinator.instance.onForeground();
     _initDeepLinks();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      NfcCoordinator.instance.onForeground();
+    } else {
+      NfcCoordinator.instance.onBackground();
+    }
   }
 
   Future<void> _initDeepLinks() async {
@@ -84,6 +101,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    NfcCoordinator.instance.onBackground();
     _linkSub?.cancel();
     super.dispose();
   }

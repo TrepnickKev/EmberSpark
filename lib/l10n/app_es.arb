@@ -120,6 +120,8 @@
   "receiveCreateInvoice": "Crear factura",
   "receiveInvoiceCopied": "Factura copiada",
   "receiveAmountError": "Introduce un importe positivo",
+  "receiveEnterAmountFirst": "Introduce primero un importe",
+  "receiveCardCharged": "Se cobraron {sats} sats de la tarjeta",
   "receiveSatsApprox": "≈ {amount} sats",
   "receiveRatesUnavailable": "Cotizaciones en vivo no disponibles — solo sats",
   "receiveCurrencySats": "sats",

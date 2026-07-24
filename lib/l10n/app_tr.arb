@@ -120,6 +120,8 @@
   "receiveCreateInvoice": "Fatura oluştur",
   "receiveInvoiceCopied": "Fatura kopyalandı",
   "receiveAmountError": "Pozitif bir tutar gir",
+  "receiveEnterAmountFirst": "Önce bir tutar girin",
+  "receiveCardCharged": "Karttan {sats} sats çekildi",
   "receiveSatsApprox": "≈ {amount} sats",
   "receiveRatesUnavailable": "Canlı kurlar yok — yalnızca sats",
   "receiveCurrencySats": "sats",

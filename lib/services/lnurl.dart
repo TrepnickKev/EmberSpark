@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:bech32/bech32.dart';
 import 'bech32_util.dart';
 import 'http_client_factory.dart';
+import 'wallet_backend.dart';
 
 /// Decodes a `lnurl1...` (or `LIGHTNING:LNURL1...`) string into its URL.
 String decodeLnurl(String input) {
@@ -218,6 +219,53 @@ Future<void> submitWithdrawInvoice(
   if (data['status'] == 'ERROR') {
     throw Exception('LNURL-withdraw error: ${data['reason']}');
   }
+}
+
+/// Thrown by [chargeViaLnurlWithdraw] when the requested amount is outside the
+/// withdraw service's advertised min/max (both in sats). Callers map it to a
+/// friendly, localized range message.
+class LnurlWithdrawRangeError implements Exception {
+  const LnurlWithdrawRangeError(this.minSats, this.maxSats);
+  final int minSats;
+  final int maxSats;
+  @override
+  String toString() => 'Amount out of range ($minSats–$maxSats sats)';
+}
+
+/// Charges a Bolt Card / LNURL-withdraw source for [sats]: resolves [code]
+/// (an `lnurlw://…` or bech32 LNURL), validates the amount against the
+/// service's min/max, mints an invoice on the current wallet and submits it to
+/// the withdraw callback — so the funds land in the current wallet. This is the
+/// point-of-sale "charge the card" flow. Throws [LnurlWithdrawRangeError] for
+/// an out-of-range amount, [FormatException] if [code] is not a withdraw
+/// source, or any network/LNURL error.
+Future<void> chargeViaLnurlWithdraw(
+  String code,
+  int sats, {
+  String? memo,
+}) async {
+  final url = code.contains('@')
+      ? lightningAddressToUrl(code)
+      : decodeLnurl(code);
+  final info = await fetchLnurl(url);
+  if (info is! LnurlWithdrawInfo) {
+    throw const FormatException('Not an LNURL-withdraw source');
+  }
+  final msat = sats * 1000;
+  if (sats <= 0 ||
+      msat < info.minWithdrawableMsat ||
+      msat > info.maxWithdrawableMsat) {
+    throw LnurlWithdrawRangeError(
+      info.minWithdrawableMsat ~/ 1000,
+      info.maxWithdrawableMsat ~/ 1000,
+    );
+  }
+  final svc = await loadWalletBackend();
+  final resolvedMemo = (memo != null && memo.trim().isNotEmpty)
+      ? memo.trim()
+      : (info.description.isNotEmpty ? info.description : 'EmberSpark');
+  final bolt11 = await svc.createInvoice(amountSats: sats, memo: resolvedMemo);
+  await submitWithdrawInvoice(info, bolt11);
 }
 
 /// Pulls a human-readable description out of the LNURL-pay `metadata` field,

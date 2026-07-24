@@ -10,6 +10,7 @@ import '../services/friendly_error.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_service.dart';
+import '../services/nfc_coordinator.dart';
 import '../services/price_service.dart';
 import '../widgets/payment_route_header.dart';
 import '../widgets/stacked_action_button.dart';
@@ -121,7 +122,12 @@ class _SendScreenState extends State<SendScreen> {
     await _handleIncomingCode(text);
   }
 
-  Future<void> _readNfc() async {
+  // Suspend the app-wide ambient reader for the whole dedicated read (Android
+  // allows only one reader mode at a time).
+  Future<void> _readNfc() =>
+      NfcCoordinator.instance.runExclusive(_readNfcOnce);
+
+  Future<void> _readNfcOnce() async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     NfcSession? session;

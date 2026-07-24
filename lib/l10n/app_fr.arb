@@ -120,6 +120,8 @@
   "receiveCreateInvoice": "Créer une facture",
   "receiveInvoiceCopied": "Facture copiée",
   "receiveAmountError": "Saisis un montant positif",
+  "receiveEnterAmountFirst": "Saisis d'abord un montant",
+  "receiveCardCharged": "{sats} sats débités de la carte",
   "receiveSatsApprox": "≈ {amount} sats",
   "receiveRatesUnavailable": "Cours en direct indisponibles — sats uniquement",
   "receiveCurrencySats": "sats",

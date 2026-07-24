@@ -372,6 +372,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get receiveAmountError => 'Saisis un montant positif';
 
   @override
+  String get receiveEnterAmountFirst => 'Saisis d\'abord un montant';
+
+  @override
+  String receiveCardCharged(int sats) {
+    return '$sats sats débités de la carte';
+  }
+
+  @override
   String receiveSatsApprox(String amount) {
     return '≈ $amount sats';
   }

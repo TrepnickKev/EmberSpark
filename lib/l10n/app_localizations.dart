@@ -782,6 +782,18 @@ abstract class AppLocalizations {
   /// **'Enter a positive amount'**
   String get receiveAmountError;
 
+  /// No description provided for @receiveEnterAmountFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount first'**
+  String get receiveEnterAmountFirst;
+
+  /// No description provided for @receiveCardCharged.
+  ///
+  /// In en, this message translates to:
+  /// **'Charged {sats} sats from the card'**
+  String receiveCardCharged(int sats);
+
   /// No description provided for @receiveSatsApprox.
   ///
   /// In en, this message translates to:

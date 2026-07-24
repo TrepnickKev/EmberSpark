@@ -180,6 +180,72 @@ Future<NfcSession> runIsoDepSession({
   return session;
 }
 
+/// A tag surfaced by the app-wide ambient reader ([startAmbientReader]).
+/// [payload] is the first decoded URI/Text record (null if the tag has no
+/// readable NDEF). [writable] is whether the tag's NDEF can be written.
+/// [writeUri] writes a single URI record to THIS tag — valid only for the
+/// duration of the `onTag` callback.
+class NfcAmbientTag {
+  NfcAmbientTag({
+    required this.payload,
+    required this.writable,
+    required Future<void> Function(String uri) writeUri,
+  }) : _writeUri = writeUri;
+
+  final String? payload;
+  final bool writable;
+  final Future<void> Function(String uri) _writeUri;
+
+  Future<void> writeUri(String uri) => _writeUri(uri);
+}
+
+/// Starts a long-lived foreground reader session that stays active until
+/// [NfcSession.stop]. Every tapped tag is decoded and delivered to [onTag].
+///
+/// This is the app-wide capture that suppresses Android's tag-dispatch chooser
+/// while EmberSpark is foregrounded (see [NfcCoordinator]). Throws
+/// [NfcUnavailable] synchronously if NFC is off or absent.
+Future<NfcSession> startAmbientReader({
+  required Future<void> Function(NfcAmbientTag tag) onTag,
+}) async {
+  await _ensureAvailable();
+  final session = NfcSession._();
+  await NfcManager.instance.startSession(
+    pollingOptions: {NfcPollingOption.iso14443, NfcPollingOption.iso15693},
+    onDiscovered: (NfcTag tag) async {
+      final ndef = NdefAndroid.from(tag);
+      String? payload;
+      var writable = false;
+      if (ndef != null) {
+        writable = ndef.isWritable;
+        try {
+          final msg = ndef.cachedNdefMessage ?? await ndef.getNdefMessage();
+          if (msg != null) {
+            for (final r in msg.records) {
+              payload = _decodeRecord(r);
+              if (payload != null) break;
+            }
+          }
+        } catch (_) {
+          // Unreadable NDEF — treat as an empty payload (still writable check).
+        }
+      }
+      Future<void> writeUri(String uri) async {
+        if (ndef == null) throw const NfcTagNotNdef();
+        if (!ndef.isWritable) throw const NfcTagNotWritable();
+        final record = _buildUriRecord(uri);
+        if (record.byteLength > ndef.maxSize) throw const NfcTagNotWritable();
+        await ndef.writeNdefMessage(NdefMessage(records: [record]));
+      }
+
+      await onTag(
+        NfcAmbientTag(payload: payload, writable: writable, writeUri: writeUri),
+      );
+    },
+  );
+  return session;
+}
+
 /// Decodes a single NDEF record into a string, or returns null if the
 /// record type isn't a URI or Text record.
 String? _decodeRecord(NdefRecord r) {

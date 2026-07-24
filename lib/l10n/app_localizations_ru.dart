@@ -371,6 +371,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get receiveAmountError => 'Введи положительную сумму';
 
   @override
+  String get receiveEnterAmountFirst => 'Сначала введи сумму';
+
+  @override
+  String receiveCardCharged(int sats) {
+    return 'Списано $sats sats с карты';
+  }
+
+  @override
   String receiveSatsApprox(String amount) {
     return '≈ $amount sats';
   }

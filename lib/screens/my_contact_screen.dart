@@ -8,6 +8,7 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/my_contact_service.dart';
 import '../services/nfc_service.dart';
+import '../services/nfc_coordinator.dart';
 import '../widgets/stacked_action_button.dart';
 import 'contacts_screen.dart' show contactAvatar;
 
@@ -301,7 +302,11 @@ class _MyContactScreenState extends State<MyContactScreen>
     );
   }
 
-  Future<void> _writeNfc(String value) async {
+  Future<void> _writeNfc(String value) =>
+      NfcCoordinator.instance.runExclusive(() => _writeNfcOnce(value));
+
+  // Suspend the app-wide ambient reader for the whole dedicated write.
+  Future<void> _writeNfcOnce(String value) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     NfcSession? session;
