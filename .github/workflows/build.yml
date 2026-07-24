@@ -115,7 +115,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ env.PLAY_JSON }}
           packageName: com.emberspark.wallet
           releaseFiles: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
-          track: internal
+          tracks: internal
           status: completed
 
       - name: Generate App installation token

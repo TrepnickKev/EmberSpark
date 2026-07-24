@@ -27,6 +27,7 @@ class NfcCoordinator {
   NfcSession? _ambient;
   bool _foreground = false;
   bool _starting = false;
+  bool _handling = false;
   int _suspend = 0;
   DateTime? _lastTapAt;
   final List<NfcTapHandler> _handlers = [];
@@ -98,17 +99,18 @@ class NfcCoordinator {
   }
 
   Future<void> _handleTap(NfcAmbientTag tag) async {
-    // Debounce: a still-present card is re-discovered by the fresh session we
-    // start after handling, so ignore repeats within a short window.
+    // Ignore a tap while one is already being handled, and debounce a card
+    // that lingers on the reader. Crucially we do NOT stop the ambient reader
+    // here: turning reader mode off while the card is still present makes
+    // Android re-dispatch the tag and pop up the app-chooser mid-charge.
+    if (_handling) return;
     final now = DateTime.now();
     if (_lastTapAt != null &&
         now.difference(_lastTapAt!) < const Duration(seconds: 2)) {
       return;
     }
+    _handling = true;
     _lastTapAt = now;
-
-    // Suspend polling while acting on this tap.
-    await _stopAmbient();
     try {
       for (final handler in _handlers.reversed.toList()) {
         if (await handler(tag)) return;
@@ -121,7 +123,7 @@ class NfcCoordinator {
         unawaited(routeLightningCode(nav, payload));
       }
     } finally {
-      await _ensureAmbient();
+      _handling = false;
     }
   }
 }

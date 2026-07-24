@@ -268,7 +268,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         error = null;
       });
       try {
-        await chargeViaLnurlWithdraw(code, sats, memo: memoCtrl.text.trim());
+        await chargeViaLnurlWithdraw(
+          code,
+          sats,
+          memo: memoCtrl.text.trim(),
+          existingBolt11: invoice,
+        );
         if (!mounted) return true;
         signalPaymentSuccess();
         messenger

@@ -250,6 +250,7 @@ Future<void> chargeViaLnurlWithdraw(
   String code,
   int sats, {
   String? memo,
+  String? existingBolt11,
 }) async {
   final url = code.contains('@')
       ? lightningAddressToUrl(code)
@@ -267,11 +268,19 @@ Future<void> chargeViaLnurlWithdraw(
       info.maxWithdrawableMsat ~/ 1000,
     );
   }
-  final svc = await loadWalletBackend();
-  final resolvedMemo = (memo != null && memo.trim().isNotEmpty)
-      ? memo.trim()
-      : (info.description.isNotEmpty ? info.description : 'EmberSpark');
-  final bolt11 = await svc.createInvoice(amountSats: sats, memo: resolvedMemo);
+  // Reuse the invoice the caller already created (e.g. the one shown as the
+  // Receive QR) so the card pays that one instead of orphaning it and minting
+  // a second. Only create a fresh invoice when none was supplied.
+  final String bolt11;
+  if (existingBolt11 != null && existingBolt11.trim().isNotEmpty) {
+    bolt11 = existingBolt11.trim();
+  } else {
+    final svc = await loadWalletBackend();
+    final resolvedMemo = (memo != null && memo.trim().isNotEmpty)
+        ? memo.trim()
+        : (info.description.isNotEmpty ? info.description : 'EmberSpark');
+    bolt11 = await svc.createInvoice(amountSats: sats, memo: resolvedMemo);
+  }
   await submitWithdrawInvoice(info, bolt11);
 }
 
