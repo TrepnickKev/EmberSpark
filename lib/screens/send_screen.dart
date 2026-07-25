@@ -9,12 +9,12 @@ import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
-import '../services/nfc_service.dart';
 import '../services/nfc_coordinator.dart';
 import '../services/price_service.dart';
 import '../widgets/payment_route_header.dart';
 import '../widgets/stacked_action_button.dart';
 import 'bolt12_action_screen.dart';
+import 'bolt_card_charge_prompt.dart';
 import 'lnurl_action_screen.dart';
 import 'qr_scan_screen.dart';
 
@@ -36,10 +36,15 @@ class _SendScreenState extends State<SendScreen> {
   Bolt11Decoded? decoded;
   ({String seed, String name})? senderInfo;
 
+  // A tapped Bolt Card can only be charged, not paid to: inform, then charge.
+  late final NfcTapHandler _nfcHandler;
+
   @override
   void initState() {
     super.initState();
     bolt11Ctrl.addListener(_onChanged);
+    _nfcHandler = (tag) => promptBoltCardChargeOnly(context, tag);
+    NfcCoordinator.instance.pushHandler(_nfcHandler);
     if (widget.initialInvoice != null) {
       bolt11Ctrl.text = widget.initialInvoice!;
     } else {
@@ -59,6 +64,7 @@ class _SendScreenState extends State<SendScreen> {
 
   @override
   void dispose() {
+    NfcCoordinator.instance.removeHandler(_nfcHandler);
     bolt11Ctrl.removeListener(_onChanged);
     bolt11Ctrl.dispose();
     super.dispose();
@@ -122,68 +128,14 @@ class _SendScreenState extends State<SendScreen> {
     await _handleIncomingCode(text);
   }
 
-  // Suspend the app-wide ambient reader for the whole dedicated read (Android
-  // allows only one reader mode at a time).
-  Future<void> _readNfc() =>
-      NfcCoordinator.instance.runExclusive(_readNfcOnce);
-
-  Future<void> _readNfcOnce() async {
+  // The app-wide ambient reader already captures NFC taps (and shows the
+  // Bolt Card charge-only prompt via the registered handler), so this button
+  // is just a hint to hold the tag near the phone.
+  void _readNfc() {
     final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    NfcSession? session;
-    try {
-      session = await readNdefText(
-        onRead: (payload) async {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          await _handleIncomingCode(payload);
-        },
-        onError: (_) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-        },
-      );
-    } on NfcUnavailable {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
-      return;
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-      return;
-    }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    await _showNfcDialog(session);
-  }
-
-  Future<void> _showNfcDialog(NfcSession session) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(child: Text(l10n.nfcHoldTag)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        ],
-      ),
-    );
-    await session.stop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.nfcHoldTag)));
   }
 
   Future<void> _pickImage() async {

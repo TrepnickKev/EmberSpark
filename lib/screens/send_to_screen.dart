@@ -5,7 +5,6 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
-import '../services/nfc_service.dart';
 import '../services/nfc_coordinator.dart';
 import '../widgets/stacked_action_button.dart';
 import 'bolt_card_charge_prompt.dart';
@@ -89,68 +88,14 @@ class _SendToScreenState extends State<SendToScreen> {
     await _handleIncomingCode(text);
   }
 
-  // Suspend the app-wide ambient reader for the whole dedicated read (Android
-  // allows only one reader mode at a time).
-  Future<void> _readNfc() =>
-      NfcCoordinator.instance.runExclusive(_readNfcOnce);
-
-  Future<void> _readNfcOnce() async {
+  // The app-wide ambient reader already captures NFC taps (and shows the
+  // Bolt Card charge-only prompt via the registered handler), so this button
+  // is just a hint to hold the tag near the phone.
+  void _readNfc() {
     final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    NfcSession? session;
-    try {
-      session = await readNdefText(
-        onRead: (payload) async {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          await _handleIncomingCode(payload);
-        },
-        onError: (_) {
-          if (!mounted) return;
-          Navigator.of(context, rootNavigator: true).pop();
-          messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-        },
-      );
-    } on NfcUnavailable {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcUnavailable)));
-      return;
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
-      return;
-    }
-    if (!mounted) {
-      await session.stop();
-      return;
-    }
-    await _showNfcDialog(session);
-  }
-
-  Future<void> _showNfcDialog(NfcSession session) async {
-    final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(child: Text(l10n.nfcHoldTag)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        ],
-      ),
-    );
-    await session.stop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.nfcHoldTag)));
   }
 
   Future<void> _pickImage() async {
