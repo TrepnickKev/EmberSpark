@@ -104,9 +104,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       setState(() {
         info = i;
         busy = false;
-        if (i is LnurlWithdrawInfo) {
-          amountCtrl.text = (i.maxWithdrawableMsat ~/ 1000).toString();
-        }
+        // Leave the amount blank so it (and the currency) are set manually.
       });
     } catch (e) {
       if (!mounted) return;
