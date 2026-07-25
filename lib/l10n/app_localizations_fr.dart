@@ -709,6 +709,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutCheckFailed => 'Impossible de vérifier les mises à jour';
 
   @override
+  String get aboutUpdatesViaStore =>
+      'Les mises à jour sont gérées par Google Play';
+
+  @override
   String get aboutSupportDevelopment => 'Soutenir le développement';
 
   @override

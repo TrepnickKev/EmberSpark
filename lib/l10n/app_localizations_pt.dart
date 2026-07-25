@@ -709,6 +709,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aboutCheckFailed => 'Não foi possível verificar atualizações';
 
   @override
+  String get aboutUpdatesViaStore =>
+      'As atualizações são gerenciadas pelo Google Play';
+
+  @override
   String get aboutSupportDevelopment => 'Apoiar o desenvolvimento';
 
   @override

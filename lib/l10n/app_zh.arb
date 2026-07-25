@@ -222,6 +222,7 @@
   "aboutUpdateAvailable": "有可用更新：v{version}",
   "aboutOpenRelease": "打开版本",
   "aboutCheckFailed": "无法检查更新",
+  "aboutUpdatesViaStore": "更新由 Google Play 管理",
   "aboutSupportDevelopment": "支持开发",
   "aboutSupportBody": "EmberSpark 是在业余时间开发和维护的。如果它让你更轻松地管理 sats，欢迎向下方地址发送一些 on-chain BTC。每一点都让项目得以延续。谢谢！在 GitHub 上报告 bug 或提出功能请求同样受欢迎。",
   "aboutDonateMethods": "通过 Lightning / On-Chain 捐赠",

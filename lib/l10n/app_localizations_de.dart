@@ -708,6 +708,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutCheckFailed => 'Update-Prüfung fehlgeschlagen';
 
   @override
+  String get aboutUpdatesViaStore => 'Updates werden von Google Play verwaltet';
+
+  @override
   String get aboutSupportDevelopment => 'Entwicklung unterstützen';
 
   @override

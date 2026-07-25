@@ -30,12 +30,17 @@ class VersionInfo {
   /// muted "Couldn't check for updates" rather than implying up-to-date.
   final bool checkFailed;
 
+  /// True when the app was installed from a managed store (Google Play), which
+  /// handles updates itself — the in-app GitHub-release check is skipped.
+  final bool managedByStore;
+
   const VersionInfo({
     required this.current,
     required this.latest,
     required this.updateAvailable,
     required this.releaseUrl,
     required this.checkFailed,
+    this.managedByStore = false,
   });
 }
 
@@ -48,7 +53,24 @@ Future<String> getCurrentVersion() async {
 /// the version baked into this build. Never throws — failure modes are
 /// folded into the returned [VersionInfo].
 Future<VersionInfo> checkForUpdate() async {
-  final current = await getCurrentVersion();
+  final packageInfo = await PackageInfo.fromPlatform();
+  final current = packageInfo.version;
+
+  // Installed from Google Play? Then Play handles updates — skip the in-app
+  // GitHub-release check entirely (and don't prompt sideload updates, which
+  // Play policy forbids). Sideloads (other installer, or null for adb/desktop)
+  // fall through to the GitHub check.
+  if (packageInfo.installerStore == 'com.android.vending') {
+    return VersionInfo(
+      current: current,
+      latest: null,
+      updateAvailable: false,
+      releaseUrl: null,
+      checkFailed: false,
+      managedByStore: true,
+    );
+  }
+
   try {
     final client = await getHttpClient();
     final res = await client

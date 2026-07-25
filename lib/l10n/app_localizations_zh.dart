@@ -686,6 +686,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutCheckFailed => '无法检查更新';
 
   @override
+  String get aboutUpdatesViaStore => '更新由 Google Play 管理';
+
+  @override
   String get aboutSupportDevelopment => '支持开发';
 
   @override

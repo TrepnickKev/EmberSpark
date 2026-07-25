@@ -173,6 +173,12 @@ class _AboutScreenState extends State<AboutScreen> {
         ],
       );
     }
+    if (i.managedByStore) {
+      return Text(
+        l10n.aboutUpdatesViaStore,
+        style: const TextStyle(color: Colors.grey),
+      );
+    }
     if (i.checkFailed) {
       return Text(
         l10n.aboutCheckFailed,

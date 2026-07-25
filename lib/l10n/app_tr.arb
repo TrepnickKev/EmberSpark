@@ -222,6 +222,7 @@
   "aboutUpdateAvailable": "Güncelleme mevcut: v{version}",
   "aboutOpenRelease": "Sürümü aç",
   "aboutCheckFailed": "Güncellemeler kontrol edilemedi",
+  "aboutUpdatesViaStore": "Güncellemeler Google Play tarafından yönetilir",
   "aboutSupportDevelopment": "Geliştirmeyi destekle",
   "aboutSupportBody": "EmberSpark boş zamanlarda geliştirilir ve bakımı yapılır. Sats'larını yönetmeni kolaylaştırıyorsa, aşağıdaki adrese birkaç on-chain BTC göndermeyi düşün. Her katkı projeyi ayakta tutar. Teşekkürler! GitHub'da hata bildirmek veya özellik istemek de aynı derecede memnuniyetle karşılanır.",
   "aboutDonateMethods": "Lightning / On-Chain ile bağış yap",

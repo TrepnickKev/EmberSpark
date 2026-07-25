@@ -222,6 +222,7 @@
   "aboutUpdateAvailable": "Atualização disponível: v{version}",
   "aboutOpenRelease": "Abrir versão",
   "aboutCheckFailed": "Não foi possível verificar atualizações",
+  "aboutUpdatesViaStore": "As atualizações são gerenciadas pelo Google Play",
   "aboutSupportDevelopment": "Apoiar o desenvolvimento",
   "aboutSupportBody": "O EmberSpark é criado e mantido no tempo livre. Se ele facilita a gestão dos seus sats, considere enviar alguns BTC on-chain para o endereço abaixo. Cada contribuição mantém o projeto vivo. Obrigado! Relatar bugs ou pedir recursos no GitHub é igualmente bem-vindo.",
   "aboutDonateMethods": "Doar via Lightning / On-Chain",

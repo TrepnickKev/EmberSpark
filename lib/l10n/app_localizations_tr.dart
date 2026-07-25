@@ -703,6 +703,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get aboutCheckFailed => 'Güncellemeler kontrol edilemedi';
 
   @override
+  String get aboutUpdatesViaStore =>
+      'Güncellemeler Google Play tarafından yönetilir';
+
+  @override
   String get aboutSupportDevelopment => 'Geliştirmeyi destekle';
 
   @override

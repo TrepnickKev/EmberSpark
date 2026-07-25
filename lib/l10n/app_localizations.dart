@@ -1358,6 +1358,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t check for updates'**
   String get aboutCheckFailed;
 
+  /// No description provided for @aboutUpdatesViaStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates are managed by Google Play'**
+  String get aboutUpdatesViaStore;
+
   /// No description provided for @aboutSupportDevelopment.
   ///
   /// In en, this message translates to:
