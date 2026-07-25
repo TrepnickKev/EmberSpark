@@ -29,13 +29,23 @@ class _QrScanScreenState extends State<QrScanScreen> {
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (_handled) return;
+    if (_handled || !mounted) return;
     final code = capture.barcodes.isEmpty
         ? null
         : capture.barcodes.first.rawValue;
     if (code == null || code.isEmpty) return;
+    _finish(code);
+  }
+
+  /// Pops the scanner exactly once with [result]. Guards against the camera
+  /// stream (or an NFC/paste callback) firing a second pop after the route has
+  /// already been dismissed — e.g. by the system back button. That extra pop
+  /// would remove the screen underneath and black out the app.
+  void _finish(String? result) {
+    if (_handled || !mounted) return;
     _handled = true;
-    Navigator.pop(context, code);
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) navigator.pop(result);
   }
 
   Future<void> _paste() async {
@@ -50,8 +60,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
       );
       return;
     }
-    _handled = true;
-    Navigator.pop(context, text);
+    _finish(text);
   }
 
   Future<void> _readNfc() async {
@@ -69,8 +78,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
             messenger.showSnackBar(SnackBar(content: Text(l10n.nfcReadFailed)));
             return;
           }
-          _handled = true;
-          Navigator.pop(context, text);
+          _finish(text);
         },
         onError: (_) {
           if (!mounted) return;
@@ -138,8 +146,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
         return;
       }
       if (!mounted) return;
-      _handled = true;
-      Navigator.pop(context, code);
+      _finish(code);
     } finally {
       await analyser.dispose();
     }
@@ -148,9 +155,15 @@ class _QrScanScreenState extends State<QrScanScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title ?? l10n.commonScanQr),
+    return PopScope(
+      // A back gesture pops this route; mark it handled so an in-flight camera
+      // detection can't fire a second pop and black out the app.
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _handled = true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title ?? l10n.commonScanQr),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
@@ -203,6 +216,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
