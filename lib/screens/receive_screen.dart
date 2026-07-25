@@ -27,6 +27,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   final amountCtrl = TextEditingController();
   final memoCtrl = TextEditingController();
   String? invoice;
+  int? _invoiceSats;
   String? error;
   bool busy = false;
 
@@ -177,6 +178,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       busy = true;
       error = null;
       invoice = null;
+      _invoiceSats = null;
     });
     try {
       final WalletBackend svc = await loadWalletBackend();
@@ -185,7 +187,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         memo: memoCtrl.text.trim(),
       );
       if (!mounted) return;
-      setState(() => invoice = bolt11);
+      setState(() {
+        invoice = bolt11;
+        _invoiceSats = sats;
+      });
       _startPaidPolling(bolt11);
     } catch (e) {
       if (!mounted) return;
@@ -255,12 +260,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     if (isWithdraw) {
       final sats = _resolveSats();
       if (sats == null || sats <= 0) {
-        messenger
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(content: Text(l10n.receiveEnterAmountFirst)),
-          );
-        return true;
+        // No amount entered: don't consume the tap. The NfcCoordinator then
+        // falls through to default routing, opening the same withdraw/charge
+        // screen as the home screen (with the card's max pre-filled).
+        return false;
       }
       setState(() {
         _charging = true;
@@ -353,6 +356,77 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (invoice == null) _buildIdentitySection(l10n),
+                if (invoice != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${formatThousands(_invoiceSats ?? 0)} ${l10n.homeSatsUnit}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (_invoiceSats != null &&
+                      rates?[displayCurrency] != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      formatFiat(
+                        (_invoiceSats! / 100000000) * rates![displayCurrency]!,
+                        displayCurrency,
+                      ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 15, color: Colors.grey),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(12),
+                      child: QrImageView(
+                        data: invoice!,
+                        size: 240,
+                        backgroundColor: Colors.white,
+                        embeddedImage: const AssetImage('images/Logo_icon.png'),
+                        embeddedImageStyle: const QrEmbeddedImageStyle(
+                          size: Size(48, 48),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StackedActionButton(
+                        icon: Icons.copy,
+                        label: l10n.commonCopy,
+                        onPressed: _copy,
+                      ),
+                      StackedActionButton(
+                        icon: Icons.ios_share,
+                        label: l10n.commonShare,
+                        onPressed: _share,
+                      ),
+                      StackedActionButton(
+                        icon: Icons.nfc,
+                        label: l10n.commonNfc,
+                        onPressed: _armNfc,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    invoice!,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Divider(),
+                  ),
+                ],
+                // Amount / memo / create-invoice controls live at the bottom, so
+                // the created invoice + QR sit above them.
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -408,50 +482,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 if (error != null) ...[
                   const SizedBox(height: 16),
                   Text(error!, style: const TextStyle(color: Colors.redAccent)),
-                ],
-                if (invoice != null) ...[
-                  const SizedBox(height: 24),
-                  Center(
-                    child: Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(12),
-                      child: QrImageView(
-                        data: invoice!,
-                        size: 240,
-                        backgroundColor: Colors.white,
-                        embeddedImage: const AssetImage('images/Logo_icon.png'),
-                        embeddedImageStyle: const QrEmbeddedImageStyle(
-                          size: Size(48, 48),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      StackedActionButton(
-                        icon: Icons.copy,
-                        label: l10n.commonCopy,
-                        onPressed: _copy,
-                      ),
-                      StackedActionButton(
-                        icon: Icons.ios_share,
-                        label: l10n.commonShare,
-                        onPressed: _share,
-                      ),
-                      StackedActionButton(
-                        icon: Icons.nfc,
-                        label: l10n.commonNfc,
-                        onPressed: _armNfc,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText(
-                    invoice!,
-                    style: const TextStyle(fontSize: 11),
-                  ),
                 ],
               ],
             ),
