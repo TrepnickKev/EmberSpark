@@ -249,6 +249,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'La tarjeta se retiró demasiado pronto. Manténla plana contra la parte trasera del teléfono y quieta hasta que termine la operación, luego inténtalo de nuevo.';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody =>
+      'Una Bolt Card solo puede cobrarse, no pagarse. ¿Quieres cobrarla?';
+
+  @override
+  String get boltCardChargeAction => 'Cobrar';
+
+  @override
   String get boltCardVerifyFailed => 'No se pudo verificar la tarjeta.';
 
   @override

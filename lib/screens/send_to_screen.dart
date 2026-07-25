@@ -8,6 +8,7 @@ import '../services/lightning_router.dart';
 import '../services/nfc_service.dart';
 import '../services/nfc_coordinator.dart';
 import '../widgets/stacked_action_button.dart';
+import 'bolt_card_charge_prompt.dart';
 import 'contacts_screen.dart' show contactAvatar, contactTypeBadge;
 import 'qr_scan_screen.dart';
 
@@ -22,15 +23,21 @@ class _SendToScreenState extends State<SendToScreen> {
   final inputCtrl = TextEditingController();
   List<Contact>? contacts;
 
+  // A tapped Bolt Card can only be charged, not paid to: inform, then charge.
+  late final NfcTapHandler _nfcHandler;
+
   @override
   void initState() {
     super.initState();
     inputCtrl.addListener(() => setState(() {}));
+    _nfcHandler = (tag) => promptBoltCardChargeOnly(context, tag);
+    NfcCoordinator.instance.pushHandler(_nfcHandler);
     _loadContacts();
   }
 
   @override
   void dispose() {
+    NfcCoordinator.instance.removeHandler(_nfcHandler);
     inputCtrl.dispose();
     super.dispose();
   }

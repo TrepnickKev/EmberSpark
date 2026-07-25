@@ -238,6 +238,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get boltCardTagLost => '卡片移开得太早。请将它平贴在手机背面并保持不动，直到操作完成，然后重试。';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody => 'Bolt Card 只能收款，不能付款。你想收款吗？';
+
+  @override
+  String get boltCardChargeAction => '收款';
+
+  @override
   String get boltCardVerifyFailed => '无法验证卡片。';
 
   @override

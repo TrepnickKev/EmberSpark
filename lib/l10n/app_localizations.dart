@@ -548,6 +548,24 @@ abstract class AppLocalizations {
   /// **'The card moved away too soon. Hold it flat against the back of the phone and keep it still until the operation finishes, then try again.'**
   String get boltCardTagLost;
 
+  /// No description provided for @boltCardChargeOnlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bolt Card'**
+  String get boltCardChargeOnlyTitle;
+
+  /// No description provided for @boltCardChargeOnlyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A Bolt Card can only be charged, not paid to. Do you want to charge it?'**
+  String get boltCardChargeOnlyBody;
+
+  /// No description provided for @boltCardChargeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge'**
+  String get boltCardChargeAction;
+
   /// No description provided for @boltCardVerifyFailed.
   ///
   /// In en, this message translates to:

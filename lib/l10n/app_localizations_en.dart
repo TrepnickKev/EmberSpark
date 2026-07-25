@@ -246,6 +246,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'The card moved away too soon. Hold it flat against the back of the phone and keep it still until the operation finishes, then try again.';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody =>
+      'A Bolt Card can only be charged, not paid to. Do you want to charge it?';
+
+  @override
+  String get boltCardChargeAction => 'Charge';
+
+  @override
   String get boltCardVerifyFailed => 'Could not verify the card.';
 
   @override

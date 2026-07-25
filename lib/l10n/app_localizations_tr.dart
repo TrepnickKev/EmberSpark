@@ -246,6 +246,16 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kart çok erken uzaklaştırıldı. İşlem bitene kadar telefonun arkasına düz ve sabit tut, sonra tekrar dene.';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody =>
+      'Bir Bolt Card yalnızca tahsil edilebilir, ödeme yapılamaz. Tahsil etmek ister misin?';
+
+  @override
+  String get boltCardChargeAction => 'Tahsil et';
+
+  @override
   String get boltCardVerifyFailed => 'Kart doğrulanamadı.';
 
   @override

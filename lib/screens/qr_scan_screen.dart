@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
+import '../services/nfc_coordinator.dart';
 import '../services/nfc_service.dart';
 import '../widgets/stacked_action_button.dart';
+import 'bolt_card_charge_prompt.dart';
 
 class QrScanScreen extends StatefulWidget {
   const QrScanScreen({super.key, this.title});
@@ -22,8 +24,19 @@ class _QrScanScreenState extends State<QrScanScreen> {
   );
   bool _handled = false;
 
+  // A tapped Bolt Card can only be charged, not paid to: inform, then charge.
+  late final NfcTapHandler _nfcHandler;
+
+  @override
+  void initState() {
+    super.initState();
+    _nfcHandler = (tag) => promptBoltCardChargeOnly(context, tag);
+    NfcCoordinator.instance.pushHandler(_nfcHandler);
+  }
+
   @override
   void dispose() {
+    NfcCoordinator.instance.removeHandler(_nfcHandler);
     controller.dispose();
     super.dispose();
   }

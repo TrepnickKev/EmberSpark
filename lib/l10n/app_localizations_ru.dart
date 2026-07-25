@@ -248,6 +248,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Карту убрали слишком рано. Держи её плоско у задней части телефона и неподвижно до конца операции, затем попробуй снова.';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody =>
+      'С Bolt Card можно только списать, но не оплатить ей. Хочешь списать?';
+
+  @override
+  String get boltCardChargeAction => 'Списать';
+
+  @override
   String get boltCardVerifyFailed => 'Не удалось проверить карту.';
 
   @override

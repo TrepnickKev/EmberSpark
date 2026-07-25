@@ -249,6 +249,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'La carte a été retirée trop tôt. Maintiens-la à plat contre l\'arrière du téléphone et immobile jusqu\'à la fin de l\'opération, puis réessaie.';
 
   @override
+  String get boltCardChargeOnlyTitle => 'Bolt Card';
+
+  @override
+  String get boltCardChargeOnlyBody =>
+      'Une Bolt Card ne peut être que débitée, pas payée. Veux-tu la débiter ?';
+
+  @override
+  String get boltCardChargeAction => 'Débiter';
+
+  @override
   String get boltCardVerifyFailed => 'Impossible de vérifier la carte.';
 
   @override
