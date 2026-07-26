@@ -1514,6 +1514,12 @@ abstract class AppLocalizations {
   /// **'This invoice is from this wallet. You can\'t pay yourself.'**
   String get errorSelfPayment;
 
+  /// No description provided for @errorNotLnurl.
+  ///
+  /// In en, this message translates to:
+  /// **'This link is not a valid LNURL service'**
+  String get errorNotLnurl;
+
   /// No description provided for @errorLnurlInsecureCallback.
   ///
   /// In en, this message translates to:

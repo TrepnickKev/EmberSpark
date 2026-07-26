@@ -40,4 +40,32 @@ void main() {
       );
     });
   });
+
+  group('lightningParamOrSelf', () {
+    test('extracts the lightning= payload from a web-fallback URL', () {
+      const url =
+          'https://lightning.finbil.de/?lightning=LNURL1DP68GURN8GHJ7MRFVA58G';
+      expect(lightningParamOrSelf(url), 'LNURL1DP68GURN8GHJ7MRFVA58G');
+    });
+
+    test('extracts an lnurl= param too, case-insensitive key', () {
+      const url = 'https://host/pay?LNURL=LNURL1ABC';
+      expect(lightningParamOrSelf(url), 'LNURL1ABC');
+    });
+
+    test('returns a URL without a lightning/lnurl param unchanged', () {
+      const url = 'https://host/withdraw/api/v1/lnurl/xyz';
+      expect(lightningParamOrSelf(url), url);
+    });
+
+    test('returns a bare bech32 LNURL unchanged', () {
+      const bech32 = 'LNURL1DP68GURN8GHJ7MRFVA58G';
+      expect(lightningParamOrSelf(bech32), bech32);
+    });
+
+    test('leaves lnurlw:// and lightning addresses unchanged', () {
+      expect(lightningParamOrSelf('lnurlw://host/x'), 'lnurlw://host/x');
+      expect(lightningParamOrSelf('alice@example.com'), 'alice@example.com');
+    });
+  });
 }

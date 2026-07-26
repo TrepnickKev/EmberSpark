@@ -249,6 +249,7 @@
   "error520": "LNbits 未配置 Lightning 后端（VoidWallet）。请在 LNbits → Server → Funding 中连接一个 Lightning 节点。",
   "errorInsufficientFunds": "你的钱包中 sats 不足以完成此支付。",
   "errorSelfPayment": "这张发票来自本钱包，无法向自己付款。",
+  "errorNotLnurl": "此链接不是有效的 LNURL 服务",
   "errorLnurlInsecureCallback": "LNbits 服务器返回了不安全的（http://）回调网址。这通常意味着 LNbits 位于反向代理之后，且不知道其公开的 HTTPS 地址。在 LNbits 主机上，于 .env 中设置 LNBITS_BASE_URL=https://your-host 并重启。或者，将代理配置为传递 X-Forwarded-Proto: https。",
   "errorServerGeneric": "服务器错误（{code}）。",
   "lnurlAuthErrorKeyInUse": "此认证密钥已在此站点使用中。请稍候重试，或重新加载登录二维码。",

@@ -3,6 +3,7 @@ import '../screens/bolt12_action_screen.dart';
 import '../screens/lnurl_action_screen.dart';
 import '../screens/send_screen.dart';
 import 'contact_service.dart' show Contact;
+import 'lnurl.dart';
 import 'wallet_account_service.dart';
 
 /// Classifies a Lightning string (BOLT11 / LNURL / Lightning address) and
@@ -20,6 +21,9 @@ Future<void> routeLightningCode(
   String code, {
   Contact? fromContact,
 }) async {
+  // Pull the Lightning payload out of a QR web-fallback URL
+  // (https://host/?lightning=LNURL1...) before classifying it.
+  code = lightningParamOrSelf(code);
   final clean = code.trim().replaceFirst(
     RegExp(r'^(lightning|lnurl):', caseSensitive: false),
     '',

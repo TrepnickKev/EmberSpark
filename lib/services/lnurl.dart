@@ -45,6 +45,33 @@ String decodeLnurl(String input) {
   return utf8.decode(bytes);
 }
 
+/// If [code] is an http(s) URL that carries a `lightning=` (or `lnurl=`) query
+/// parameter — the standard QR web-fallback form, e.g.
+/// `https://host/?lightning=LNURL1...` — return that parameter's value;
+/// otherwise return [code] unchanged. Lets a QR that doubles as a web link
+/// still yield its Lightning payload instead of fetching the web page.
+String lightningParamOrSelf(String code) {
+  final trimmed = code.trim();
+  final uri = Uri.tryParse(trimmed);
+  if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+    for (final entry in uri.queryParameters.entries) {
+      final key = entry.key.toLowerCase();
+      if ((key == 'lightning' || key == 'lnurl') && entry.value.isNotEmpty) {
+        return entry.value.trim();
+      }
+    }
+  }
+  return trimmed;
+}
+
+/// Thrown by [fetchLnurl] when the endpoint's response is not LNURL JSON (e.g.
+/// a scanned link that is actually a web page returning HTML).
+class NotAnLnurlServiceException implements Exception {
+  const NotAnLnurlServiceException();
+  @override
+  String toString() => 'Not an LNURL service';
+}
+
 /// Returns a canonical form of an LNURL string: decodes it, collapses any
 /// accidental duplicate slashes in the URL path (some LNbits setups emit
 /// `…/lnurlp//<id>`), and re-encodes. Returns the input unchanged if it is
@@ -158,7 +185,14 @@ Future<LnurlInfo> fetchLnurl(String url) async {
   if (res.statusCode != 200) {
     throw Exception('LNURL fetch failed (${res.statusCode}): ${res.body}');
   }
-  final data = jsonDecode(res.body) as Map<String, dynamic>;
+  // A non-JSON / non-object body means this wasn't an LNURL endpoint at all
+  // (e.g. a scanned link that is really a web page returning HTML).
+  final Map<String, dynamic> data;
+  try {
+    data = jsonDecode(res.body) as Map<String, dynamic>;
+  } catch (_) {
+    throw const NotAnLnurlServiceException();
+  }
   if (data['status'] == 'ERROR') {
     throw Exception('LNURL error: ${data['reason']}');
   }

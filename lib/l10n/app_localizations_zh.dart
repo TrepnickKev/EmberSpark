@@ -768,6 +768,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorSelfPayment => '这张发票来自本钱包，无法向自己付款。';
 
   @override
+  String get errorNotLnurl => '此链接不是有效的 LNURL 服务';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'LNbits 服务器返回了不安全的（http://）回调网址。这通常意味着 LNbits 位于反向代理之后，且不知道其公开的 HTTPS 地址。在 LNbits 主机上，于 .env 中设置 LNBITS_BASE_URL=https://your-host 并重启。或者，将代理配置为传递 X-Forwarded-Proto: https。';
 

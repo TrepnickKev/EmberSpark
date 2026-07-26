@@ -804,6 +804,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Esta fatura é desta carteira. Você não pode pagar a si mesmo.';
 
   @override
+  String get errorNotLnurl => 'Este link não é um serviço LNURL válido';
+
+  @override
   String get errorLnurlInsecureCallback =>
       'O servidor LNbits retornou uma URL de callback insegura (http://). Isso geralmente significa que o LNbits está atrás de um proxy reverso e não conhece seu endereço HTTPS público. No host do LNbits, defina LNBITS_BASE_URL=https://seu-host no .env e reinicie. Como alternativa, configure o proxy para repassar X-Forwarded-Proto: https.';
 

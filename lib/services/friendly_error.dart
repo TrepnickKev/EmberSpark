@@ -1,5 +1,6 @@
 import '../l10n/app_localizations.dart';
 import 'lnbits_service.dart' show SelfPaymentException;
+import 'lnurl.dart' show NotAnLnurlServiceException;
 
 /// Maps a thrown exception to a short user-readable message. Tries to
 /// recognise the most common failure modes (TLS, network, common HTTP
@@ -8,6 +9,10 @@ String friendlyError(AppLocalizations l10n, Object e) {
   // Paying your own wallet — a deliberate, recognisable cancellation.
   if (e is SelfPaymentException) {
     return l10n.errorSelfPayment;
+  }
+  // A scanned link that isn't actually an LNURL service (returned HTML, etc.).
+  if (e is NotAnLnurlServiceException) {
+    return l10n.errorNotLnurl;
   }
 
   final s = e.toString();

@@ -249,6 +249,7 @@
   "error520": "LNbits n'a aucun backend Lightning configuré (VoidWallet). Connecte un nœud Lightning dans LNbits → Server → Funding.",
   "errorInsufficientFunds": "Pas assez de sats dans ton portefeuille pour ce paiement.",
   "errorSelfPayment": "Cette facture provient de ce portefeuille. Tu ne peux pas te payer toi-même.",
+  "errorNotLnurl": "Ce lien n'est pas un service LNURL valide",
   "errorLnurlInsecureCallback": "Le serveur LNbits a renvoyé une URL de callback non sécurisée (http://). Cela signifie généralement que LNbits est derrière un reverse proxy et ne connaît pas son adresse HTTPS publique. Sur l'hôte LNbits, définis LNBITS_BASE_URL=https://ton-hote dans .env et redémarre. Sinon, configure le proxy pour transmettre X-Forwarded-Proto: https.",
   "errorServerGeneric": "Erreur du serveur ({code}).",
   "lnurlAuthErrorKeyInUse": "Cette clé d'authentification est déjà utilisée pour ce site. Attends un instant et réessaie, ou recharge le QR de connexion.",
