@@ -623,7 +623,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginAdminKeyHelper.
   ///
   /// In en, this message translates to:
-  /// **'Full-access key — used for all operations'**
+  /// **'Admin key for full access, or an invoice/read key for a read-only wallet'**
   String get loginAdminKeyHelper;
 
   /// No description provided for @loginAdminKeyRequired.
@@ -1519,6 +1519,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This link is not a valid LNURL service'**
   String get errorNotLnurl;
+
+  /// No description provided for @errorReadOnlyWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a read-only wallet. It can only receive, not send.'**
+  String get errorReadOnlyWallet;
+
+  /// No description provided for @walletReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Read only'**
+  String get walletReadOnly;
 
   /// No description provided for @errorLnurlInsecureCallback.
   ///

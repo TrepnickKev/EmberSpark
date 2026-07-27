@@ -14,15 +14,25 @@ class SelfPaymentException implements Exception {
   String toString() => 'Self-payment: the invoice belongs to this wallet';
 }
 
+/// Thrown by [LNbitsService.payInvoice] when the active wallet is read-only
+/// (its key is an LNbits invoice/read key that cannot send).
+class ReadOnlyWalletException implements Exception {
+  const ReadOnlyWalletException();
+  @override
+  String toString() => 'Read-only wallet: sending is not possible';
+}
+
 class LNbitsService implements WalletBackend {
   final String baseUrl;
   final String adminKey;
+  final bool readOnly;
   final http.Client _client;
 
   LNbitsService({
     required this.baseUrl,
     required this.adminKey,
     required http.Client client,
+    this.readOnly = false,
   }) : _client = client;
 
   static Future<LNbitsService> fromStorage() async {
@@ -30,8 +40,32 @@ class LNbitsService implements WalletBackend {
     return LNbitsService(
       baseUrl: w?.url ?? '',
       adminKey: w?.adminKey ?? '',
+      readOnly: w?.readOnly ?? false,
       client: await getHttpClient(),
     );
+  }
+
+  /// Best-effort probe of whether [key] can send from [url] (has admin scope).
+  /// Fires a deliberately-malformed outgoing-payment request: LNbits rejects an
+  /// invoice/read key with 401/403 before the (empty) invoice is ever decoded,
+  /// so nothing is paid or created. Returns true when inconclusive (network
+  /// error) so a real wallet is never wrongly flagged read-only.
+  static Future<bool> canSendWith(String url, String key) async {
+    try {
+      final client = await getHttpClient();
+      final base = url.replaceFirst(RegExp(r'/+$'), '');
+      final onion = Uri.parse(base).host.toLowerCase().endsWith('.onion');
+      final res = await client
+          .post(
+            Uri.parse('$base/api/v1/payments'),
+            headers: {'Content-Type': 'application/json', 'X-Api-Key': key},
+            body: jsonEncode({'out': true, 'bolt11': ''}),
+          )
+          .timeout(Duration(seconds: onion ? 60 : 15));
+      return res.statusCode != 401 && res.statusCode != 403;
+    } catch (_) {
+      return true;
+    }
   }
 
   /// Cleans up a user-entered URL: trims, supplies a scheme if missing
@@ -105,6 +139,9 @@ class LNbitsService implements WalletBackend {
 
   @override
   Future<void> payInvoice(String bolt11) async {
+    // Read-only wallets (invoice/read key) cannot send. Block every send path
+    // here with a clear error rather than a raw 401 from LNbits.
+    if (readOnly) throw const ReadOnlyWalletException();
     // Refuse to pay an invoice this same wallet created (paying yourself is a
     // no-op). Best-effort: if the ownership check can't be determined, proceed
     // so a transient glitch never blocks a legitimate payment.

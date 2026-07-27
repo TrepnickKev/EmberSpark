@@ -21,21 +21,31 @@ class WalletAccount {
   /// error, or fresh wallet).
   final String? serverWalletId;
 
+  /// True when the stored key is an LNbits invoice/read key (not the admin
+  /// key): the wallet can see balance/history and receive, but not send.
+  final bool readOnly;
+
   const WalletAccount({
     required this.id,
     required this.label,
     required this.url,
     required this.adminKey,
     this.serverWalletId,
+    this.readOnly = false,
   });
 
-  WalletAccount copyWith({String? label, String? serverWalletId}) =>
+  WalletAccount copyWith({
+    String? label,
+    String? serverWalletId,
+    bool? readOnly,
+  }) =>
       WalletAccount(
         id: id,
         label: label ?? this.label,
         url: url,
         adminKey: adminKey,
         serverWalletId: serverWalletId ?? this.serverWalletId,
+        readOnly: readOnly ?? this.readOnly,
       );
 
   Map<String, dynamic> toJson() => {
@@ -44,6 +54,7 @@ class WalletAccount {
         'url': url,
         'adminKey': adminKey,
         if (serverWalletId != null) 'serverWalletId': serverWalletId,
+        if (readOnly) 'readOnly': true,
       };
 
   factory WalletAccount.fromJson(Map<String, dynamic> j) => WalletAccount(
@@ -52,6 +63,7 @@ class WalletAccount {
         url: j['url'] as String,
         adminKey: j['adminKey'] as String,
         serverWalletId: j['serverWalletId'] as String?,
+        readOnly: j['readOnly'] as bool? ?? false,
       );
 }
 
@@ -121,6 +133,7 @@ Future<WalletAccount> addWallet({
   required String url,
   required String adminKey,
   String? label,
+  bool readOnly = false,
 }) async {
   final wallets = await listWallets();
   for (final w in wallets) {
@@ -134,6 +147,7 @@ Future<WalletAccount> addWallet({
     label: fallbackLabel,
     url: url,
     adminKey: adminKey,
+    readOnly: readOnly,
   );
   await _writeWallets([...wallets, w]);
   return w;
@@ -161,6 +175,7 @@ Future<void> updateWallet(
   required String url,
   required String adminKey,
   String? label,
+  bool readOnly = false,
 }) async {
   final wallets = await listWallets();
   final next = [...wallets];
@@ -177,6 +192,7 @@ Future<void> updateWallet(
       url: url,
       adminKey: adminKey,
       serverWalletId: connChanged ? null : w.serverWalletId,
+      readOnly: readOnly,
     );
     break;
   }

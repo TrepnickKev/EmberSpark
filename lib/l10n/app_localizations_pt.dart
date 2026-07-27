@@ -288,7 +288,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get loginAdminKeyHelper =>
-      'Chave de acesso total — usada para todas as operações';
+      'Chave admin para acesso total, ou uma chave de fatura/leitura para uma carteira somente leitura';
 
   @override
   String get loginAdminKeyRequired => 'A chave de administrador é obrigatória';
@@ -805,6 +805,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorNotLnurl => 'Este link não é um serviço LNURL válido';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'Esta é uma carteira somente leitura. Só pode receber, não enviar.';
+
+  @override
+  String get walletReadOnly => 'Somente leitura';
 
   @override
   String get errorLnurlInsecureCallback =>

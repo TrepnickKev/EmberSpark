@@ -288,7 +288,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get loginAdminKeyHelper =>
-      'Vollzugriffs-Schlüssel — wird für alle Operationen verwendet';
+      'Admin-Schlüssel für vollen Zugriff, oder ein Invoice/Read-Schlüssel für eine schreibgeschützte Wallet';
 
   @override
   String get loginAdminKeyRequired => 'Admin-Schlüssel ist erforderlich';
@@ -802,6 +802,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorNotLnurl => 'Dieser Link ist kein gültiger LNURL-Dienst';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'Dies ist eine schreibgeschützte Wallet. Sie kann nur empfangen, nicht senden.';
+
+  @override
+  String get walletReadOnly => 'Nur Lesen';
 
   @override
   String get errorLnurlInsecureCallback =>

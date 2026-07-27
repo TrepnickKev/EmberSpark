@@ -285,7 +285,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loginAdminKeyHelper =>
-      'Tam erişim anahtarı — tüm işlemler için kullanılır';
+      'Tam erişim için admin anahtarı veya salt okunur cüzdan için invoice/read anahtarı';
 
   @override
   String get loginAdminKeyRequired => 'Yönetici anahtarı gerekli';
@@ -797,6 +797,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errorNotLnurl => 'Bu bağlantı geçerli bir LNURL hizmeti değil';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'Bu salt okunur bir cüzdan. Yalnızca alabilir, gönderemez.';
+
+  @override
+  String get walletReadOnly => 'Salt okunur';
 
   @override
   String get errorLnurlInsecureCallback =>

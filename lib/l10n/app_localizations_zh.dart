@@ -274,7 +274,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginAdminKeyLabel => '管理员 API 密钥';
 
   @override
-  String get loginAdminKeyHelper => '完全访问密钥 — 用于所有操作';
+  String get loginAdminKeyHelper => '管理员密钥用于完全访问，或使用 invoice/read 密钥创建只读钱包';
 
   @override
   String get loginAdminKeyRequired => '需要管理员密钥';
@@ -769,6 +769,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorNotLnurl => '此链接不是有效的 LNURL 服务';
+
+  @override
+  String get errorReadOnlyWallet => '这是一个只读钱包，只能接收，不能发送。';
+
+  @override
+  String get walletReadOnly => '只读';
 
   @override
   String get errorLnurlInsecureCallback =>

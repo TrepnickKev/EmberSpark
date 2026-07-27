@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/wallet_account_service.dart';
+import '../widgets/read_only_badge.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -166,7 +167,12 @@ class _WalletsScreenState extends State<WalletsScreen> {
             active ? Icons.check_circle : Icons.circle_outlined,
             color: active ? bitcoinOrange : Theme.of(context).disabledColor,
           ),
-          title: Text(w.label),
+          title: Row(
+            children: [
+              Flexible(child: Text(w.label)),
+              if (w.readOnly) readOnlyBadge(l10n),
+            ],
+          ),
           subtitle: Text(
             _hostOf(w.url),
             style: const TextStyle(color: Colors.grey, fontSize: 12),

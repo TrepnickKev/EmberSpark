@@ -288,7 +288,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loginAdminKeyHelper =>
-      'Clé d\'accès complet — utilisée pour toutes les opérations';
+      'Clé admin pour l\'accès complet, ou une clé invoice/lecture pour un portefeuille en lecture seule';
 
   @override
   String get loginAdminKeyRequired => 'La clé admin est requise';
@@ -803,6 +803,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorNotLnurl => 'Ce lien n\'est pas un service LNURL valide';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'Ceci est un portefeuille en lecture seule. Il peut seulement recevoir, pas envoyer.';
+
+  @override
+  String get walletReadOnly => 'Lecture seule';
 
   @override
   String get errorLnurlInsecureCallback =>

@@ -1,5 +1,5 @@
 import '../l10n/app_localizations.dart';
-import 'lnbits_service.dart' show SelfPaymentException;
+import 'lnbits_service.dart' show SelfPaymentException, ReadOnlyWalletException;
 import 'lnurl.dart' show NotAnLnurlServiceException;
 
 /// Maps a thrown exception to a short user-readable message. Tries to
@@ -9,6 +9,10 @@ String friendlyError(AppLocalizations l10n, Object e) {
   // Paying your own wallet — a deliberate, recognisable cancellation.
   if (e is SelfPaymentException) {
     return l10n.errorSelfPayment;
+  }
+  // Read-only wallet (invoice/read key) — can receive but not send.
+  if (e is ReadOnlyWalletException) {
+    return l10n.errorReadOnlyWallet;
   }
   // A scanned link that isn't actually an LNURL service (returned HTML, etc.).
   if (e is NotAnLnurlServiceException) {

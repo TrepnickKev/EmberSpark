@@ -287,7 +287,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginAdminKeyHelper =>
-      'Ключ с полным доступом — используется для всех операций';
+      'Admin-ключ для полного доступа или invoice/read-ключ для кошелька только для чтения';
 
   @override
   String get loginAdminKeyRequired => 'Требуется админ-ключ';
@@ -799,6 +799,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorNotLnurl =>
       'Эта ссылка не является действительным сервисом LNURL';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'Это кошелёк только для чтения. Он может только получать, но не отправлять.';
+
+  @override
+  String get walletReadOnly => 'Только чтение';
 
   @override
   String get errorLnurlInsecureCallback =>

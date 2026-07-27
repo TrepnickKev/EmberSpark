@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController urlController;
   late final TextEditingController adminKeyController;
   String? error;
+  bool _busy = false;
   bool _disclaimerShown = false;
 
   bool get _isEdit => widget.initial != null;
@@ -107,45 +108,65 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     final name = nameController.text.trim();
     final labelArg = name.isEmpty ? null : name;
-    if (_isEdit) {
-      final connChanged =
-          url != widget.initial!.url || admin != widget.initial!.adminKey;
-      await updateWallet(
-        widget.initial!.id,
+
+    setState(() {
+      _busy = true;
+      error = null;
+    });
+    try {
+      // Detect whether this key can send (admin key) or is an invoice/read key
+      // (read-only wallet). Harmless probe; never pays or creates anything.
+      final canSend = await LNbitsService.canSendWith(url, admin);
+      final readOnly = !canSend;
+
+      if (_isEdit) {
+        final connChanged =
+            url != widget.initial!.url || admin != widget.initial!.adminKey;
+        await updateWallet(
+          widget.initial!.id,
+          url: url,
+          adminKey: admin,
+          label: labelArg,
+          readOnly: readOnly,
+        );
+        // Re-detect the Lightning Address only when the connection changed, so a
+        // label-only edit doesn't clobber a manually set address.
+        if (connChanged) {
+          await _importLightningAddress(
+            walletId: widget.initial!.id,
+            url: url,
+            adminKey: admin,
+            overwrite: true,
+          );
+        }
+        if (!mounted) return;
+        Navigator.pop(context, true);
+        return;
+      }
+      final account = await addWallet(
         url: url,
         adminKey: admin,
         label: labelArg,
+        readOnly: readOnly,
       );
-      // Re-detect the Lightning Address only when the connection changed, so a
-      // label-only edit doesn't clobber a manually set address.
-      if (connChanged) {
-        await _importLightningAddress(
-          walletId: widget.initial!.id,
-          url: url,
-          adminKey: admin,
-          overwrite: true,
+      await setCurrentWalletId(account.id);
+      await _importLightningAddress(
+        walletId: account.id,
+        url: url,
+        adminKey: admin,
+        overwrite: false,
+      );
+      if (!mounted) return;
+      if (widget.addFlow) {
+        Navigator.pop(context, true);
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
       }
-      if (!mounted) return;
-      Navigator.pop(context, true);
-      return;
-    }
-    final account = await addWallet(url: url, adminKey: admin, label: labelArg);
-    await setCurrentWalletId(account.id);
-    await _importLightningAddress(
-      walletId: account.id,
-      url: url,
-      adminKey: admin,
-      overwrite: false,
-    );
-    if (!mounted) return;
-    if (widget.addFlow) {
-      Navigator.pop(context, true);
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
@@ -268,7 +289,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(onPressed: _save, child: Text(l10n.commonSave)),
+                ElevatedButton(
+                  onPressed: _busy ? null : _save,
+                  child: _busy
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.commonSave),
+                ),
                 if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(error!, style: const TextStyle(color: Colors.redAccent)),

@@ -13,6 +13,7 @@ import '../services/payment_feedback.dart';
 import '../services/unseen_incoming_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/flipping_avatar.dart';
+import '../widgets/read_only_badge.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'about_screen.dart';
 import 'bolt_card_screen.dart';
@@ -50,6 +51,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   List<WalletAccount> _wallets = const [];
   Map<String, String> _walletSeeds = const {};
   int _walletIndex = 0;
+  // Signature (joined wallet ids) of the set the carousel controller was built
+  // for; a change means recreate the controller + key so it re-lands correctly.
+  String _walletSig = '';
   PageController? _avatarPage;
   // A never-firing flip trigger for the non-active carousel pages.
   final ValueNotifier<int> _noFlip = ValueNotifier<int>(0);
@@ -225,7 +229,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final walletIndex = idx < 0 ? 0 : idx;
 
       if (!mounted) return;
-      final oldCount = _wallets.length;
+      // Rebuild the carousel controller (at the active index) whenever the
+      // wallet SET changes — add/remove/reorder — so it always lands on the
+      // active wallet's avatar. The PageView is keyed by this signature so a
+      // fresh element honours the new controller's initialPage; the old
+      // controller is disposed after the frame (once its old PageView is gone)
+      // to avoid an attach conflict.
+      final walletSig = wallets.map((x) => x.id).join(',');
+      if (wallets.length > 1 && (_avatarPage == null || walletSig != _walletSig)) {
+        final old = _avatarPage;
+        _avatarPage = PageController(initialPage: walletIndex);
+        if (old != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
+        }
+      }
       setState(() {
         balance = b;
         fiatCurrency = cur;
@@ -236,8 +253,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _wallets = wallets;
         _walletSeeds = seeds;
         _walletIndex = walletIndex;
+        _walletSig = walletSig;
       });
-      _syncAvatarPage(oldCount, wallets.length, walletIndex);
       await _reconcileUnseen(b, w?.id);
     } catch (e) {
       if (!mounted) return;
@@ -250,26 +267,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } finally {
       if (mounted) setState(() => loading = false);
     }
-  }
-
-  /// Keeps the avatar PageController in step with the loaded wallet set.
-  /// Creates it (at the active index) the first time the multi-wallet carousel
-  /// shows and recreates it only when the wallet count changes; otherwise, for
-  /// an external switch, jumps to the active index without animation.
-  void _syncAvatarPage(int oldCount, int newCount, int index) {
-    if (newCount <= 1) return;
-    if (_avatarPage == null || oldCount != newCount) {
-      _avatarPage?.dispose();
-      _avatarPage = PageController(initialPage: index);
-      return;
-    }
-    final controller = _avatarPage!;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !controller.hasClients) return;
-      if (controller.page?.round() != index) {
-        controller.jumpToPage(index);
-      }
-    });
   }
 
   Future<void> _onWalletPageChanged(int i) async {
@@ -307,6 +304,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         width: 88,
         height: 88,
         child: PageView.builder(
+          key: ValueKey(_walletSig),
           scrollDirection: Axis.vertical,
           controller: _avatarPage,
           onPageChanged: _onWalletPageChanged,
@@ -403,6 +401,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final readOnly = currentWallet?.readOnly ?? false;
     return Scaffold(
       appBar: AppBar(
         // Pin the bar colour hard so it can't drift between wallets: fixed
@@ -547,6 +546,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         size: 14,
                         color: Colors.grey,
                       ),
+                      if (readOnly) readOnlyBadge(l10n),
                     ],
                   ),
                 ),
@@ -644,13 +644,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SendToScreen()),
-                      );
-                      if (mounted) _load();
-                    },
+                    // Read-only wallets (invoice/read key) can't send.
+                    onPressed: readOnly
+                        ? null
+                        : () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SendToScreen(),
+                              ),
+                            );
+                            if (mounted) _load();
+                          },
                   ),
                 ),
                 const SizedBox(width: 12),

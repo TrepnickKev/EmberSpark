@@ -284,7 +284,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginAdminKeyLabel => 'Admin API key';
 
   @override
-  String get loginAdminKeyHelper => 'Full-access key — used for all operations';
+  String get loginAdminKeyHelper =>
+      'Admin key for full access, or an invoice/read key for a read-only wallet';
 
   @override
   String get loginAdminKeyRequired => 'Admin key is required';
@@ -794,6 +795,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNotLnurl => 'This link is not a valid LNURL service';
+
+  @override
+  String get errorReadOnlyWallet =>
+      'This is a read-only wallet. It can only receive, not send.';
+
+  @override
+  String get walletReadOnly => 'Read only';
 
   @override
   String get errorLnurlInsecureCallback =>
