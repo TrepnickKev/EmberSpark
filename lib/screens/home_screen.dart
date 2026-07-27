@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../main.dart' show routeObserver;
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
@@ -34,7 +35,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, RouteAware {
   int? balance;
   String? error;
   bool loading = false;
@@ -57,6 +59,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   PageController? _avatarPage;
   // A never-firing flip trigger for the non-active carousel pages.
   final ValueNotifier<int> _noFlip = ValueNotifier<int>(0);
+  // Drives the active avatar's coin-flip. Home bumps this itself once it is the
+  // current route again (see didPopNext) rather than letting a pay/withdraw
+  // screen fire the global trigger while home is covered (its ticker is muted)
+  // and about to reload. _flipSeen tracks the last global success we've played.
+  final ValueNotifier<int> _avatarFlip = ValueNotifier<int>(0);
+  int _flipSeen = 0;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -66,16 +74,38 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _flipSeen = paymentSuccessTrigger.value;
     _load();
     _startPolling();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) routeObserver.subscribe(this, route);
+  }
+
+  /// A screen above home was popped, so home is the current route again. If a
+  /// payment succeeded while we were covered, play the coin-flip now (on the
+  /// visible avatar) instead of having missed it under the muted ticker.
+  @override
+  void didPopNext() {
+    if (!mounted) return;
+    if (paymentSuccessTrigger.value != _flipSeen) {
+      _flipSeen = paymentSuccessTrigger.value;
+      _avatarFlip.value++;
+    }
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    routeObserver.unsubscribe(this);
     _stopPolling();
     _avatarPage?.dispose();
     _noFlip.dispose();
+    _avatarFlip.dispose();
     super.dispose();
   }
 
@@ -292,7 +322,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// wallet (swipe up/down to switch), otherwise the single avatar.
   Widget _buildAvatarSwitcher() {
     if (_wallets.length <= 1 || _avatarPage == null) {
-      return _avatarBubble(avatarSeed, paymentSuccessTrigger);
+      return _avatarBubble(
+        avatarSeed,
+        _avatarFlip,
+        avatarKey: ValueKey('avatar-${currentWallet?.id}'),
+      );
     }
     // Swallow the carousel's scroll notifications so they never reach the
     // Scaffold's ScrollNotificationObserver — otherwise the AppBar treats a
@@ -314,7 +348,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             final seed = _walletSeeds[w.id];
             return _avatarBubble(
               (seed == null || seed.isEmpty) ? null : seed,
-              i == _walletIndex ? paymentSuccessTrigger : _noFlip,
+              i == _walletIndex ? _avatarFlip : _noFlip,
+              avatarKey: ValueKey('avatar-${w.id}'),
             );
           },
         ),
@@ -322,7 +357,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-  Widget _avatarBubble(String? seed, ValueListenable<int> trigger) {
+  Widget _avatarBubble(
+    String? seed,
+    ValueListenable<int> trigger, {
+    Key? avatarKey,
+  }) {
     return Material(
       color: seed == null ? bitcoinOrange : Colors.transparent,
       shape: const CircleBorder(),
@@ -334,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           height: 88,
           child: seed == null
               ? const Icon(Icons.person, size: 48, color: Colors.white)
-              : FlippingAvatar(seed: seed, trigger: trigger),
+              : FlippingAvatar(key: avatarKey, seed: seed, trigger: trigger),
         ),
       ),
     );

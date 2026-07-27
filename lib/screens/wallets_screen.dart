@@ -155,45 +155,78 @@ class _WalletsScreenState extends State<WalletsScreen> {
     );
   }
 
+  Future<void> _onReorder(int oldIndex, int newIndex) async {
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final list = List<WalletAccount>.of(wallets);
+      final item = list.removeAt(oldIndex);
+      list.insert(newIndex, item);
+      wallets = list;
+    });
+    await reorderWallets(wallets);
+  }
+
   Widget _buildList(AppLocalizations l10n) {
-    return ListView.separated(
+    return ReorderableListView.builder(
+      // Only the explicit drag handle initiates a reorder, so tapping a row
+      // (switch) and the edit/remove menu keep working.
+      buildDefaultDragHandles: false,
       itemCount: wallets.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      onReorder: _onReorder,
       itemBuilder: (_, i) {
         final w = wallets[i];
         final active = w.id == currentId;
-        return ListTile(
-          leading: Icon(
-            active ? Icons.check_circle : Icons.circle_outlined,
-            color: active ? bitcoinOrange : Theme.of(context).disabledColor,
-          ),
-          title: Row(
-            children: [
-              Flexible(child: Text(w.label)),
-              if (w.readOnly) readOnlyBadge(l10n),
-            ],
-          ),
-          subtitle: Text(
-            _hostOf(w.url),
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-          trailing: PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'edit') _edit(w);
-              if (v == 'remove') _remove(w);
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'edit',
-                child: Text(l10n.walletsEdit),
+        return Column(
+          key: ValueKey(w.id),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                active ? Icons.check_circle : Icons.circle_outlined,
+                color: active ? bitcoinOrange : Theme.of(context).disabledColor,
               ),
-              PopupMenuItem(
-                value: 'remove',
-                child: Text(l10n.walletsRemove),
+              title: Row(
+                children: [
+                  Flexible(child: Text(w.label)),
+                  if (w.readOnly) readOnlyBadge(l10n),
+                ],
               ),
-            ],
-          ),
-          onTap: active ? null : () => _switchTo(w),
+              subtitle: Text(
+                _hostOf(w.url),
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ReorderableDragStartListener(
+                    index: i,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(Icons.drag_handle, color: Colors.grey),
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (v) {
+                      if (v == 'edit') _edit(w);
+                      if (v == 'remove') _remove(w);
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Text(l10n.walletsEdit),
+                      ),
+                      PopupMenuItem(
+                        value: 'remove',
+                        child: Text(l10n.walletsRemove),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              onTap: active ? null : () => _switchTo(w),
+            ),
+            const Divider(height: 1),
+          ],
         );
       },
     );

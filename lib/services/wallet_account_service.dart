@@ -127,6 +127,10 @@ Future<void> _writeWallets(List<WalletAccount> wallets) async {
   await storage.write(key: _walletsKey, value: json);
 }
 
+/// Persists a new wallet ordering (drag-to-reorder in the Wallets screen).
+Future<void> reorderWallets(List<WalletAccount> ordered) =>
+    _writeWallets(ordered);
+
 /// Adds a wallet. If a wallet with the same (url, adminKey) already exists,
 /// returns the existing record without creating a duplicate.
 Future<WalletAccount> addWallet({

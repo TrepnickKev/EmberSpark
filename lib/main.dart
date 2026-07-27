@@ -16,6 +16,12 @@ import 'widgets/stacked_action_button.dart' show bitcoinOrange;
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
+/// Lets the home screen learn when it becomes visible again (a screen above it
+/// was popped) so it can play the payment coin-flip once it is the current
+/// route, rather than while it is covered. See HomeScreen's RouteAware.
+final RouteObserver<PageRoute<dynamic>> routeObserver =
+    RouteObserver<PageRoute<dynamic>>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadInitialLocale();
@@ -115,6 +121,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MaterialApp(
           onGenerateTitle: (ctx) => AppLocalizations.of(ctx)!.appTitle,
           navigatorKey: navigatorKey,
+          navigatorObservers: [routeObserver],
           theme: ThemeData.dark(useMaterial3: true).copyWith(
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(foregroundColor: bitcoinOrange),
