@@ -185,12 +185,7 @@ class _WalletsScreenState extends State<WalletsScreen> {
                 active ? Icons.check_circle : Icons.circle_outlined,
                 color: active ? bitcoinOrange : Theme.of(context).disabledColor,
               ),
-              title: Row(
-                children: [
-                  Flexible(child: Text(w.label)),
-                  if (w.readOnly) readOnlyBadge(l10n),
-                ],
-              ),
+              title: Text(w.label),
               subtitle: Text(
                 _hostOf(w.url),
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -198,13 +193,7 @@ class _WalletsScreenState extends State<WalletsScreen> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ReorderableDragStartListener(
-                    index: i,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Icon(Icons.drag_handle, color: Colors.grey),
-                    ),
-                  ),
+                  if (w.readOnly) readOnlyBadge(l10n),
                   PopupMenuButton<String>(
                     onSelected: (v) {
                       if (v == 'edit') _edit(w);
@@ -220,6 +209,13 @@ class _WalletsScreenState extends State<WalletsScreen> {
                         child: Text(l10n.walletsRemove),
                       ),
                     ],
+                  ),
+                  ReorderableDragStartListener(
+                    index: i,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(Icons.drag_handle, color: Colors.grey),
+                    ),
                   ),
                 ],
               ),
