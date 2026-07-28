@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../screens/bolt12_action_screen.dart';
 import '../screens/lnurl_action_screen.dart';
 import '../screens/send_screen.dart';
@@ -29,6 +30,13 @@ Future<void> routeLightningCode(
     '',
   );
   final lower = clean.toLowerCase();
+
+  // Captured before any await so the snackbars below never touch a possibly
+  // stale BuildContext after an async gap.
+  final messenger = ScaffoldMessenger.of(navigator.context);
+  final readOnlyMsg =
+      AppLocalizations.of(navigator.context)?.errorReadOnlyWallet ??
+          'This is a read-only wallet. It can only receive, not send.';
 
   // LUD-17 scheme URLs (Bolt Cards emit lnurlw://). Keep original case: the
   // path/query may be case-sensitive. Checked before the bech32 lnurl branch,
@@ -65,6 +73,20 @@ Future<void> routeLightningCode(
     return;
   }
 
+  // Read-only wallets (added with an invoice/read key) cannot send. Stop the
+  // pay flows that route straight to a send screen — BOLT11 and BOLT12 — right
+  // here, before showing a Send screen the user can't complete. LNURL forms go
+  // through LnurlActionScreen, which blocks the pay case after it resolves the
+  // tag (so an LNURL-withdraw / Bolt Card charge into the wallet still works).
+  if (lower.startsWith('lnbc') ||
+      lower.startsWith('lno1') ||
+      lower.startsWith('lni1')) {
+    if ((await getCurrentWallet())?.readOnly ?? false) {
+      messenger.showSnackBar(SnackBar(content: Text(readOnlyMsg)));
+      return;
+    }
+  }
+
   if (lower.startsWith('lnbc')) {
     await navigator.push(
       MaterialPageRoute(
@@ -94,10 +116,9 @@ Future<void> routeLightningCode(
       ),
     );
   } else {
-    final ctx = navigator.context;
-    ScaffoldMessenger.of(
-      ctx,
-    ).showSnackBar(const SnackBar(content: Text('Unrecognized Lightning code')));
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Unrecognized Lightning code')),
+    );
   }
 }
 

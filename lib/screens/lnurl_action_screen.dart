@@ -9,6 +9,7 @@ import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
 import '../services/payment_feedback.dart';
 import '../services/price_service.dart';
+import '../services/wallet_account_service.dart';
 import '../widgets/payment_route_header.dart';
 import 'send_screen.dart';
 
@@ -100,6 +101,18 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       }
 
       final i = await fetchLnurl(url);
+      if (!mounted) return;
+      // A read-only wallet cannot pay. Block the LNURL-pay case here, before
+      // showing an amount form the user can't submit. Withdraw (Bolt Card /
+      // receive) and auth stay available.
+      if (i is LnurlPayInfo && ((await getCurrentWallet())?.readOnly ?? false)) {
+        if (!mounted) return;
+        setState(() {
+          error = AppLocalizations.of(context)!.errorReadOnlyWallet;
+          busy = false;
+        });
+        return;
+      }
       if (!mounted) return;
       setState(() {
         info = i;
