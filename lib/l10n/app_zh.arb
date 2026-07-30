@@ -285,6 +285,7 @@
   "myContactInvalidLnurlp": "不是有效的 LNURL-pay 链接。",
   "myContactGenerating": "正在生成…",
   "myContactLnurlpExtensionMissing": "LNbits 未安装 LNURL-pay 扩展。",
+  "myContactReadOnlyNoGenerate": "这是一个只读钱包，因此无法在服务器上创建链接。你仍可以在下方粘贴一个现有的。",
   "myContactLnAddressServerUpdated": "Lightning Address 已在服务器上更新。",
   "myContactBolt12ExtensionMissing": "LNbits 未安装 BOLT12 扩展，或你的 Lightning 节点不支持 BOLT12。",
   "myContactAvatarPriority": "你的个人头像由这些标识之一生成。点按星标选择使用哪一个。否则将依次使用 Lightning address、BOLT12、LNURL。",

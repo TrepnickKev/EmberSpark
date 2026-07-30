@@ -317,6 +317,7 @@
   "myContactInvalidLnurlp": "Not a valid LNURL-pay link.",
   "myContactGenerating": "Generating…",
   "myContactLnurlpExtensionMissing": "LNbits doesn't have the LNURL-pay extension installed.",
+  "myContactReadOnlyNoGenerate": "This is a read-only wallet, so it cannot create a link on the server. You can still paste an existing one below.",
   "myContactLnAddressServerUpdated": "Lightning Address updated on the server.",
   "myContactBolt12ExtensionMissing": "LNbits doesn't have a BOLT12 extension installed, or your Lightning node doesn't support BOLT12.",
   "myContactAvatarPriority": "Your profile avatar is generated from one of these identifiers. Tap a star to choose which one. Otherwise it uses Lightning address, then BOLT12, then LNURL.",

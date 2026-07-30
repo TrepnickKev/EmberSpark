@@ -9,6 +9,7 @@ import '../services/lnbits_service.dart';
 import '../services/my_contact_service.dart';
 import '../services/nfc_service.dart';
 import '../services/nfc_coordinator.dart';
+import '../services/wallet_account_service.dart';
 import '../widgets/stacked_action_button.dart';
 import 'contacts_screen.dart' show contactAvatar;
 import 'qr_scan_screen.dart';
@@ -36,6 +37,9 @@ class _MyContactScreenState extends State<MyContactScreen>
   String? _bolt12;
   MyContactKind? _defaultKind;
   bool _loading = true;
+  // Read-only wallets (invoice/read key) can't create server-side links, so
+  // Auto-generate is hidden and an LN address is stored locally only.
+  bool _readOnly = false;
 
   // Whether the server's lnurlp / bolt12 extensions are installed. null = not
   // yet checked (or unknown because the probe couldn't reach the server);
@@ -78,12 +82,14 @@ class _MyContactScreenState extends State<MyContactScreen>
       getMyBolt12Offer(),
     ]);
     final defaultKind = await getMyDefaultContactKind();
+    final wallet = await getCurrentWallet();
     if (!mounted) return;
     setState(() {
       _lnAddress = results[0];
       _lnurlp = results[1];
       _bolt12 = results[2];
       _defaultKind = defaultKind;
+      _readOnly = wallet?.readOnly ?? false;
       _loading = false;
     });
     // Detect missing extensions in the background so the screen stays instant.
@@ -95,6 +101,9 @@ class _MyContactScreenState extends State<MyContactScreen>
   /// failing when the user taps Auto-generate. Only probes a kind that has no
   /// stored value yet (otherwise the Auto-generate area isn't shown anyway).
   Future<void> _probeExtensions() async {
+    // Read-only wallets can't auto-generate anyway (Auto-generate is hidden),
+    // and the list probes need more than a read key, so skip them entirely.
+    if (_readOnly) return;
     final needLnurlp = _lnurlp == null;
     final needBolt12 = _bolt12 == null;
     if (!needLnurlp && !needBolt12) return;
@@ -189,6 +198,9 @@ class _MyContactScreenState extends State<MyContactScreen>
           RegExp(r'^(lightning|lnurl):', caseSensitive: false),
           '',
         );
+    // A read-only wallet can't push a username to the server; just keep the
+    // address locally so the user can still display and share it.
+    if (_readOnly) return clean;
     final parts = clean.split('@');
     if (parts.length != 2) return clean;
     final username = parts[0];
@@ -473,6 +485,11 @@ class _MyContactScreenState extends State<MyContactScreen>
     final message = kind == MyContactKind.bolt12
         ? l10n.myContactBolt12ExtensionMissing
         : l10n.myContactLnurlpExtensionMissing;
+    return _noticeBox(message, icon: Icons.extension_off);
+  }
+
+  /// Grey inline notice box, styled like the info row at the top of the screen.
+  Widget _noticeBox(String message, {required IconData icon}) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -482,7 +499,7 @@ class _MyContactScreenState extends State<MyContactScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.extension_off, size: 18, color: Colors.grey),
+          Icon(icon, size: 18, color: Colors.grey),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -560,7 +577,20 @@ class _MyContactScreenState extends State<MyContactScreen>
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 12),
-              if (canAutoGenerate && _extAvailable(kind) == false) ...[
+              if (canAutoGenerate && _readOnly) ...[
+                // Read-only wallet: it can't create a link on the server, so
+                // drop Auto-generate. Manual Add still works (paste a link).
+                _noticeBox(
+                  l10n.myContactReadOnlyNoGenerate,
+                  icon: Icons.visibility_outlined,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text(addLabel),
+                  onPressed: () => _edit(kind),
+                ),
+              ] else if (canAutoGenerate && _extAvailable(kind) == false) ...[
                 // Extension not installed: surface it up front and drop the
                 // Auto-generate button. Manual Add still works (paste a link).
                 _extensionMissingNotice(l10n, kind),

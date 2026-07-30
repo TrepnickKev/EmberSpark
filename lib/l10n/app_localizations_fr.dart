@@ -920,6 +920,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'LNbits n\'a pas l\'extension LNURL-pay installée.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Ceci est un portefeuille en lecture seule, il ne peut donc pas créer de lien sur le serveur. Vous pouvez toujours en coller un existant ci-dessous.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning Address mise à jour sur le serveur.';
 

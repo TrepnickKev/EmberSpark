@@ -287,6 +287,7 @@
   "myContactInvalidLnurlp": "Kein gültiger LNURL-Pay-Link.",
   "myContactGenerating": "Wird erstellt …",
   "myContactLnurlpExtensionMissing": "Auf dem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.",
+  "myContactReadOnlyNoGenerate": "Dies ist eine schreibgeschützte Wallet und kann daher keinen Link auf dem Server erstellen. Du kannst unten weiterhin einen vorhandenen einfügen.",
   "myContactLnAddressServerUpdated": "Lightning-Adresse auf dem Server aktualisiert.",
   "myContactBolt12ExtensionMissing": "Auf dem LNbits-Server ist keine BOLT12-Erweiterung installiert, oder dein Lightning-Node unterstützt BOLT12 nicht.",
   "myContactAvatarPriority": "Dein Profil-Avatar wird aus einer dieser Kennungen erzeugt. Tippe auf einen Stern, um auszuwählen, welche. Sonst gilt: Lightning-Adresse, dann BOLT12, dann LNURL.",

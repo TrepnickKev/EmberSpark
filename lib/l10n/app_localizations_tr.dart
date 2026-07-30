@@ -914,6 +914,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'LNbits\'te LNURL-pay eklentisi yüklü değil.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Bu salt okunur bir cüzdandır, bu nedenle sunucuda bağlantı oluşturamaz. Aşağıya mevcut bir tanesini yine de yapıştırabilirsiniz.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning Address sunucuda güncellendi.';
 

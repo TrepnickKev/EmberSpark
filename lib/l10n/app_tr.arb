@@ -285,6 +285,7 @@
   "myContactInvalidLnurlp": "Geçerli bir LNURL-pay bağlantısı değil.",
   "myContactGenerating": "Oluşturuluyor…",
   "myContactLnurlpExtensionMissing": "LNbits'te LNURL-pay eklentisi yüklü değil.",
+  "myContactReadOnlyNoGenerate": "Bu salt okunur bir cüzdandır, bu nedenle sunucuda bağlantı oluşturamaz. Aşağıya mevcut bir tanesini yine de yapıştırabilirsiniz.",
   "myContactLnAddressServerUpdated": "Lightning Address sunucuda güncellendi.",
   "myContactBolt12ExtensionMissing": "LNbits'te BOLT12 eklentisi yüklü değil veya Lightning düğümün BOLT12'yi desteklemiyor.",
   "myContactAvatarPriority": "Profil avatarın bu tanımlayıcılardan biriyle oluşturulur. Hangisi olacağını seçmek için bir yıldıza dokun. Aksi halde önce Lightning address, sonra BOLT12, sonra LNURL kullanılır.",

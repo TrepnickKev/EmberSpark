@@ -917,6 +917,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auf dem LNbits-Server ist die LNURL-Pay-Erweiterung nicht installiert.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Dies ist eine schreibgeschützte Wallet und kann daher keinen Link auf dem Server erstellen. Du kannst unten weiterhin einen vorhandenen einfügen.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning-Adresse auf dem Server aktualisiert.';
 

@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Re-detect the Lightning Address only when the connection changed, so a
         // label-only edit doesn't clobber a manually set address.
         if (connChanged) {
-          await _importLightningAddress(
+          await _importServerIdentities(
             walletId: widget.initial!.id,
             url: url,
             adminKey: admin,
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
         readOnly: readOnly,
       );
       await setCurrentWalletId(account.id);
-      await _importLightningAddress(
+      await _importServerIdentities(
         walletId: account.id,
         url: url,
         adminKey: admin,
@@ -170,27 +170,31 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Detects an existing Lightning Address for the given wallet: if the server's
-  /// lnurlp extension has a pay link with a username, adopt it as that wallet's
-  /// Lightning Address so the user doesn't have to type it. Runs when a wallet
-  /// is created and when its connection is edited.
+  /// Detects existing server-side identities for the given wallet from the
+  /// lnurlp extension: a pay link's `username` becomes the Lightning Address,
+  /// and a pay link's `lnurl` becomes the wallet's LNURL-pay. Lets already
+  /// configured identities appear automatically without the user typing them,
+  /// including on read-only wallets that can't create links themselves. Runs
+  /// when a wallet is created and when its connection is edited.
   ///
   /// With [overwrite] false (create) it never clobbers an existing value. With
-  /// [overwrite] true (connection-changed edit) it replaces the stored address,
-  /// and if the now-reachable server has no Lightning Address it clears the
-  /// stale one. Bounded and silent on an unreachable server / timeout, which
-  /// leaves the stored value untouched.
-  Future<void> _importLightningAddress({
+  /// [overwrite] true (connection-changed edit) it replaces each stored value,
+  /// and clears a now-stale one the reachable server no longer has. Each
+  /// identity is guarded independently. Bounded and silent on an unreachable
+  /// server / timeout, which leaves stored values untouched.
+  Future<void> _importServerIdentities({
     required String walletId,
     required String url,
     required String adminKey,
     required bool overwrite,
   }) async {
     try {
-      if (!overwrite &&
-          ((await getMyLightningAddressFor(walletId))?.isNotEmpty ?? false)) {
-        return;
-      }
+      final haveAddr =
+          (await getMyLightningAddressFor(walletId))?.isNotEmpty ?? false;
+      final haveLnurl =
+          (await getMyLnurlpLinkFor(walletId))?.isNotEmpty ?? false;
+      if (!overwrite && haveAddr && haveLnurl) return;
+
       final svc = LNbitsService(
         baseUrl: url,
         adminKey: adminKey,
@@ -204,23 +208,39 @@ class _LoginScreenState extends State<LoginScreen> {
         links = const []; // reachable server, just no lnurlp extension
       }
       String? username;
+      String? addrLnurl; // lnurl of the username-backed link
+      String? anyLnurl; // first link with a non-empty lnurl
       for (final l in links) {
+        final lnurl = (l['lnurl'] as String?)?.trim() ?? '';
         final u = (l['username'] as String?)?.trim() ?? '';
-        if (u.isNotEmpty) {
+        if (anyLnurl == null && lnurl.isNotEmpty) anyLnurl = lnurl;
+        if (username == null && u.isNotEmpty) {
           username = u;
-          break;
+          if (lnurl.isNotEmpty) addrLnurl = lnurl;
         }
       }
-      final host = Uri.parse(url).host;
-      if (username != null && host.isNotEmpty) {
-        await setMyLightningAddressFor(walletId, '$username@$host');
-      } else if (overwrite) {
-        // Connection changed and the reachable server has no Lightning Address:
-        // drop the stale one so the identity reflects the current wallet.
-        await setMyLightningAddressFor(walletId, null);
+
+      if (overwrite || !haveAddr) {
+        final host = Uri.parse(url).host;
+        if (username != null && host.isNotEmpty) {
+          await setMyLightningAddressFor(walletId, '$username@$host');
+        } else if (overwrite) {
+          // Connection changed and the reachable server has no Lightning
+          // Address: drop the stale one so the identity reflects the wallet.
+          await setMyLightningAddressFor(walletId, null);
+        }
+      }
+
+      if (overwrite || !haveLnurl) {
+        final lnurl = addrLnurl ?? anyLnurl;
+        if (lnurl != null && lnurl.isNotEmpty) {
+          await setMyLnurlpLinkFor(walletId, lnurl);
+        } else if (overwrite) {
+          await setMyLnurlpLinkFor(walletId, null);
+        }
       }
     } catch (_) {
-      // Unreachable server / timeout / other: leave the stored value untouched.
+      // Unreachable server / timeout / other: leave stored values untouched.
     }
   }
 

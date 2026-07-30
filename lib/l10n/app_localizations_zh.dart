@@ -878,6 +878,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myContactLnurlpExtensionMissing => 'LNbits 未安装 LNURL-pay 扩展。';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      '这是一个只读钱包，因此无法在服务器上创建链接。你仍可以在下方粘贴一个现有的。';
+
+  @override
   String get myContactLnAddressServerUpdated => 'Lightning Address 已在服务器上更新。';
 
   @override

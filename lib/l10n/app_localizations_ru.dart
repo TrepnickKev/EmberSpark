@@ -914,6 +914,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'В LNbits не установлено расширение LNURL-pay.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Это кошелёк только для чтения, поэтому он не может создать ссылку на сервере. Вы всё же можете вставить существующую ниже.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning Address обновлён на сервере.';
 

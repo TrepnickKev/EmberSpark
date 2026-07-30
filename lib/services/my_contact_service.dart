@@ -117,6 +117,18 @@ Future<String?> getMyBolt12OfferFor(String walletId) =>
 Future<String?> getMyLnurlpLinkFor(String walletId) =>
     _readScopedFor(walletId, myLnurlpLinkKey);
 
+/// Writes a wallet's LNURL-pay link by explicit id (e.g. detecting it for a
+/// wallet being added/edited from the setup screen). Mirror
+/// [setMyLightningAddressFor].
+Future<void> setMyLnurlpLinkFor(String walletId, String? value) async {
+  const storage = FlutterSecureStorage();
+  if (value == null || value.trim().isEmpty) {
+    await storage.delete(key: myLnurlpLinkKey(walletId));
+  } else {
+    await storage.write(key: myLnurlpLinkKey(walletId), value: value.trim());
+  }
+}
+
 Future<MyContactKind?> getMyDefaultContactKindFor(String walletId) async =>
     _parseContactKind(await _readScopedFor(walletId, myDefaultContactKindKey));
 

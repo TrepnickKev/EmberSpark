@@ -1718,6 +1718,12 @@ abstract class AppLocalizations {
   /// **'LNbits doesn\'t have the LNURL-pay extension installed.'**
   String get myContactLnurlpExtensionMissing;
 
+  /// No description provided for @myContactReadOnlyNoGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a read-only wallet, so it cannot create a link on the server. You can still paste an existing one below.'**
+  String get myContactReadOnlyNoGenerate;
+
   /// No description provided for @myContactLnAddressServerUpdated.
   ///
   /// In en, this message translates to:

@@ -920,6 +920,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'O LNbits não tem a extensão LNURL-pay instalada.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Esta é uma carteira somente leitura, portanto não pode criar um link no servidor. Você ainda pode colar um existente abaixo.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning Address atualizada no servidor.';
 

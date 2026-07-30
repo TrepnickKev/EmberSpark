@@ -285,6 +285,7 @@
   "myContactInvalidLnurlp": "Ce n'est pas un lien LNURL-pay valide.",
   "myContactGenerating": "Génération…",
   "myContactLnurlpExtensionMissing": "LNbits n'a pas l'extension LNURL-pay installée.",
+  "myContactReadOnlyNoGenerate": "Ceci est un portefeuille en lecture seule, il ne peut donc pas créer de lien sur le serveur. Vous pouvez toujours en coller un existant ci-dessous.",
   "myContactLnAddressServerUpdated": "Lightning Address mise à jour sur le serveur.",
   "myContactBolt12ExtensionMissing": "LNbits n'a pas d'extension BOLT12 installée, ou ton nœud Lightning ne prend pas en charge BOLT12.",
   "myContactAvatarPriority": "Ton avatar de profil est généré à partir de l'un de ces identifiants. Touche une étoile pour choisir lequel. Sinon, il utilise la Lightning address, puis BOLT12, puis LNURL.",

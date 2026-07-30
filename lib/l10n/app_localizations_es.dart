@@ -919,6 +919,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'LNbits no tiene instalada la extensión LNURL-pay.';
 
   @override
+  String get myContactReadOnlyNoGenerate =>
+      'Esta es una wallet de solo lectura, por lo que no puede crear un enlace en el servidor. Puedes pegar uno existente abajo.';
+
+  @override
   String get myContactLnAddressServerUpdated =>
       'Lightning Address actualizada en el servidor.';
 

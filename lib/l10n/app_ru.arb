@@ -285,6 +285,7 @@
   "myContactInvalidLnurlp": "Недопустимая ссылка LNURL-pay.",
   "myContactGenerating": "Создание…",
   "myContactLnurlpExtensionMissing": "В LNbits не установлено расширение LNURL-pay.",
+  "myContactReadOnlyNoGenerate": "Это кошелёк только для чтения, поэтому он не может создать ссылку на сервере. Вы всё же можете вставить существующую ниже.",
   "myContactLnAddressServerUpdated": "Lightning Address обновлён на сервере.",
   "myContactBolt12ExtensionMissing": "В LNbits не установлено расширение BOLT12, или твой узел Lightning не поддерживает BOLT12.",
   "myContactAvatarPriority": "Аватар профиля создаётся из одного из этих идентификаторов. Нажми звезду, чтобы выбрать нужный. Иначе используется Lightning address, затем BOLT12, затем LNURL.",
