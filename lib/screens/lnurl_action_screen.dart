@@ -31,6 +31,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   LnurlInfo? info;
   String? error;
   String? resolvedUrl;
+  // True when we stopped a read-only wallet from paying. The resolved URL /
+  // Copy URL block is then irrelevant (not a server problem), so it is hidden.
+  bool readOnlyBlocked = false;
   bool busy = true;
   ({String seed, String name})? senderInfo;
 
@@ -109,6 +112,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
         if (!mounted) return;
         setState(() {
           error = AppLocalizations.of(context)!.errorReadOnlyWallet;
+          readOnlyBlocked = true;
           busy = false;
         });
         return;
@@ -273,7 +277,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
           error ?? l10n.commonUnknownError,
           style: const TextStyle(color: Colors.redAccent),
         ),
-        if (resolvedUrl != null) ...[
+        if (resolvedUrl != null && !readOnlyBlocked) ...[
           const SizedBox(height: 24),
           Text(
             l10n.lnurlResolvedExplain,

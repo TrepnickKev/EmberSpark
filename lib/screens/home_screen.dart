@@ -266,7 +266,8 @@ class _HomeScreenState extends State<HomeScreen>
       // controller is disposed after the frame (once its old PageView is gone)
       // to avoid an attach conflict.
       final walletSig = wallets.map((x) => x.id).join(',');
-      if (wallets.length > 1 && (_avatarPage == null || walletSig != _walletSig)) {
+      final sigChanged = walletSig != _walletSig;
+      if (wallets.length > 1 && (_avatarPage == null || sigChanged)) {
         final old = _avatarPage;
         _avatarPage = PageController(initialPage: walletIndex);
         if (old != null) {
@@ -285,6 +286,18 @@ class _HomeScreenState extends State<HomeScreen>
         _walletIndex = walletIndex;
         _walletSig = walletSig;
       });
+      // Same wallet set but the active wallet changed elsewhere (e.g. picked on
+      // the Wallets screen): the keyed PageView is reused and keeps its old
+      // page, so nudge the existing controller onto the active wallet's avatar.
+      if (!sigChanged && wallets.length > 1) {
+        final controller = _avatarPage;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || controller == null || !controller.hasClients) return;
+          if (controller.page?.round() != walletIndex) {
+            controller.jumpToPage(walletIndex);
+          }
+        });
+      }
       await _reconcileUnseen(b, w?.id);
     } catch (e) {
       if (!mounted) return;
