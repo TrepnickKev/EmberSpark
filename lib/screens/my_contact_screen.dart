@@ -11,6 +11,7 @@ import '../services/nfc_service.dart';
 import '../services/nfc_coordinator.dart';
 import '../widgets/stacked_action_button.dart';
 import 'contacts_screen.dart' show contactAvatar;
+import 'qr_scan_screen.dart';
 
 /// Stores and presents the user's *own* static Lightning destinations
 /// (Lightning address, LNURL-pay link, BOLT12 offer) for sharing with
@@ -698,6 +699,19 @@ class _EditDialogState extends State<_EditDialog> {
     MyContactKind.bolt12 => l10n.myContactInvalidBolt12,
   };
 
+  Future<void> _scan() async {
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const QrScanScreen()),
+    );
+    if (code != null && mounted) {
+      setState(() {
+        ctrl.text = code.trim();
+        error = null;
+      });
+    }
+  }
+
   void _save() {
     final l10n = AppLocalizations.of(context)!;
     final value = ctrl.text.trim();
@@ -765,7 +779,14 @@ class _EditDialogState extends State<_EditDialog> {
                     autocorrect: false,
                     enableSuggestions: false,
                     maxLines: isSingleLine ? 1 : 4,
-                    decoration: InputDecoration(hintText: hintText),
+                    decoration: InputDecoration(
+                      hintText: hintText,
+                      suffixIcon: IconButton(
+                        tooltip: l10n.commonScanQr,
+                        icon: const Icon(Icons.qr_code_scanner),
+                        onPressed: _scan,
+                      ),
+                    ),
                   ),
                   if (error != null) ...[
                     const SizedBox(height: 8),
