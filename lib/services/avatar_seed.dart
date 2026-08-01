@@ -3,8 +3,38 @@
 // whole point of seeding from a public Lightning identity instead of a
 // device-local random.
 
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:pointycastle/export.dart';
+
 import 'my_contact_service.dart';
 import 'wallet_account_service.dart';
+
+/// Stable, device-independent avatar seed for a wallet that has no shared
+/// Lightning identity. Derived from the wallet's stored key with an HMAC, the
+/// same basis LNURL-auth uses (see lnurl_auth.dart), so the avatar survives a
+/// reinstall and matches on any device that re-enters the same key, instead of
+/// the random local wallet id. Uses a distinct domain tag from the LNURL-auth
+/// seed so the two can't be correlated, and is one-way so it never exposes the
+/// key.
+String walletKeyAvatarSeed(String walletSecret) {
+  final hmac = HMac(SHA256Digest(), 64)
+    ..init(KeyParameter(Uint8List.fromList(utf8.encode(walletSecret.trim()))));
+  final out = hmac.process(
+    Uint8List.fromList(utf8.encode('emberspark-avatar-seed-v1')),
+  );
+  return out.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+}
+
+/// The stable fallback seed for [w] when it has no LN address / LNURL / BOLT12:
+/// the wallet-key-derived seed, or (only if the key is somehow empty) the local
+/// id. Empty when there is no wallet.
+String fallbackAvatarSeedFor(WalletAccount? w) {
+  if (w == null) return '';
+  final key = w.adminKey.trim();
+  return key.isEmpty ? w.id : walletKeyAvatarSeed(key);
+}
 
 /// Normalises a Lightning destination so identical identities written in
 /// different forms produce the same hash. Strips `lightning:` / `lnurl:`
@@ -17,8 +47,9 @@ String normalizeDestination(String s) =>
 
 /// Picks the most-shared public identifier as the seed, falling through to
 /// less-shared ones. Order: LN address > BOLT12 offer > LNURL-pay link >
-/// LNbits server-side wallet UUID > local random id. Matches what most
-/// contacts will save someone by, so the bubble matches their tile.
+/// [fallbackSeed] (the stable wallet-key-derived seed, see
+/// [fallbackAvatarSeedFor]). Matches what most contacts will save someone by,
+/// so the bubble matches their tile.
 ///
 /// When [defaultKind] is set and its identifier is non-empty, the user has
 /// pinned a default identity and it overrides the priority order. If the
@@ -27,8 +58,7 @@ String avatarSeedForWallet({
   String? lnAddress,
   String? bolt12,
   String? lnurlp,
-  String? serverWalletId,
-  required String fallbackLocalId,
+  required String fallbackSeed,
   MyContactKind? defaultKind,
 }) {
   if (defaultKind != null) {
@@ -41,10 +71,10 @@ String avatarSeedForWallet({
       return normalizeDestination(chosen);
     }
   }
-  for (final s in [lnAddress, bolt12, lnurlp, serverWalletId]) {
+  for (final s in [lnAddress, bolt12, lnurlp]) {
     if (s != null && s.trim().isNotEmpty) return normalizeDestination(s);
   }
-  return fallbackLocalId;
+  return fallbackSeed;
 }
 
 /// Computes the avatar seed for a specific [w] (not necessarily the active
@@ -63,8 +93,7 @@ Future<String> avatarSeedForAccount(WalletAccount w) async {
     lnAddress: results[0] as String?,
     bolt12: results[1] as String?,
     lnurlp: results[2] as String?,
-    serverWalletId: w.serverWalletId,
-    fallbackLocalId: w.id,
+    fallbackSeed: fallbackAvatarSeedFor(w),
     defaultKind: results[3] as MyContactKind?,
   );
 }
@@ -87,8 +116,7 @@ Future<({String seed, String name})> getOwnAvatarInfo() async {
     lnAddress: results[0] as String?,
     bolt12: results[1] as String?,
     lnurlp: results[2] as String?,
-    serverWalletId: w?.serverWalletId,
-    fallbackLocalId: w?.id ?? '',
+    fallbackSeed: fallbackAvatarSeedFor(w),
     defaultKind: results[4] as MyContactKind?,
   );
   return (seed: seed, name: w?.label ?? '');

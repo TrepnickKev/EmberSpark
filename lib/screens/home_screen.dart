@@ -232,33 +232,17 @@ class _HomeScreenState extends State<HomeScreen>
       final b = results[0] as int;
       final cur = results[1] as String;
       final rates = results[2] as Map<String, double>?;
-      var w = results[3] as WalletAccount?;
+      final w = results[3] as WalletAccount?;
       final myLnAddress = results[4] as String?;
       final myBolt12 = results[5] as String?;
       final myLnurlp = results[6] as String?;
       final defaultKind = results[7] as MyContactKind?;
 
-      // Lazy-fetch the LNbits server-side wallet UUID on the first
-      // successful load. Best-effort: any failure (404 on older servers,
-      // wrong shape) is swallowed; avatar falls through to lower-priority
-      // seeds.
-      if (w != null &&
-          (w.serverWalletId == null || w.serverWalletId!.isEmpty)) {
-        try {
-          final sid = await svc.getServerWalletId();
-          await setServerWalletId(w.id, sid);
-          w = w.copyWith(serverWalletId: sid);
-        } catch (_) {
-          // Ignore — keep the lower-priority avatar seed.
-        }
-      }
-
       final seed = avatarSeedForWallet(
         lnAddress: myLnAddress,
         bolt12: myBolt12,
         lnurlp: myLnurlp,
-        serverWalletId: w?.serverWalletId,
-        fallbackLocalId: w?.id ?? '',
+        fallbackSeed: fallbackAvatarSeedFor(w),
         defaultKind: defaultKind,
       );
 
