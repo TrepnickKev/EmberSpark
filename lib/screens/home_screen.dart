@@ -70,6 +70,14 @@ class _HomeScreenState extends State<HomeScreen>
   bool _polling = false;
   static const _pollInterval = Duration(seconds: 5);
 
+  // Guards against racing loads: a fast multi-wallet swipe fires _load() for
+  // each page crossed. Only the newest load (highest seq) may apply its result,
+  // so an intermediate wallet can't overwrite the one the user settled on.
+  int _loadSeq = 0;
+  // The wallet the currently displayed `balance` belongs to, so a wallet switch
+  // isn't mistaken for a send/receive when comparing balances.
+  String? _balanceWalletId;
+
   @override
   void initState() {
     super.initState();
@@ -133,18 +141,25 @@ class _HomeScreenState extends State<HomeScreen>
     if (loading || _polling || !mounted) return;
     _polling = true;
     try {
+      final walletId = currentWallet?.id;
       final svc = await LNbitsService.fromStorage();
       final b = await svc.getBalanceSats();
       if (!mounted) return;
       final prev = balance;
-      if (prev != null && b != prev) {
+      // Only treat a change as a payment when the previous balance belongs to
+      // the same wallet; otherwise a wallet switch looks like a send/receive.
+      if (prev != null &&
+          b != prev &&
+          walletId != null &&
+          walletId == _balanceWalletId) {
         _showPaymentNotification(b - prev);
       }
       setState(() {
         balance = b;
+        _balanceWalletId = walletId;
         if (error != null) error = null;
       });
-      await _reconcileUnseen(b, currentWallet?.id);
+      await _reconcileUnseen(b, walletId);
     } catch (_) {
       // Stay quiet on poll errors so transient network blips don't spam.
     } finally {
@@ -196,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _load() async {
+    final seq = ++_loadSeq;
     setState(() {
       loading = true;
       error = null;
@@ -258,7 +274,9 @@ class _HomeScreenState extends State<HomeScreen>
       final idx = wallets.indexWhere((x) => x.id == w?.id);
       final walletIndex = idx < 0 ? 0 : idx;
 
-      if (!mounted) return;
+      // Discard a superseded load (a newer wallet switch started meanwhile) so
+      // it can't overwrite the active wallet's carousel/balance/name.
+      if (!mounted || seq != _loadSeq) return;
       // Rebuild the carousel controller (at the active index) whenever the
       // wallet SET changes — add/remove/reorder — so it always lands on the
       // active wallet's avatar. The PageView is keyed by this signature so a
@@ -276,6 +294,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
       setState(() {
         balance = b;
+        _balanceWalletId = w?.id;
         fiatCurrency = cur;
         fiatRate = rates?[cur];
         currentWallet = w;
@@ -300,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
       await _reconcileUnseen(b, w?.id);
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
       setState(() {
         error = friendlyError(AppLocalizations.of(context)!, e);
         // Endpoint unreachable: show the placeholder avatar, not the previous
@@ -308,7 +327,9 @@ class _HomeScreenState extends State<HomeScreen>
         avatarSeed = null;
       });
     } finally {
-      if (mounted) setState(() => loading = false);
+      // Only the latest load owns the loading flag, so a discarded stale load
+      // can't clear it while the newest one is still fetching.
+      if (mounted && seq == _loadSeq) setState(() => loading = false);
     }
   }
 
