@@ -701,6 +701,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsNotifyTest => 'Testbenachrichtigung senden';
 
   @override
+  String get settingsNotifySound => 'Benachrichtigungston';
+
+  @override
+  String get notifySoundCoins => 'Münzen';
+
+  @override
+  String get notifySoundWoosh => 'Fire Woosh';
+
+  @override
+  String get notifySoundDefault => 'Gerätestandard';
+
+  @override
+  String get notifySoundPreview => 'Ton abspielen';
+
+  @override
   String get notifyReceivedTitle => 'Zahlung empfangen';
 
   @override

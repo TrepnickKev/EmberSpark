@@ -247,6 +247,11 @@
   "settingsNotifyPermissionDenied": "Allow notifications for EmberSpark in system settings to use this.",
   "settingsNotifyHelp": "Get instant notifications (advanced)",
   "settingsNotifyTest": "Send test notification",
+  "settingsNotifySound": "Notification sound",
+  "notifySoundCoins": "Coins",
+  "notifySoundWoosh": "Fire Woosh",
+  "notifySoundDefault": "Device default",
+  "notifySoundPreview": "Play sound",
   "notifyReceivedTitle": "Payment received",
   "notifyReceivedBody": "{walletLabel}: received {amount} sats",
   "@notifyReceivedBody": {

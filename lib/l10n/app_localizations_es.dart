@@ -699,6 +699,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsNotifyTest => 'Send test notification';
 
   @override
+  String get settingsNotifySound => 'Notification sound';
+
+  @override
+  String get notifySoundCoins => 'Coins';
+
+  @override
+  String get notifySoundWoosh => 'Fire Woosh';
+
+  @override
+  String get notifySoundDefault => 'Device default';
+
+  @override
+  String get notifySoundPreview => 'Play sound';
+
+  @override
   String get notifyReceivedTitle => 'Payment received';
 
   @override

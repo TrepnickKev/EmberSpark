@@ -34,6 +34,7 @@ void main() async {
   await initReceivedNotify();
   if (await isReceivedNotifyEnabled()) {
     await enableReceivedNotifyTask();
+    await applyNotifySound();
   }
   runApp(const MyApp());
 }

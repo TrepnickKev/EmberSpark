@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The notification small icon is referenced only by string name from Dart
-     (flutter_local_notifications), so the release resource shrinker cannot see
-     it is used and would strip it, making notifications fail to post. Keep it. -->
+<!-- The notification small icon and the custom notification sounds are
+     referenced only by string name from Dart (flutter_local_notifications), so
+     the release resource shrinker cannot see they are used and would strip
+     them, making notifications fail to post or fall back to no sound. Keep. -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@drawable/ic_stat_notify" />
+    tools:keep="@drawable/ic_stat_notify,@raw/coin_received_coins_handling,@raw/coin_received_soft_woosh_fire" />

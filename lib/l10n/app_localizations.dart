@@ -1340,6 +1340,36 @@ abstract class AppLocalizations {
   /// **'Send test notification'**
   String get settingsNotifyTest;
 
+  /// No description provided for @settingsNotifySound.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification sound'**
+  String get settingsNotifySound;
+
+  /// No description provided for @notifySoundCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Coins'**
+  String get notifySoundCoins;
+
+  /// No description provided for @notifySoundWoosh.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire Woosh'**
+  String get notifySoundWoosh;
+
+  /// No description provided for @notifySoundDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Device default'**
+  String get notifySoundDefault;
+
+  /// No description provided for @notifySoundPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Play sound'**
+  String get notifySoundPreview;
+
   /// No description provided for @notifyReceivedTitle.
   ///
   /// In en, this message translates to:

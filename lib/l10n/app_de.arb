@@ -220,6 +220,11 @@
   "settingsNotifyPermissionDenied": "Erlaube Benachrichtigungen für EmberSpark in den Systemeinstellungen, um dies zu nutzen.",
   "settingsNotifyHelp": "Sofortige Benachrichtigungen (fortgeschritten)",
   "settingsNotifyTest": "Testbenachrichtigung senden",
+  "settingsNotifySound": "Benachrichtigungston",
+  "notifySoundCoins": "Münzen",
+  "notifySoundWoosh": "Fire Woosh",
+  "notifySoundDefault": "Gerätestandard",
+  "notifySoundPreview": "Ton abspielen",
   "notifyReceivedTitle": "Zahlung empfangen",
   "notifyReceivedBody": "{walletLabel}: {amount} Sats empfangen",
   "@notifyReceivedBody": {

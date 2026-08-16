@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -22,9 +23,30 @@ import 'wallet_account_service.dart';
 /// receive is never reported twice.
 
 const _notifyKey = 'notify_received';
+const _notifySoundKey = 'notify_sound';
 const _taskUniqueName = 'emberspark-balance-poll';
-const _channelId = 'received_payments';
+const _legacyChannelId = 'received_payments';
 const _notifyIcon = 'ic_stat_notify';
+
+/// Notification sound choices. The value is stored and also forms the channel
+/// id (Android ties a channel's sound to creation time, so each choice gets its
+/// own channel). 'coins' is the default; 'default' means the device sound.
+const _soundCoins = 'coins';
+const _soundWoosh = 'woosh';
+const _soundDefault = 'default';
+const _allSounds = [_soundCoins, _soundWoosh, _soundDefault];
+
+String _channelIdFor(String sound) => 'received_payments_$sound';
+
+AndroidNotificationSound? _rawSoundFor(String sound) => switch (sound) {
+      _soundCoins => const RawResourceAndroidNotificationSound(
+          'coin_received_coins_handling',
+        ),
+      _soundWoosh => const RawResourceAndroidNotificationSound(
+          'coin_received_soft_woosh_fire',
+        ),
+      _ => null, // device default
+    };
 
 /// Dev-only: when true, Settings shows a "Send test notification" button so the
 /// notification path (permission + channel + icon) can be verified instantly,
@@ -47,6 +69,18 @@ Future<void> setReceivedNotifyEnabled(bool enabled) async {
   } else {
     await storage.delete(key: _notifyKey);
   }
+}
+
+/// The chosen notification sound ('coins' by default, 'woosh', or 'default').
+Future<String> getNotifySound() async {
+  const storage = FlutterSecureStorage();
+  final v = await storage.read(key: _notifySoundKey);
+  return _allSounds.contains(v) ? v! : _soundCoins;
+}
+
+Future<void> setNotifySound(String sound) async {
+  const storage = FlutterSecureStorage();
+  await storage.write(key: _notifySoundKey, value: sound);
 }
 
 Future<int?> getLastNotifiedBalanceFor(String walletId) async {
@@ -134,8 +168,9 @@ Future<void> runReceivedNotifyPoll() async {
   if (!await isReceivedNotifyEnabled()) return;
 
   final plugin = await _initPlugin();
-
   final l10n = await _isolateL10n();
+  final sound = await _ensureSoundChannel(plugin, l10n);
+
   final wallets = await listWallets();
   if (wallets.isEmpty) return;
 
@@ -153,7 +188,7 @@ Future<void> runReceivedNotifyPoll() async {
         final baseline = await getLastNotifiedBalanceFor(w.id);
         final d = evaluateNotify(balance, baseline);
         if (d.notify) {
-          await _showReceived(plugin, l10n, w, balance - baseline!);
+          await _showReceived(plugin, l10n, w, balance - baseline!, sound);
         }
         if (d.baseline != baseline) {
           await setLastNotifiedBalanceFor(w.id, d.baseline);
@@ -178,28 +213,84 @@ Future<FlutterLocalNotificationsPlugin> _initPlugin() async {
   return plugin;
 }
 
-NotificationDetails _details(AppLocalizations l10n) => NotificationDetails(
+/// Creates the notification channel for the currently chosen sound and removes
+/// the others (a channel's sound is fixed at creation on Android 8+, so each
+/// choice is its own channel; keeping only one keeps system settings tidy and
+/// makes a sound change actually take effect). Also drops the legacy channel
+/// from earlier builds. Returns the chosen sound.
+Future<String> _ensureSoundChannel(
+  FlutterLocalNotificationsPlugin plugin,
+  AppLocalizations l10n,
+) async {
+  final sound = await getNotifySound();
+  final android = plugin.resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>();
+  if (android == null) return sound;
+  await android.deleteNotificationChannel(_legacyChannelId);
+  for (final s in _allSounds) {
+    if (s != sound) await android.deleteNotificationChannel(_channelIdFor(s));
+  }
+  await android.createNotificationChannel(
+    AndroidNotificationChannel(
+      _channelIdFor(sound),
+      l10n.notifyChannelName,
+      description: l10n.notifyChannelDescription,
+      importance: Importance.high,
+      playSound: true,
+      sound: _rawSoundFor(sound),
+    ),
+  );
+  return sound;
+}
+
+/// Applies the chosen notification sound now (recreates the channel), so a
+/// dropdown change takes effect without waiting for a poll. No-op off Android.
+Future<void> applyNotifySound() async {
+  if (!_isAndroid) return;
+  final plugin = await _initPlugin();
+  final l10n = await _isolateL10n();
+  await _ensureSoundChannel(plugin, l10n);
+}
+
+const _soundPreviewChannel = MethodChannel('emberspark/sound_preview');
+
+/// Plays a short preview of [sound] (native RingtoneManager) so the user can
+/// hear a choice from the settings dropdown. No-op off Android; never throws.
+Future<void> previewNotifySound(String sound) async {
+  if (!_isAndroid) return;
+  try {
+    await _soundPreviewChannel.invokeMethod('preview', {'sound': sound});
+  } catch (_) {
+    // A failed preview must never disrupt settings.
+  }
+}
+
+NotificationDetails _details(AppLocalizations l10n, String sound) =>
+    NotificationDetails(
       android: AndroidNotificationDetails(
-        _channelId,
+        _channelIdFor(sound),
         l10n.notifyChannelName,
         channelDescription: l10n.notifyChannelDescription,
         importance: Importance.high,
         priority: Priority.high,
         icon: _notifyIcon,
+        playSound: true,
+        sound: _rawSoundFor(sound),
       ),
     );
 
 /// Dev-only (see [kNotifyDebug]): posts a sample notification immediately to
-/// verify permission, channel, and icon independent of the WorkManager poll.
+/// verify permission, channel, icon, and sound independent of the poll.
 Future<void> showTestNotification() async {
   WidgetsFlutterBinding.ensureInitialized();
   final plugin = await _initPlugin();
   final l10n = await _isolateL10n();
+  final sound = await _ensureSoundChannel(plugin, l10n);
   await plugin.show(
     _taskUniqueName.hashCode,
     l10n.notifyReceivedTitle,
     l10n.notifyReceivedBody('EmberSpark', formatThousands(1000)),
-    _details(l10n),
+    _details(l10n, sound),
   );
 }
 
@@ -208,6 +299,7 @@ Future<void> _showReceived(
   AppLocalizations l10n,
   WalletAccount w,
   int deltaSats,
+  String sound,
 ) async {
   await plugin.show(
     // Stable per-wallet id so a later notification for the same wallet replaces
@@ -215,7 +307,7 @@ Future<void> _showReceived(
     w.id.hashCode,
     l10n.notifyReceivedTitle,
     l10n.notifyReceivedBody(w.label, formatThousands(deltaSats)),
-    _details(l10n),
+    _details(l10n, sound),
   );
 }
 

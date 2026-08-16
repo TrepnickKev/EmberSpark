@@ -27,6 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool deviceSupportsLock = false;
   String? language;
   bool? notifyReceived;
+  String? notifySound;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       isDeviceSecuritySupported(),
       getSelectedLanguageCode(),
       isReceivedNotifyEnabled(),
+      getNotifySound(),
     ]);
     if (!mounted) return;
     setState(() {
@@ -51,6 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       deviceSupportsLock = results[3] as bool;
       language = results[4] as String;
       notifyReceived = results[5] as bool;
+      notifySound = results[6] as String;
     });
   }
 
@@ -107,11 +110,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lock = lockEnabled;
     final lang = language;
     final notify = notifyReceived;
+    final sound = notifySound;
     if (tls == null ||
         cur == null ||
         lock == null ||
         lang == null ||
-        notify == null) {
+        notify == null ||
+        sound == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -194,6 +199,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: notify,
               onChanged: _toggleNotify,
             ),
+            if (notify)
+              ListTile(
+                title: _title(l10n.settingsNotifySound),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.play_arrow),
+                      tooltip: l10n.notifySoundPreview,
+                      onPressed: () => previewNotifySound(sound),
+                    ),
+                    DropdownButton<String>(
+                      value: sound,
+                      items: [
+                        DropdownMenuItem(
+                          value: 'coins',
+                          child: Text(l10n.notifySoundCoins),
+                        ),
+                        DropdownMenuItem(
+                          value: 'woosh',
+                          child: Text(l10n.notifySoundWoosh),
+                        ),
+                        DropdownMenuItem(
+                          value: 'default',
+                          child: Text(l10n.notifySoundDefault),
+                        ),
+                      ],
+                      onChanged: (next) async {
+                        if (next == null) return;
+                        await setNotifySound(next);
+                        await applyNotifySound();
+                        await previewNotifySound(next);
+                        if (mounted) setState(() => notifySound = next);
+                      },
+                    ),
+                  ],
+                ),
+              ),
             if (kNotifyDebug)
               ListTile(
                 leading: const Icon(Icons.notifications_none),
