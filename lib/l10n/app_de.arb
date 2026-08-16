@@ -150,6 +150,8 @@
 
   "historyTitle": "Verlauf",
   "historyEmpty": "Noch keine Transaktionen",
+  "historySearchHint": "Zahlungen durchsuchen",
+  "historyNoResults": "Keine passenden Zahlungen",
   "historyPaymentDefault": "Lightning-Zahlung",
   "historyPending": "ausstehend",
   "historyFee": "Gebühr {amount}",

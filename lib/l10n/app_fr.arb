@@ -148,6 +148,8 @@
 
   "historyTitle": "Historique",
   "historyEmpty": "Aucune transaction pour l'instant",
+  "historySearchHint": "Search payments",
+  "historyNoResults": "No matching payments",
   "historyPaymentDefault": "Paiement Lightning",
   "historyPending": "en attente",
   "historyFee": "frais {amount}",

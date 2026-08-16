@@ -148,6 +148,8 @@
 
   "historyTitle": "Geçmiş",
   "historyEmpty": "Henüz işlem yok",
+  "historySearchHint": "Search payments",
+  "historyNoResults": "No matching payments",
   "historyPaymentDefault": "Lightning ödemesi",
   "historyPending": "beklemede",
   "historyFee": "ücret {amount}",

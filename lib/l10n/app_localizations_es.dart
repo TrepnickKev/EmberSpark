@@ -462,6 +462,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get historyEmpty => 'Aún no hay transacciones';
 
   @override
+  String get historySearchHint => 'Search payments';
+
+  @override
+  String get historyNoResults => 'No matching payments';
+
+  @override
   String get historyPaymentDefault => 'Pago Lightning';
 
   @override

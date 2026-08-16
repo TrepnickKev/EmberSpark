@@ -463,6 +463,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get historyEmpty => 'Aucune transaction pour l\'instant';
 
   @override
+  String get historySearchHint => 'Search payments';
+
+  @override
+  String get historyNoResults => 'No matching payments';
+
+  @override
   String get historyPaymentDefault => 'Paiement Lightning';
 
   @override

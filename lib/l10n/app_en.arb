@@ -160,6 +160,8 @@
 
   "historyTitle": "History",
   "historyEmpty": "No transactions yet",
+  "historySearchHint": "Search payments",
+  "historyNoResults": "No matching payments",
   "historyPaymentDefault": "Lightning payment",
   "historyPending": "pending",
   "historyFee": "fee {amount}",

@@ -938,6 +938,18 @@ abstract class AppLocalizations {
   /// **'No transactions yet'**
   String get historyEmpty;
 
+  /// No description provided for @historySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search payments'**
+  String get historySearchHint;
+
+  /// No description provided for @historyNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching payments'**
+  String get historyNoResults;
+
   /// No description provided for @historyPaymentDefault.
   ///
   /// In en, this message translates to:

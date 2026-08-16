@@ -457,6 +457,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get historyEmpty => 'Henüz işlem yok';
 
   @override
+  String get historySearchHint => 'Search payments';
+
+  @override
+  String get historyNoResults => 'No matching payments';
+
+  @override
   String get historyPaymentDefault => 'Lightning ödemesi';
 
   @override

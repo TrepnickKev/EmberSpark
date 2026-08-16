@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
+import '../services/payment_search.dart';
 import '../services/wallet_backend.dart';
 import '../services/price_service.dart';
 
@@ -21,11 +22,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String fiatCurrency = 'USD';
   double? fiatRate;
 
+  bool _searching = false;
+  final TextEditingController _searchCtrl = TextEditingController();
+  String _query = '';
+
   @override
   void initState() {
     super.initState();
     _load();
   }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _startSearch() => setState(() => _searching = true);
+
+  void _stopSearch() => setState(() {
+        _searching = false;
+        _searchCtrl.clear();
+        _query = '';
+      });
 
   Future<void> _load() async {
     setState(() {
@@ -61,13 +80,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.historyTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: loading ? null : _load,
-          ),
-        ],
+        title: _searching
+            ? TextField(
+                controller: _searchCtrl,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: l10n.historySearchHint,
+                  border: InputBorder.none,
+                ),
+                onChanged: (v) => setState(() => _query = v),
+              )
+            : Text(l10n.historyTitle),
+        actions: _searching
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: _stopSearch,
+                ),
+              ]
+            : [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  tooltip: l10n.historySearchHint,
+                  onPressed: _startSearch,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: loading ? null : _load,
+                ),
+              ],
       ),
       body: RefreshIndicator(
         onRefresh: _load,
@@ -95,14 +136,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       );
     }
-    final list = payments ?? const [];
-    if (list.isEmpty) {
+    final all = payments ?? const [];
+    if (all.isEmpty) {
       return ListView(
         children: [
           const SizedBox(height: 80),
           Center(
             child: Text(
               l10n.historyEmpty,
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+        ],
+      );
+    }
+    final list = _query.trim().isEmpty
+        ? all
+        : all.where((p) => paymentMatchesQuery(p, _query)).toList();
+    if (list.isEmpty) {
+      return ListView(
+        children: [
+          const SizedBox(height: 80),
+          Center(
+            child: Text(
+              l10n.historyNoResults,
               style: const TextStyle(color: Colors.grey),
             ),
           ),

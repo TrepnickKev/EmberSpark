@@ -446,6 +446,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyEmpty => '还没有交易';
 
   @override
+  String get historySearchHint => 'Search payments';
+
+  @override
+  String get historyNoResults => 'No matching payments';
+
+  @override
   String get historyPaymentDefault => 'Lightning 支付';
 
   @override

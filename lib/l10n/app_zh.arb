@@ -148,6 +148,8 @@
 
   "historyTitle": "历史",
   "historyEmpty": "还没有交易",
+  "historySearchHint": "Search payments",
+  "historyNoResults": "No matching payments",
   "historyPaymentDefault": "Lightning 支付",
   "historyPending": "待处理",
   "historyFee": "手续费 {amount}",

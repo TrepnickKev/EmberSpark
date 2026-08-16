@@ -148,6 +148,8 @@
 
   "historyTitle": "История",
   "historyEmpty": "Пока нет транзакций",
+  "historySearchHint": "Search payments",
+  "historyNoResults": "No matching payments",
   "historyPaymentDefault": "Платёж Lightning",
   "historyPending": "в ожидании",
   "historyFee": "комиссия {amount}",

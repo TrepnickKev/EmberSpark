@@ -460,6 +460,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyEmpty => 'Пока нет транзакций';
 
   @override
+  String get historySearchHint => 'Search payments';
+
+  @override
+  String get historyNoResults => 'No matching payments';
+
+  @override
   String get historyPaymentDefault => 'Платёж Lightning';
 
   @override
