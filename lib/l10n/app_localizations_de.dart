@@ -698,6 +698,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sofortige Benachrichtigungen (fortgeschritten)';
 
   @override
+  String get settingsNotifyTest => 'Testbenachrichtigung senden';
+
+  @override
   String get notifyReceivedTitle => 'Zahlung empfangen';
 
   @override

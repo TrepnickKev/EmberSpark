@@ -246,6 +246,7 @@
   "settingsNotifyReceivedSubtitle": "Checks periodically in the background while the app is closed. May be delayed and uses some battery.",
   "settingsNotifyPermissionDenied": "Allow notifications for EmberSpark in system settings to use this.",
   "settingsNotifyHelp": "Get instant notifications (advanced)",
+  "settingsNotifyTest": "Send test notification",
   "notifyReceivedTitle": "Payment received",
   "notifyReceivedBody": "{walletLabel}: received {amount} sats",
   "@notifyReceivedBody": {

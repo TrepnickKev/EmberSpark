@@ -1334,6 +1334,12 @@ abstract class AppLocalizations {
   /// **'Get instant notifications (advanced)'**
   String get settingsNotifyHelp;
 
+  /// No description provided for @settingsNotifyTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test notification'**
+  String get settingsNotifyTest;
+
   /// No description provided for @notifyReceivedTitle.
   ///
   /// In en, this message translates to:

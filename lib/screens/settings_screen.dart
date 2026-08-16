@@ -194,6 +194,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: notify,
               onChanged: _toggleNotify,
             ),
+            if (kNotifyDebug)
+              ListTile(
+                leading: const Icon(Icons.notifications_none),
+                title: _title(l10n.settingsNotifyTest),
+                onTap: () async {
+                  await requestNotifyPermission();
+                  await showTestNotification();
+                },
+              ),
             if (_kShowNtfyHelp)
               ListTile(
                 leading: const Icon(Icons.notifications_active_outlined),

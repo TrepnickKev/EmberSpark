@@ -674,6 +674,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsNotifyHelp => 'Get instant notifications (advanced)';
 
   @override
+  String get settingsNotifyTest => 'Send test notification';
+
+  @override
   String get notifyReceivedTitle => 'Payment received';
 
   @override

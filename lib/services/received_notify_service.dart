@@ -24,6 +24,12 @@ import 'wallet_account_service.dart';
 const _notifyKey = 'notify_received';
 const _taskUniqueName = 'emberspark-balance-poll';
 const _channelId = 'received_payments';
+const _notifyIcon = 'ic_stat_notify';
+
+/// Dev-only: when true, Settings shows a "Send test notification" button so the
+/// notification path (permission + channel + icon) can be verified instantly,
+/// without waiting for a WorkManager cycle. Keep false for production.
+const bool kNotifyDebug = false;
 
 /// Per-wallet baseline the background poll compares against.
 String lastNotifiedBalanceKey(String walletId) =>
@@ -127,12 +133,7 @@ Future<void> runReceivedNotifyPoll() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!await isReceivedNotifyEnabled()) return;
 
-  final plugin = FlutterLocalNotificationsPlugin();
-  await plugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('ic_stat_notify'),
-    ),
-  );
+  final plugin = await _initPlugin();
 
   final l10n = await _isolateL10n();
   final wallets = await listWallets();
@@ -167,29 +168,54 @@ Future<void> runReceivedNotifyPoll() async {
   }
 }
 
+Future<FlutterLocalNotificationsPlugin> _initPlugin() async {
+  final plugin = FlutterLocalNotificationsPlugin();
+  await plugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings(_notifyIcon),
+    ),
+  );
+  return plugin;
+}
+
+NotificationDetails _details(AppLocalizations l10n) => NotificationDetails(
+      android: AndroidNotificationDetails(
+        _channelId,
+        l10n.notifyChannelName,
+        channelDescription: l10n.notifyChannelDescription,
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: _notifyIcon,
+      ),
+    );
+
+/// Dev-only (see [kNotifyDebug]): posts a sample notification immediately to
+/// verify permission, channel, and icon independent of the WorkManager poll.
+Future<void> showTestNotification() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final plugin = await _initPlugin();
+  final l10n = await _isolateL10n();
+  await plugin.show(
+    _taskUniqueName.hashCode,
+    l10n.notifyReceivedTitle,
+    l10n.notifyReceivedBody('EmberSpark', formatThousands(1000)),
+    _details(l10n),
+  );
+}
+
 Future<void> _showReceived(
   FlutterLocalNotificationsPlugin plugin,
   AppLocalizations l10n,
   WalletAccount w,
   int deltaSats,
 ) async {
-  final details = NotificationDetails(
-    android: AndroidNotificationDetails(
-      _channelId,
-      l10n.notifyChannelName,
-      channelDescription: l10n.notifyChannelDescription,
-      importance: Importance.high,
-      priority: Priority.high,
-      icon: 'ic_stat_notify',
-    ),
-  );
   await plugin.show(
     // Stable per-wallet id so a later notification for the same wallet replaces
     // the previous one rather than stacking.
     w.id.hashCode,
     l10n.notifyReceivedTitle,
     l10n.notifyReceivedBody(w.label, formatThousands(deltaSats)),
-    details,
+    _details(l10n),
   );
 }
 
