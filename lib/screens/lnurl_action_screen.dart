@@ -118,10 +118,16 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
         return;
       }
       if (!mounted) return;
+      // A fixed-amount withdraw (min == max) has only one valid value, so
+      // prefill it. currency defaults to 'sats', so _resolveSats() parses it.
+      if (i is LnurlWithdrawInfo &&
+          i.minWithdrawableMsat == i.maxWithdrawableMsat) {
+        amountCtrl.text = (i.maxWithdrawableMsat ~/ 1000).toString();
+      }
       setState(() {
         info = i;
         busy = false;
-        // Leave the amount blank so it (and the currency) are set manually.
+        // Otherwise leave the amount blank so it (and the currency) are manual.
       });
     } catch (e) {
       if (!mounted) return;
