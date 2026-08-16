@@ -26,6 +26,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // flutter_local_notifications requires core library desugaring.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -36,7 +38,9 @@ android {
 
     defaultConfig {
         applicationId = "com.emberspark.wallet"
-        minSdk = flutter.minSdkVersion
+        // flutter_local_notifications requires at least API 21; pin so it never
+        // resolves below that regardless of Flutter's default.
+        minSdk = maxOf(flutter.minSdkVersion, 21)
         // Pinned for Play Store rather than tracking Flutter's default, which
         // lags behind the deadline. Google Play requires targeting Android 16
         // (API 36) for app updates from 31 Aug 2026.
@@ -75,4 +79,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Required by flutter_local_notifications (core library desugaring).
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

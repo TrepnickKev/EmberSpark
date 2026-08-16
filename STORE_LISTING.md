@@ -18,7 +18,7 @@ Conventions:
 A control client for your own self-hosted LNbits Lightning server. Open source.
 ```
 
-### Full description (~2400 / 4000)
+### Full description (~3520 / 4000)
 
 ```
 EmberSpark is a small, open-source Android client for your own self-hosted LNbits server. It is not a wallet on its own. EmberSpark works like a remote control that lets you use your LNbits server as a wallet from your phone, wherever you are. The app never holds private keys or seed phrases. It only stores the API key your LNbits server gave you, encrypted in the Android Keystore.
@@ -38,7 +38,8 @@ WHAT IT DOES
 * Scan QR codes, paste destinations, decode QR images from your gallery, or read Lightning data from NFC tags.
 * Tap any amount to swap between sats and your preferred fiat. USD, EUR, GBP, CHF, CAD, AUD, JPY via mempool.space.
 * Save contacts you pay regularly. Edit and delete entries. Each contact shows the same recognisable avatar across devices and across users.
-* Manage multiple LNbits server connections in one app with a quick switcher and per-connection identifiers.
+* Manage multiple LNbits server connections in one app. Switch the active connection by swiping the home avatar up or down, reorder your connections, and keep a separate identifier for each.
+* Add a connection with a read-only invoice key. It is marked read-only and can receive but not send.
 
 BOLT CARDS
 
@@ -63,7 +64,7 @@ REQUIREMENTS
 
 LANGUAGES
 
-English and German.
+English, German, Spanish, French, Portuguese (Brazil), Russian, Turkish, and Simplified Chinese.
 
 OPEN SOURCE
 
@@ -81,7 +82,7 @@ https://github.com/TrepnickKev/EmberSpark
 Bedienclient für deinen eigenen selbst gehosteten LNbits-Lightning-Server.
 ```
 
-### Vollständige Beschreibung (~2500 / 4000)
+### Vollständige Beschreibung (~3970 / 4000)
 
 ```
 EmberSpark ist ein kleiner, quelloffener Android-Client für deinen eigenen, selbst gehosteten LNbits-Server. Die App ist selbst keine Wallet. EmberSpark funktioniert wie eine Fernbedienung, mit der du deinen LNbits-Server vom Handy aus wie eine Wallet benutzen kannst, wo immer du bist. Die App hält keine privaten Schlüssel und keine Seed-Phrase. Sie speichert nur den API-Key, den dir dein LNbits-Server gegeben hat, verschlüsselt im Android Keystore.
@@ -101,7 +102,8 @@ WAS SIE KANN
 * QR-Codes scannen, Ziele einfügen, QR-Bilder aus der Galerie dekodieren oder Lightning-Daten von NFC-Tags lesen.
 * Auf jeden Betrag tippen, um zwischen Sats und deiner bevorzugten Fiat-Währung umzuschalten. USD, EUR, GBP, CHF, CAD, AUD, JPY über mempool.space.
 * Kontakte speichern, die du regelmäßig bezahlst. Bearbeiten und löschen. Jeder Kontakt zeigt denselben erkennbaren Avatar geräteübergreifend und nutzerübergreifend.
-* Mehrere LNbits-Server-Verbindungen in einer App mit schnellem Wechsel und verbindungsspezifischen Kennungen verwalten.
+* Mehrere LNbits-Server-Verbindungen in einer App verwalten. Die aktive Verbindung per Wischen über den Start-Avatar wechseln, Verbindungen neu anordnen und je eine eigene Kennung behalten.
+* Eine Verbindung mit reinem Invoice-Key (Lesezugriff) hinzufügen. Sie ist schreibgeschützt und kann empfangen, aber nicht senden.
 
 BOLT CARDS
 
@@ -126,7 +128,7 @@ VORAUSSETZUNGEN
 
 SPRACHEN
 
-Englisch und Deutsch.
+Englisch, Deutsch, Spanisch, Französisch, Portugiesisch (Brasilien), Russisch, Türkisch und vereinfachtes Chinesisch.
 
 OPEN SOURCE
 

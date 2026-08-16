@@ -1298,6 +1298,120 @@ abstract class AppLocalizations {
   /// **'About'**
   String get settingsAbout;
 
+  /// No description provided for @settingsNotifyReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify me about received payments'**
+  String get settingsNotifyReceived;
+
+  /// No description provided for @settingsNotifyReceivedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Checks periodically in the background while the app is closed. May be delayed and uses some battery.'**
+  String get settingsNotifyReceivedSubtitle;
+
+  /// No description provided for @settingsNotifyPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications for EmberSpark in system settings to use this.'**
+  String get settingsNotifyPermissionDenied;
+
+  /// No description provided for @settingsNotifyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant notifications (advanced)'**
+  String get settingsNotifyHelp;
+
+  /// No description provided for @notifyReceivedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received'**
+  String get notifyReceivedTitle;
+
+  /// No description provided for @notifyReceivedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{walletLabel}: received {amount} sats'**
+  String notifyReceivedBody(String walletLabel, String amount);
+
+  /// No description provided for @notifyChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Received payments'**
+  String get notifyChannelName;
+
+  /// No description provided for @notifyChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifies you when a wallet receives sats while the app is closed.'**
+  String get notifyChannelDescription;
+
+  /// No description provided for @notifyHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant notifications'**
+  String get notifyHelpTitle;
+
+  /// No description provided for @notifyHelpIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The built-in option checks your balance about every 15 minutes while the app is closed, so a notification can be delayed. For instant alerts without draining the battery, you can connect your own LNbits server to a self-hosted ntfy push service.'**
+  String get notifyHelpIntro;
+
+  /// No description provided for @notifyHelpHowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get notifyHelpHowTitle;
+
+  /// No description provided for @notifyHelpHowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'ntfy is a free, open-source push service you can self-host or use at ntfy.sh. Your LNbits server sends a short message to a private ntfy topic the moment a payment arrives, and the ntfy app on your phone shows it instantly. No Google services and no background polling from EmberSpark.'**
+  String get notifyHelpHowBody;
+
+  /// No description provided for @notifyHelpStepsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set it up'**
+  String get notifyHelpStepsTitle;
+
+  /// No description provided for @notifyHelpStepsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Install the ntfy app and subscribe to a private topic. Pick a long, hard-to-guess name.\n2. In LNbits, set the invoice webhook to your ntfy topic URL when you create invoices, or run a small script that watches your wallet\'s payment stream and posts to the topic on every receive.\n3. Send yourself a test payment to confirm the notification arrives.'**
+  String get notifyHelpStepsBody;
+
+  /// No description provided for @notifyHelpCoverageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note: a per-invoice webhook only fires for invoices this app creates with a webhook attached. Payments to a static Lightning Address, LNURL-pay link, or Bolt Card are created on the server, so covering those needs the small watcher script rather than a per-invoice webhook.'**
+  String get notifyHelpCoverageNote;
+
+  /// No description provided for @notifyHelpExampleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Example ntfy topic URL'**
+  String get notifyHelpExampleLabel;
+
+  /// No description provided for @notifyHelpCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get notifyHelpCopied;
+
+  /// No description provided for @notifyHelpOpenNtfy.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ntfy.sh'**
+  String get notifyHelpOpenNtfy;
+
+  /// No description provided for @notifyHelpPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'On the public ntfy.sh, topics have no access control, so anyone who knows the topic name can read its messages, including the amount and memo. Use a long, random topic name, and for real privacy use a reserved topic (ntfy Pro) or self-host ntfy with authentication.'**
+  String get notifyHelpPrivacyNote;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:

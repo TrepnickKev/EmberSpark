@@ -20,6 +20,17 @@
 -keep class com.google.zxing.** { *; }
 -keep class io.github.julian-arroyo.mobile_scanner.** { *; }
 
+# flutter_local_notifications — GSON (de)serialises notification/schedule models
+# reflectively; keep them and the plugin classes.
+-keep class com.dexterous.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# workmanager — the background Dart callback dispatcher is invoked via the
+# WorkManager Worker; keep the plugin + androidx.work classes.
+-keep class dev.fluttercommunity.workmanager.** { *; }
+-keep class androidx.work.** { *; }
+
 # Generic safety net — Flutter plugins commonly enumerate enum values via
 # reflection across the JNI boundary.
 -keepclassmembers enum * { *; }

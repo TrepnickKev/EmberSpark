@@ -213,6 +213,31 @@
   "settingsTrustTls": "Unverifizierte HTTPS-Verbindungen erlauben",
   "settingsTrustTlsSubtitle": "Vertrauen in selbstsignierte oder unvollständige Zertifikatsketten. Nötig für manche Hobby-Lightning-Server und .onion-Adressen. Nur für Server aktivieren, denen du vertraust.",
   "settingsAbout": "Über",
+  "settingsNotifyReceived": "Über eingehende Zahlungen benachrichtigen",
+  "settingsNotifyReceivedSubtitle": "Prüft im Hintergrund regelmäßig, während die App geschlossen ist. Kann verzögert sein und verbraucht etwas Akku.",
+  "settingsNotifyPermissionDenied": "Erlaube Benachrichtigungen für EmberSpark in den Systemeinstellungen, um dies zu nutzen.",
+  "settingsNotifyHelp": "Sofortige Benachrichtigungen (fortgeschritten)",
+  "notifyReceivedTitle": "Zahlung empfangen",
+  "notifyReceivedBody": "{walletLabel}: {amount} Sats empfangen",
+  "@notifyReceivedBody": {
+    "placeholders": {
+      "walletLabel": { "type": "String" },
+      "amount": { "type": "String" }
+    }
+  },
+  "notifyChannelName": "Empfangene Zahlungen",
+  "notifyChannelDescription": "Benachrichtigt dich, wenn eine Wallet Sats empfängt, während die App geschlossen ist.",
+  "notifyHelpTitle": "Sofortige Benachrichtigungen",
+  "notifyHelpIntro": "Die eingebaute Option prüft den Kontostand etwa alle 15 Minuten, während die App geschlossen ist, daher kann eine Benachrichtigung verzögert sein. Für sofortige Hinweise ohne Akkuverbrauch kannst du deinen eigenen LNbits-Server mit einem selbst gehosteten ntfy-Push-Dienst verbinden.",
+  "notifyHelpHowTitle": "So funktioniert es",
+  "notifyHelpHowBody": "ntfy ist ein kostenloser, quelloffener Push-Dienst, den du selbst hosten oder auf ntfy.sh nutzen kannst. Dein LNbits-Server sendet in dem Moment, in dem eine Zahlung eintrifft, eine kurze Nachricht an ein privates ntfy-Topic, und die ntfy-App auf deinem Handy zeigt sie sofort an. Keine Google-Dienste und kein Hintergrund-Polling durch EmberSpark.",
+  "notifyHelpStepsTitle": "Einrichten",
+  "notifyHelpStepsBody": "1. Installiere die ntfy-App und abonniere ein privates Topic. Wähle einen langen, schwer zu erratenden Namen.\n2. Setze in LNbits beim Erstellen von Rechnungen den Invoice-Webhook auf die URL deines ntfy-Topics, oder betreibe ein kleines Skript, das den Zahlungsstrom deiner Wallet beobachtet und bei jedem Eingang an das Topic sendet.\n3. Sende dir eine Testzahlung, um zu prüfen, ob die Benachrichtigung ankommt.",
+  "notifyHelpCoverageNote": "Hinweis: Ein Invoice-Webhook wird nur für Rechnungen ausgelöst, die diese App mit angehängtem Webhook erstellt. Zahlungen an eine feste Lightning-Adresse, einen LNURL-Pay-Link oder eine Bolt Card werden auf dem Server erstellt, daher braucht es dafür das kleine Beobachter-Skript statt eines Invoice-Webhooks.",
+  "notifyHelpExampleLabel": "Beispiel-URL für ein ntfy-Topic",
+  "notifyHelpCopied": "In die Zwischenablage kopiert",
+  "notifyHelpOpenNtfy": "ntfy.sh öffnen",
+  "notifyHelpPrivacyNote": "Auf dem öffentlichen ntfy.sh haben Topics keine Zugriffskontrolle, wer den Topic-Namen kennt, kann die Nachrichten lesen, samt Betrag und Verwendungszweck. Nutze einen langen, zufälligen Topic-Namen und für echte Privatsphäre ein reserviertes Topic (ntfy Pro) oder hoste ntfy selbst mit Authentifizierung.",
 
   "aboutTitle": "Über",
   "aboutTagline": "Eine schlanke Lightning-Wallet für LNbits",

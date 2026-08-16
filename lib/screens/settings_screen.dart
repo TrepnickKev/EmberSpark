@@ -4,8 +4,14 @@ import '../services/http_client_factory.dart';
 import '../services/language_service.dart';
 import '../services/lock_service.dart';
 import '../services/price_service.dart';
+import '../services/received_notify_service.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'about_screen.dart';
+import 'notify_help_screen.dart';
+
+/// The advanced ntfy recipe help row is hidden until it has been fully tested.
+/// Flip to true to ship it; the screen and its strings stay compiled meanwhile.
+const bool _kShowNtfyHelp = false;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -20,6 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool? lockEnabled;
   bool deviceSupportsLock = false;
   String? language;
+  bool? notifyReceived;
 
   @override
   void initState() {
@@ -34,6 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       isLockEnabled(),
       isDeviceSecuritySupported(),
       getSelectedLanguageCode(),
+      isReceivedNotifyEnabled(),
     ]);
     if (!mounted) return;
     setState(() {
@@ -42,7 +50,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       lockEnabled = results[2] as bool;
       deviceSupportsLock = results[3] as bool;
       language = results[4] as String;
+      notifyReceived = results[5] as bool;
     });
+  }
+
+  Future<void> _toggleNotify(bool next) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (next) {
+      // Android 13+ needs the runtime notification permission first.
+      final granted = await requestNotifyPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.settingsNotifyPermissionDenied)),
+          );
+        }
+        return;
+      }
+      await setReceivedNotifyEnabled(true);
+      await enableReceivedNotifyTask();
+    } else {
+      await setReceivedNotifyEnabled(false);
+      await disableReceivedNotifyTask();
+    }
+    if (mounted) setState(() => notifyReceived = next);
   }
 
   Future<void> _toggleLock(bool next) async {
@@ -75,7 +106,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final cur = currency;
     final lock = lockEnabled;
     final lang = language;
-    if (tls == null || cur == null || lock == null || lang == null) {
+    final notify = notifyReceived;
+    if (tls == null ||
+        cur == null ||
+        lock == null ||
+        lang == null ||
+        notify == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -151,6 +187,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (mounted) setState(() => trustUnverified = next);
               },
             ),
+            const Divider(),
+            SwitchListTile(
+              title: _title(l10n.settingsNotifyReceived),
+              subtitle: Text(l10n.settingsNotifyReceivedSubtitle),
+              value: notify,
+              onChanged: _toggleNotify,
+            ),
+            if (_kShowNtfyHelp)
+              ListTile(
+                leading: const Icon(Icons.notifications_active_outlined),
+                title: _title(l10n.settingsNotifyHelp),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotifyHelpScreen()),
+                ),
+              ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.info_outline),

@@ -11,6 +11,7 @@ import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
 import 'services/nfc_coordinator.dart';
 import 'services/price_service.dart';
+import 'services/received_notify_service.dart';
 import 'services/wallet_account_service.dart';
 import 'widgets/stacked_action_button.dart' show bitcoinOrange;
 
@@ -27,6 +28,13 @@ void main() async {
   await loadInitialLocale();
   await loadAmountDisplayMode();
   await migrateLegacyStorageIfNeeded();
+  // Opt-in received-payment notifications: register the WorkManager callback,
+  // then re-schedule the periodic poll if the user has it enabled (survives
+  // process death without a boot receiver). All Android-guarded internally.
+  await initReceivedNotify();
+  if (await isReceivedNotifyEnabled()) {
+    await enableReceivedNotifyTask();
+  }
   runApp(const MyApp());
 }
 

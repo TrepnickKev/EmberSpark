@@ -11,6 +11,7 @@ import '../services/price_service.dart';
 import '../services/avatar_seed.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
+import '../services/received_notify_service.dart';
 import '../services/unseen_incoming_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/flipping_avatar.dart';
@@ -160,6 +161,9 @@ class _HomeScreenState extends State<HomeScreen>
         if (error != null) error = null;
       });
       await _reconcileUnseen(b, walletId);
+      // Keep the background poll's baseline current for the active wallet so it
+      // doesn't re-notify (up to 15 min later) for a receive already shown here.
+      if (walletId != null) await setLastNotifiedBalanceFor(walletId, b);
     } catch (_) {
       // Stay quiet on poll errors so transient network blips don't spam.
     } finally {
@@ -302,6 +306,9 @@ class _HomeScreenState extends State<HomeScreen>
         });
       }
       await _reconcileUnseen(b, w?.id);
+      // See _pollOnce: keep the background poll's baseline current for the
+      // active wallet so it doesn't duplicate a receive already shown here.
+      if (w != null) await setLastNotifiedBalanceFor(w.id, b);
     } catch (e) {
       if (!mounted || seq != _loadSeq) return;
       setState(() {

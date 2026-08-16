@@ -676,6 +676,73 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsAbout => 'Acerca de';
 
   @override
+  String get settingsNotifyReceived => 'Notify me about received payments';
+
+  @override
+  String get settingsNotifyReceivedSubtitle =>
+      'Checks periodically in the background while the app is closed. May be delayed and uses some battery.';
+
+  @override
+  String get settingsNotifyPermissionDenied =>
+      'Allow notifications for EmberSpark in system settings to use this.';
+
+  @override
+  String get settingsNotifyHelp => 'Get instant notifications (advanced)';
+
+  @override
+  String get notifyReceivedTitle => 'Payment received';
+
+  @override
+  String notifyReceivedBody(String walletLabel, String amount) {
+    return '$walletLabel: received $amount sats';
+  }
+
+  @override
+  String get notifyChannelName => 'Received payments';
+
+  @override
+  String get notifyChannelDescription =>
+      'Notifies you when a wallet receives sats while the app is closed.';
+
+  @override
+  String get notifyHelpTitle => 'Instant notifications';
+
+  @override
+  String get notifyHelpIntro =>
+      'The built-in option checks your balance about every 15 minutes while the app is closed, so a notification can be delayed. For instant alerts without draining the battery, you can connect your own LNbits server to a self-hosted ntfy push service.';
+
+  @override
+  String get notifyHelpHowTitle => 'How it works';
+
+  @override
+  String get notifyHelpHowBody =>
+      'ntfy is a free, open-source push service you can self-host or use at ntfy.sh. Your LNbits server sends a short message to a private ntfy topic the moment a payment arrives, and the ntfy app on your phone shows it instantly. No Google services and no background polling from EmberSpark.';
+
+  @override
+  String get notifyHelpStepsTitle => 'Set it up';
+
+  @override
+  String get notifyHelpStepsBody =>
+      '1. Install the ntfy app and subscribe to a private topic. Pick a long, hard-to-guess name.\n2. In LNbits, set the invoice webhook to your ntfy topic URL when you create invoices, or run a small script that watches your wallet\'s payment stream and posts to the topic on every receive.\n3. Send yourself a test payment to confirm the notification arrives.';
+
+  @override
+  String get notifyHelpCoverageNote =>
+      'Note: a per-invoice webhook only fires for invoices this app creates with a webhook attached. Payments to a static Lightning Address, LNURL-pay link, or Bolt Card are created on the server, so covering those needs the small watcher script rather than a per-invoice webhook.';
+
+  @override
+  String get notifyHelpExampleLabel => 'Example ntfy topic URL';
+
+  @override
+  String get notifyHelpCopied => 'Copied to clipboard';
+
+  @override
+  String get notifyHelpOpenNtfy => 'Open ntfy.sh';
+
+  @override
+  String get notifyHelpPrivacyNote =>
+      'On the public ntfy.sh, topics have no access control, so anyone who knows the topic name can read its messages, including the amount and memo. Use a long, random topic name, and for real privacy use a reserved topic (ntfy Pro) or self-host ntfy with authentication.';
+
+  @override
   String get aboutTitle => 'Acerca de';
 
   @override

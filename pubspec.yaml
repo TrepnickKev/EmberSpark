@@ -29,6 +29,8 @@ dependencies:
   random_avatar: ^0.0.8
   flutter_file_dialog: ^3.0.2
   path_provider: ^2.1.5
+  workmanager: ^0.9.0
+  flutter_local_notifications: ^19.0.0
 
 dev_dependencies:
   flutter_test:
