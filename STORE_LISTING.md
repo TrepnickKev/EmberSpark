@@ -18,7 +18,7 @@ Conventions:
 A control client for your own self-hosted LNbits Lightning server. Open source.
 ```
 
-### Full description (~3520 / 4000)
+### Full description (~3700 / 4000)
 
 ```
 EmberSpark is a small, open-source Android client for your own self-hosted LNbits server. It is not a wallet on its own. EmberSpark works like a remote control that lets you use your LNbits server as a wallet from your phone, wherever you are. The app never holds private keys or seed phrases. It only stores the API key your LNbits server gave you, encrypted in the Android Keystore.
@@ -54,6 +54,7 @@ PRIVACY
 * The API key for your LNbits server lives in the Android Keystore and never leaves the device.
 * Cloud backup and device-to-device transfer are deliberately disabled. Re-enter your LNbits server URL and API key on a new device.
 * Optional biometric or device-PIN lock on app launch.
+* Optional notifications for received payments, off by default. Turning them on asks for the notification permission and checks your balance periodically in the background.
 
 REQUIREMENTS
 
@@ -82,7 +83,7 @@ https://github.com/TrepnickKev/EmberSpark
 Bedienclient für deinen eigenen selbst gehosteten LNbits-Lightning-Server.
 ```
 
-### Vollständige Beschreibung (~3970 / 4000)
+### Vollständige Beschreibung (~3990 / 4000)
 
 ```
 EmberSpark ist ein kleiner, quelloffener Android-Client für deinen eigenen, selbst gehosteten LNbits-Server. Die App ist selbst keine Wallet. EmberSpark funktioniert wie eine Fernbedienung, mit der du deinen LNbits-Server vom Handy aus wie eine Wallet benutzen kannst, wo immer du bist. Die App hält keine privaten Schlüssel und keine Seed-Phrase. Sie speichert nur den API-Key, den dir dein LNbits-Server gegeben hat, verschlüsselt im Android Keystore.
@@ -95,14 +96,14 @@ WAS SIE KANN
 
 * Mit deinem LNbits-Server verbinden und über ihn Lightning-Zahlungen senden und empfangen.
 * BOLT11-Rechnungen, BOLT12-Angebote, LNURL-Pay-Links und Lightning-Adressen (user@host) bezahlen, über deinen Server geroutet.
-* Über BOLT11 mit einem QR-Code empfangen, der von deinem LNbits-Server erzeugt wird. Lightning-Adresse, BOLT12-Angebot oder LNURL-Pay-Link deines Servers via QR, Kopie, System-Teilen oder NFC teilen.
+* Über BOLT11 mit einem vom LNbits-Server erzeugten QR-Code empfangen. Lightning-Adresse, BOLT12-Angebot oder LNURL-Pay-Link via QR, Kopie, Teilen oder NFC teilen.
 * LNURL-Pay-Links und BOLT12-Angebote automatisch auf deinem LNbits-Server erzeugen.
-* Über LNURL-Withdraw empfangen: einen Withdraw-Gutschein oder eine Bolt Card scannen oder antippen, um Sats auf deinen Server zu ziehen.
+* Über LNURL-Withdraw empfangen: Withdraw-Gutschein oder Bolt Card scannen oder antippen, um Sats zu ziehen.
 * Bei Websites mit LNURL-Auth anmelden, auf dem Gerät signiert. Kein Passwort, keine E-Mail.
 * QR-Codes scannen, Ziele einfügen, QR-Bilder aus der Galerie dekodieren oder Lightning-Daten von NFC-Tags lesen.
-* Auf jeden Betrag tippen, um zwischen Sats und deiner bevorzugten Fiat-Währung umzuschalten. USD, EUR, GBP, CHF, CAD, AUD, JPY über mempool.space.
-* Kontakte speichern, die du regelmäßig bezahlst. Bearbeiten und löschen. Jeder Kontakt zeigt denselben erkennbaren Avatar geräteübergreifend und nutzerübergreifend.
-* Mehrere LNbits-Server-Verbindungen in einer App verwalten. Die aktive Verbindung per Wischen über den Start-Avatar wechseln, Verbindungen neu anordnen und je eine eigene Kennung behalten.
+* Auf jeden Betrag tippen, um zwischen Sats und deiner bevorzugten Fiat-Währung umzuschalten. Kurse über mempool.space.
+* Kontakte speichern, bearbeiten und löschen. Jeder Kontakt zeigt geräte- und nutzerübergreifend denselben erkennbaren Avatar.
+* Mehrere LNbits-Server-Verbindungen verwalten. Die aktive per Wischen über den Start-Avatar wechseln, neu anordnen und je eine eigene Kennung behalten.
 * Eine Verbindung mit reinem Invoice-Key (Lesezugriff) hinzufügen. Sie ist schreibgeschützt und kann empfangen, aber nicht senden.
 
 BOLT CARDS
@@ -118,6 +119,7 @@ PRIVATSPHÄRE
 * Der API-Key für deinen LNbits-Server liegt im Android Keystore und verlässt das Gerät nicht.
 * Cloud-Backup und Geräte-zu-Geräte-Transfer sind bewusst deaktiviert. Gib auf einem neuen Gerät die LNbits-Server-URL und den API-Key wieder ein.
 * Optionaler biometrischer oder Geräte-PIN-Schutz beim App-Start.
+* Optionale Benachrichtigungen über empfangene Zahlungen, standardmäßig aus. Beim Aktivieren wird die Benachrichtigungsberechtigung angefragt und der Kontostand im Hintergrund geprüft.
 
 VORAUSSETZUNGEN
 
