@@ -22,6 +22,12 @@ class _SendToScreenState extends State<SendToScreen> {
   final inputCtrl = TextEditingController();
   List<Contact>? contacts;
 
+  // App-bar contact search (same pattern as the transactions screen). When
+  // searching, the contact list filters by this query; otherwise it keeps
+  // filtering by whatever is typed in the destination field.
+  bool _searching = false;
+  final TextEditingController _searchCtrl = TextEditingController();
+
   // A tapped Bolt Card can only be charged, not paid to: inform, then charge.
   late final NfcTapHandler _nfcHandler;
 
@@ -29,6 +35,7 @@ class _SendToScreenState extends State<SendToScreen> {
   void initState() {
     super.initState();
     inputCtrl.addListener(() => setState(() {}));
+    _searchCtrl.addListener(() => setState(() {}));
     _nfcHandler = (tag) => promptBoltCardChargeOnly(context, tag);
     NfcCoordinator.instance.pushHandler(_nfcHandler);
     _loadContacts();
@@ -38,8 +45,16 @@ class _SendToScreenState extends State<SendToScreen> {
   void dispose() {
     NfcCoordinator.instance.removeHandler(_nfcHandler);
     inputCtrl.dispose();
+    _searchCtrl.dispose();
     super.dispose();
   }
+
+  void _startSearch() => setState(() => _searching = true);
+
+  void _stopSearch() => setState(() {
+        _searching = false;
+        _searchCtrl.clear();
+      });
 
   Future<void> _loadContacts() async {
     final list = await getContacts();
@@ -49,7 +64,8 @@ class _SendToScreenState extends State<SendToScreen> {
 
   List<Contact> _filteredContacts() {
     final all = contacts ?? const <Contact>[];
-    final q = inputCtrl.text.trim().toLowerCase();
+    final q =
+        (_searching ? _searchCtrl.text : inputCtrl.text).trim().toLowerCase();
     if (q.isEmpty) return all;
     return all
         .where((c) =>
@@ -194,13 +210,41 @@ class _SendToScreenState extends State<SendToScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  l10n.sendToContacts,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ),
+              _searching
+                  ? TextField(
+                      controller: _searchCtrl,
+                      autofocus: true,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: l10n.contactsSearchHint,
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: _stopSearch,
+                        ),
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.sendToContacts,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          tooltip: l10n.contactsSearchHint,
+                          onPressed: _startSearch,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ],
+                    ),
               const Divider(height: 16),
               Expanded(
                 child: Builder(
