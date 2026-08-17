@@ -99,7 +99,13 @@ class _HomeScreenState extends State<HomeScreen>
   /// payment succeeded while we were covered, play the coin-flip now (on the
   /// visible avatar) instead of having missed it under the muted ticker.
   @override
-  void didPopNext() {
+  void didPopNext() => _maybePlayFlip();
+
+  /// Plays the payment coin-flip on the visible home avatar if a payment
+  /// succeeded while home was covered. Idempotent per success (guarded by
+  /// [_flipSeen]), so it is safe to call from both [didPopNext] and [_load]
+  /// (some pay flows return via popUntil where didPopNext doesn't deliver).
+  void _maybePlayFlip() {
     if (!mounted) return;
     if (paymentSuccessTrigger.value != _flipSeen) {
       _flipSeen = paymentSuccessTrigger.value;
@@ -215,6 +221,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _load() async {
+    // Returning to home after a pay flow (send-to-contact, scan-to-pay) runs
+    // _load(); play any pending coin-flip here too, since didPopNext doesn't
+    // reliably deliver it across the multi-route popUntil back to home.
+    _maybePlayFlip();
     final seq = ++_loadSeq;
     setState(() {
       loading = true;
