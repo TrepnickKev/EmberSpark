@@ -138,6 +138,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: bitcoinOrange),
             ),
+            switchTheme: SwitchThemeData(
+              thumbColor: WidgetStateProperty.resolveWith(
+                (s) => s.contains(WidgetState.selected) ? Colors.white : null,
+              ),
+              trackColor: WidgetStateProperty.resolveWith(
+                (s) => s.contains(WidgetState.selected) ? bitcoinOrange : null,
+              ),
+            ),
             tabBarTheme: const TabBarThemeData(
               labelColor: Colors.white,
               indicatorColor: Colors.white,
