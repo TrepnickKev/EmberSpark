@@ -661,6 +661,7 @@ class _MyContactScreenState extends State<MyContactScreen>
               const SizedBox(height: 12),
               SelectableText(
                 value,
+                textAlign: TextAlign.center,
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
               ),
               const SizedBox(height: 16),

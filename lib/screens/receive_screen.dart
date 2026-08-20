@@ -394,6 +394,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  SelectableText(
+                    invoice!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -414,11 +420,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         onPressed: _armNfc,
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText(
-                    invoice!,
-                    style: const TextStyle(fontSize: 11),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
@@ -531,6 +532,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 12),
+        SelectableText(
+          value,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 11),
+        ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -552,8 +559,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        SelectableText(value, style: const TextStyle(fontSize: 11)),
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 16),
           child: Divider(),
