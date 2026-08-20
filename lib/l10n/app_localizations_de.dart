@@ -693,7 +693,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsNotifyReceivedSubtitle =>
-      'Benachrichtigungen sind bewusst verzögert: EmberSpark prüft im Hintergrund, statt Push-Dienste von Drittanbietern zu nutzen, sodass keine Zahlungsdaten weitergegeben werden. Verbraucht etwas Akku.';
+      'Benachrichtigungen sind designbedingt verzögert. EmberSpark prüft im Hintergrund, statt Push-Dienste von Drittanbietern zu nutzen, sodass keine Zahlungsdaten weitergegeben werden. Verbraucht etwas Akku.';
 
   @override
   String get settingsNotifyPermissionDenied =>
