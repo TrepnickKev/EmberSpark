@@ -159,6 +159,8 @@
   "historyStatusPaid": "已支付",
   "historyStatusPendingLabel": "待处理",
   "historyAmountLabel": "金额",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "手续费",
   "historyMemoLabel": "备注",
   "historyCommentLabel": "评论",

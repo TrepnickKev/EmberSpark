@@ -172,6 +172,8 @@
   "historyStatusPaid": "Paid",
   "historyStatusPendingLabel": "Pending",
   "historyAmountLabel": "Amount",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "Fee",
   "historyMemoLabel": "Memo",
   "historyCommentLabel": "Comment",

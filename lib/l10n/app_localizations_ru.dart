@@ -495,6 +495,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyAmountLabel => 'Сумма';
 
   @override
+  String get historyValueNow => 'Value now';
+
+  @override
+  String get historyValueThen => 'Value at the time';
+
+  @override
   String get historyFeeLabel => 'Комиссия';
 
   @override

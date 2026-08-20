@@ -159,6 +159,8 @@
   "historyStatusPaid": "Pagado",
   "historyStatusPendingLabel": "Pendiente",
   "historyAmountLabel": "Importe",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "Comisión",
   "historyMemoLabel": "Nota",
   "historyCommentLabel": "Comentario",

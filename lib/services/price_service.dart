@@ -85,6 +85,76 @@ Future<Map<String, double>?> getBtcRates() async {
   }
 }
 
+// Historical BTC prices for the transaction history. Keyed by currency + UTC
+// day: a past day's price does not change, so this dedupes same-day payments
+// and repeat history opens within a session. In-memory only (refetched next
+// launch), which is fine for a price cache.
+final _histCache = <String, double>{};
+
+String btcHistKey(String currency, DateTime t) {
+  final u = t.toUtc();
+  return '$currency|${u.year}-${u.month}-${u.day}';
+}
+
+/// BTC price in [currency] at [time] from mempool.space's historical-price
+/// endpoint. Cached per currency+day. Returns null on any failure so callers
+/// fall back to the current rate.
+Future<double?> getBtcRateAt(String currency, DateTime time) async {
+  final key = btcHistKey(currency, time);
+  final cached = _histCache[key];
+  if (cached != null) return cached;
+  try {
+    final ts = time.millisecondsSinceEpoch ~/ 1000;
+    final client = await getHttpClient();
+    final res = await client
+        .get(
+          Uri.parse(
+            'https://mempool.space/api/v1/historical-price'
+            '?currency=$currency&timestamp=$ts',
+          ),
+          headers: browserLikeHeaders,
+        )
+        .timeout(const Duration(seconds: 10));
+    if (res.statusCode != 200) return null;
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final prices = data['prices'];
+    if (prices is! List || prices.isEmpty) return null;
+    final first = prices.first;
+    final v = first is Map ? first[currency] : null;
+    if (v is num) {
+      _histCache[key] = v.toDouble();
+      return v.toDouble();
+    }
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Warms historical prices for a set of [times] (e.g. the visible history
+/// list). Dedupes by currency+day and fetches a few at a time. Returns
+/// `{ btcHistKey: rate }` for the days that resolved.
+Future<Map<String, double>> getBtcRatesAt(
+  String currency,
+  Iterable<DateTime> times,
+) async {
+  final byKey = <String, DateTime>{};
+  for (final t in times) {
+    byKey.putIfAbsent(btcHistKey(currency, t), () => t);
+  }
+  final result = <String, double>{};
+  final entries = byKey.entries.toList();
+  const cap = 5;
+  for (var i = 0; i < entries.length; i += cap) {
+    final chunk = entries.skip(i).take(cap);
+    await Future.wait(chunk.map((e) async {
+      final r = await getBtcRateAt(currency, e.value);
+      if (r != null) result[e.key] = r;
+    }));
+  }
+  return result;
+}
+
 String formatThousands(int n) {
   final negative = n < 0;
   final s = n.abs().toString();

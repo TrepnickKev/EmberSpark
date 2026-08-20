@@ -21,6 +21,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool loading = true;
   String fiatCurrency = 'USD';
   double? fiatRate;
+  // Historical BTC price per currency+day (btcHistKey), so each row shows its
+  // value at the transaction's date. Filled after the list first renders.
+  Map<String, double> _histRates = {};
 
   bool _searching = false;
   final TextEditingController _searchCtrl = TextEditingController();
@@ -67,6 +70,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         fiatCurrency = cur;
         fiatRate = rates?[cur];
       });
+      // Warm historical prices in the background so rows show the value at each
+      // transaction's date; the list already rendered (current-rate fallback).
+      final hist = await getBtcRatesAt(cur, list.map((p) => p.time));
+      if (mounted && hist.isNotEmpty) setState(() => _histRates = hist);
     } catch (e) {
       if (!mounted) return;
       setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
@@ -173,6 +180,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         payment: list[i],
         fiatCurrency: fiatCurrency,
         fiatRate: fiatRate,
+        histRate: _histRates[btcHistKey(fiatCurrency, list[i].time)],
       ),
     );
   }
@@ -183,11 +191,16 @@ class _PaymentTile extends StatelessWidget {
     required this.payment,
     required this.fiatCurrency,
     required this.fiatRate,
+    required this.histRate,
   });
 
   final Payment payment;
   final String fiatCurrency;
   final double? fiatRate;
+
+  /// BTC price at the transaction's date; the row's fiat uses this (falling
+  /// back to the current [fiatRate] while it loads or if the fetch failed).
+  final double? histRate;
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +217,8 @@ class _PaymentTile extends StatelessWidget {
         ? ' (${l10n.historyFee(payment.feeSats.toString())})'
         : '';
     final satsText = '$sign$abs ${l10n.homeSatsUnit}$feePart';
-    final rate = fiatRate;
+    // Value at the transaction's date; current rate only as a fallback.
+    final rate = histRate ?? fiatRate;
     final fiatText = rate == null
         ? null
         : '$sign${formatFiat((abs / 100000000) * rate, fiatCurrency)}';
@@ -220,6 +234,7 @@ class _PaymentTile extends StatelessWidget {
         payment,
         fiatCurrency,
         fiatRate,
+        histRate,
       ),
       leading: Icon(
         incoming ? Icons.arrow_downward : Icons.arrow_upward,
@@ -272,6 +287,7 @@ Future<void> _showPaymentDetails(
   Payment p,
   String fiatCurrency,
   double? fiatRate,
+  double? histRate,
 ) {
   final ml = MaterialLocalizations.of(context);
   final use24h = MediaQuery.of(context).alwaysUse24HourFormat;
@@ -281,9 +297,12 @@ Future<void> _showPaymentDetails(
     alwaysUse24HourFormat: use24h,
   );
   final absSats = p.amountSats.abs();
-  final amountFiat = fiatRate == null
+  final valueNow = fiatRate == null
       ? null
-      : formatFiat((absSats / 100000000) * fiatRate, fiatCurrency);
+      : formatFiatApprox((absSats / 100000000) * fiatRate, fiatCurrency);
+  final valueThen = histRate == null
+      ? null
+      : formatFiatApprox((absSats / 100000000) * histRate, fiatCurrency);
   final feeFiat = (fiatRate == null || p.feeSats == 0)
       ? null
       : formatFiat((p.feeSats / 100000000) * fiatRate, fiatCurrency);
@@ -315,9 +334,12 @@ Future<void> _showPaymentDetails(
             ),
             _detailRow(
               l10n.historyAmountLabel,
-              '${formatThousands(absSats)} ${l10n.homeSatsUnit}'
-              '${amountFiat == null ? '' : '  ·  $amountFiat'}',
+              '${formatThousands(absSats)} ${l10n.homeSatsUnit}',
             ),
+            if (valueNow != null)
+              _detailRow(l10n.historyValueNow, valueNow),
+            if (valueThen != null)
+              _detailRow(l10n.historyValueThen, valueThen),
             if (p.feeSats > 0)
               _detailRow(
                 l10n.historyFeeLabel,

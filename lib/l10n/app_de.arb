@@ -161,6 +161,8 @@
   "historyStatusPaid": "Bezahlt",
   "historyStatusPendingLabel": "Ausstehend",
   "historyAmountLabel": "Betrag",
+  "historyValueNow": "Aktueller Wert",
+  "historyValueThen": "Wert damals",
   "historyFeeLabel": "Gebühr",
   "historyMemoLabel": "Notiz",
   "historyCommentLabel": "Kommentar",

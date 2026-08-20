@@ -498,6 +498,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get historyAmountLabel => 'Valor';
 
   @override
+  String get historyValueNow => 'Value now';
+
+  @override
+  String get historyValueThen => 'Value at the time';
+
+  @override
   String get historyFeeLabel => 'Taxa';
 
   @override

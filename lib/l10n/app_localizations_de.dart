@@ -497,6 +497,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get historyAmountLabel => 'Betrag';
 
   @override
+  String get historyValueNow => 'Aktueller Wert';
+
+  @override
+  String get historyValueThen => 'Wert damals';
+
+  @override
   String get historyFeeLabel => 'Gebühr';
 
   @override

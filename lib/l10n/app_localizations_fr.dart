@@ -498,6 +498,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get historyAmountLabel => 'Montant';
 
   @override
+  String get historyValueNow => 'Value now';
+
+  @override
+  String get historyValueThen => 'Value at the time';
+
+  @override
   String get historyFeeLabel => 'Frais';
 
   @override

@@ -492,6 +492,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get historyAmountLabel => 'Tutar';
 
   @override
+  String get historyValueNow => 'Value now';
+
+  @override
+  String get historyValueThen => 'Value at the time';
+
+  @override
   String get historyFeeLabel => 'Ücret';
 
   @override

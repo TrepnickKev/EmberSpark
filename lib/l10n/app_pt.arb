@@ -159,6 +159,8 @@
   "historyStatusPaid": "Pago",
   "historyStatusPendingLabel": "Pendente",
   "historyAmountLabel": "Valor",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "Taxa",
   "historyMemoLabel": "Nota",
   "historyCommentLabel": "Comentário",

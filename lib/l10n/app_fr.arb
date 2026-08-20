@@ -159,6 +159,8 @@
   "historyStatusPaid": "Payé",
   "historyStatusPendingLabel": "En attente",
   "historyAmountLabel": "Montant",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "Frais",
   "historyMemoLabel": "Note",
   "historyCommentLabel": "Commentaire",

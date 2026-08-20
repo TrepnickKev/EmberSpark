@@ -159,6 +159,8 @@
   "historyStatusPaid": "Оплачено",
   "historyStatusPendingLabel": "В ожидании",
   "historyAmountLabel": "Сумма",
+  "historyValueNow": "Value now",
+  "historyValueThen": "Value at the time",
   "historyFeeLabel": "Комиссия",
   "historyMemoLabel": "Заметка",
   "historyCommentLabel": "Комментарий",

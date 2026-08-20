@@ -481,6 +481,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyAmountLabel => '金额';
 
   @override
+  String get historyValueNow => 'Value now';
+
+  @override
+  String get historyValueThen => 'Value at the time';
+
+  @override
   String get historyFeeLabel => '手续费';
 
   @override

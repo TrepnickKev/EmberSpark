@@ -1004,6 +1004,18 @@ abstract class AppLocalizations {
   /// **'Amount'**
   String get historyAmountLabel;
 
+  /// No description provided for @historyValueNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Value now'**
+  String get historyValueNow;
+
+  /// No description provided for @historyValueThen.
+  ///
+  /// In en, this message translates to:
+  /// **'Value at the time'**
+  String get historyValueThen;
+
   /// No description provided for @historyFeeLabel.
   ///
   /// In en, this message translates to:
