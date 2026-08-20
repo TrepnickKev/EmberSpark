@@ -216,7 +216,7 @@
   "settingsTrustTlsSubtitle": "Confie em certificados autoassinados ou com cadeia incompleta. Necessário para alguns servidores Lightning caseiros e serviços .onion. Ative apenas para servidores em que você confia.",
   "settingsAbout": "Sobre",
   "settingsNotifyReceived": "Notify me about received payments",
-  "settingsNotifyReceivedSubtitle": "Checks periodically in the background while the app is closed. May be delayed and uses some battery.",
+  "settingsNotifyReceivedSubtitle": "Notifications are delayed by design: EmberSpark checks in the background instead of using third-party push services, so no payment data is shared. Uses a little battery.",
   "settingsNotifyPermissionDenied": "Allow notifications for EmberSpark in system settings to use this.",
   "settingsNotifyHelp": "Get instant notifications (advanced)",
   "settingsNotifyTest": "Send test notification",

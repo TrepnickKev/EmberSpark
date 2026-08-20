@@ -1331,7 +1331,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsNotifyReceivedSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Checks periodically in the background while the app is closed. May be delayed and uses some battery.'**
+  /// **'Notifications are delayed by design: EmberSpark checks in the background instead of using third-party push services, so no payment data is shared. Uses a little battery.'**
   String get settingsNotifyReceivedSubtitle;
 
   /// No description provided for @settingsNotifyPermissionDenied.

@@ -686,7 +686,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsNotifyReceivedSubtitle =>
-      'Checks periodically in the background while the app is closed. May be delayed and uses some battery.';
+      'Notifications are delayed by design: EmberSpark checks in the background instead of using third-party push services, so no payment data is shared. Uses a little battery.';
 
   @override
   String get settingsNotifyPermissionDenied =>
