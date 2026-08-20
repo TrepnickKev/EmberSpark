@@ -446,10 +446,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyEmpty => '还没有交易';
 
   @override
-  String get historySearchHint => 'Search payments';
+  String get historySearchHint => '搜索支付';
 
   @override
-  String get historyNoResults => 'No matching payments';
+  String get historyNoResults => '没有匹配的支付';
 
   @override
   String get historyPaymentDefault => 'Lightning 支付';
@@ -481,10 +481,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyAmountLabel => '金额';
 
   @override
-  String get historyValueNow => 'Value now';
+  String get historyValueNow => '当前价值';
 
   @override
-  String get historyValueThen => 'Value at the time';
+  String get historyValueThen => '交易日价值';
 
   @override
   String get historyFeeLabel => '手续费';
@@ -666,89 +666,88 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAbout => '关于';
 
   @override
-  String get settingsNotifyReceived => 'Notify me about received payments';
+  String get settingsNotifyReceived => '接收付款时通知我';
 
   @override
   String get settingsNotifyReceivedSubtitle =>
-      'Notifications are delayed by design: EmberSpark checks in the background instead of using third-party push services, so no payment data is shared. Uses a little battery.';
+      '通知延迟是设计使然：EmberSpark 在后台检查，而不使用第三方推送服务，因此不会共享任何支付数据。会消耗少量电量。';
 
   @override
   String get settingsNotifyPermissionDenied =>
-      'Allow notifications for EmberSpark in system settings to use this.';
+      '请在系统设置中允许 EmberSpark 的通知以使用此功能。';
 
   @override
-  String get settingsNotifyHelp => 'Get instant notifications (advanced)';
+  String get settingsNotifyHelp => '获取即时通知（高级）';
 
   @override
-  String get settingsNotifyTest => 'Send test notification';
+  String get settingsNotifyTest => '发送测试通知';
 
   @override
-  String get settingsNotifySound => 'Notification sound';
+  String get settingsNotifySound => '通知声音';
 
   @override
-  String get notifySoundCoins => 'Coins';
+  String get notifySoundCoins => '硬币';
 
   @override
   String get notifySoundWoosh => 'Fire Woosh';
 
   @override
-  String get notifySoundDefault => 'Device default';
+  String get notifySoundDefault => '设备默认';
 
   @override
-  String get notifySoundPreview => 'Play sound';
+  String get notifySoundPreview => '播放声音';
 
   @override
-  String get notifyReceivedTitle => 'Payment received';
+  String get notifyReceivedTitle => '已收到付款';
 
   @override
   String notifyReceivedBody(String walletLabel, String amount) {
-    return '$walletLabel: received $amount sats';
+    return '$walletLabel：已收到 $amount sats';
   }
 
   @override
-  String get notifyChannelName => 'Received payments';
+  String get notifyChannelName => '收到的付款';
 
   @override
-  String get notifyChannelDescription =>
-      'Notifies you when a wallet receives sats while the app is closed.';
+  String get notifyChannelDescription => '当应用关闭时钱包收到 sats 会通知你。';
 
   @override
-  String get notifyHelpTitle => 'Instant notifications';
+  String get notifyHelpTitle => '即时通知';
 
   @override
   String get notifyHelpIntro =>
-      'The built-in option checks your balance about every 15 minutes while the app is closed, so a notification can be delayed. For instant alerts without draining the battery, you can connect your own LNbits server to a self-hosted ntfy push service.';
+      '内置选项在应用关闭时大约每 15 分钟检查一次余额，因此通知可能会延迟。若要在不耗电的情况下获得即时提醒，你可以将自己的 LNbits 服务器连接到自建的 ntfy 推送服务。';
 
   @override
-  String get notifyHelpHowTitle => 'How it works';
+  String get notifyHelpHowTitle => '工作原理';
 
   @override
   String get notifyHelpHowBody =>
-      'ntfy is a free, open-source push service you can self-host or use at ntfy.sh. Your LNbits server sends a short message to a private ntfy topic the moment a payment arrives, and the ntfy app on your phone shows it instantly. No Google services and no background polling from EmberSpark.';
+      'ntfy 是一个免费的开源推送服务，你可以自建或在 ntfy.sh 上使用。付款到达时，你的 LNbits 服务器会向一个私有 ntfy 主题发送一条简短消息，手机上的 ntfy 应用会立即显示。没有 Google 服务，EmberSpark 也不做后台轮询。';
 
   @override
-  String get notifyHelpStepsTitle => 'Set it up';
+  String get notifyHelpStepsTitle => '设置方法';
 
   @override
   String get notifyHelpStepsBody =>
-      '1. Install the ntfy app and subscribe to a private topic. Pick a long, hard-to-guess name.\n2. In LNbits, set the invoice webhook to your ntfy topic URL when you create invoices, or run a small script that watches your wallet\'s payment stream and posts to the topic on every receive.\n3. Send yourself a test payment to confirm the notification arrives.';
+      '1. 安装 ntfy 应用并订阅一个私有主题。选择一个长且难以猜测的名称。\n2. 在 LNbits 中，创建发票时将发票 webhook 设置为你的 ntfy 主题 URL，或运行一个监视钱包付款流并在每次收款时发布到该主题的小脚本。\n3. 给自己发送一笔测试付款以确认通知到达。';
 
   @override
   String get notifyHelpCoverageNote =>
-      'Note: a per-invoice webhook only fires for invoices this app creates with a webhook attached. Payments to a static Lightning Address, LNURL-pay link, or Bolt Card are created on the server, so covering those needs the small watcher script rather than a per-invoice webhook.';
+      '注意：按发票的 webhook 只会为本应用创建并附加了 webhook 的发票触发。发往静态 Lightning Address、LNURL-pay 链接或 Bolt Card 的付款在服务器上创建，因此要覆盖这些情况需要那个小型监视脚本，而不是按发票的 webhook。';
 
   @override
-  String get notifyHelpExampleLabel => 'Example ntfy topic URL';
+  String get notifyHelpExampleLabel => '示例 ntfy 主题 URL';
 
   @override
-  String get notifyHelpCopied => 'Copied to clipboard';
+  String get notifyHelpCopied => '已复制到剪贴板';
 
   @override
-  String get notifyHelpOpenNtfy => 'Open ntfy.sh';
+  String get notifyHelpOpenNtfy => '打开 ntfy.sh';
 
   @override
   String get notifyHelpPrivacyNote =>
-      'On the public ntfy.sh, topics have no access control, so anyone who knows the topic name can read its messages, including the amount and memo. Use a long, random topic name, and for real privacy use a reserved topic (ntfy Pro) or self-host ntfy with authentication.';
+      '在公共的 ntfy.sh 上，主题没有访问控制，因此任何知道主题名称的人都可以读取其消息，包括金额和备注。请使用长且随机的主题名称，若需要真正的隐私，请使用预留主题（ntfy Pro）或自建带身份验证的 ntfy。';
 
   @override
   String get aboutTitle => '关于';

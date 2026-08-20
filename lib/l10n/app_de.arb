@@ -162,7 +162,7 @@
   "historyStatusPendingLabel": "Ausstehend",
   "historyAmountLabel": "Betrag",
   "historyValueNow": "Aktueller Wert",
-  "historyValueThen": "Wert damals",
+  "historyValueThen": "Wert am Transaktionsdatum",
   "historyFeeLabel": "Gebühr",
   "historyMemoLabel": "Notiz",
   "historyCommentLabel": "Kommentar",

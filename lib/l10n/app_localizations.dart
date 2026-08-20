@@ -1013,7 +1013,7 @@ abstract class AppLocalizations {
   /// No description provided for @historyValueThen.
   ///
   /// In en, this message translates to:
-  /// **'Value at the time'**
+  /// **'Value at transaction date'**
   String get historyValueThen;
 
   /// No description provided for @historyFeeLabel.

@@ -173,7 +173,7 @@
   "historyStatusPendingLabel": "Pending",
   "historyAmountLabel": "Amount",
   "historyValueNow": "Value now",
-  "historyValueThen": "Value at the time",
+  "historyValueThen": "Value at transaction date",
   "historyFeeLabel": "Fee",
   "historyMemoLabel": "Memo",
   "historyCommentLabel": "Comment",

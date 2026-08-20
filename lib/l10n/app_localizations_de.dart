@@ -500,7 +500,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get historyValueNow => 'Aktueller Wert';
 
   @override
-  String get historyValueThen => 'Wert damals';
+  String get historyValueThen => 'Wert am Transaktionsdatum';
 
   @override
   String get historyFeeLabel => 'Gebühr';

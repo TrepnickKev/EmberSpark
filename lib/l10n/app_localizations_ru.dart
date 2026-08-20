@@ -460,10 +460,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyEmpty => 'Пока нет транзакций';
 
   @override
-  String get historySearchHint => 'Search payments';
+  String get historySearchHint => 'Поиск платежей';
 
   @override
-  String get historyNoResults => 'No matching payments';
+  String get historyNoResults => 'Нет подходящих платежей';
 
   @override
   String get historyPaymentDefault => 'Платёж Lightning';
@@ -495,10 +495,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyAmountLabel => 'Сумма';
 
   @override
-  String get historyValueNow => 'Value now';
+  String get historyValueNow => 'Стоимость сейчас';
 
   @override
-  String get historyValueThen => 'Value at the time';
+  String get historyValueThen => 'Стоимость на дату транзакции';
 
   @override
   String get historyFeeLabel => 'Комиссия';
@@ -686,89 +686,89 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAbout => 'О приложении';
 
   @override
-  String get settingsNotifyReceived => 'Notify me about received payments';
+  String get settingsNotifyReceived => 'Уведомлять о полученных платежах';
 
   @override
   String get settingsNotifyReceivedSubtitle =>
-      'Notifications are delayed by design: EmberSpark checks in the background instead of using third-party push services, so no payment data is shared. Uses a little battery.';
+      'Уведомления задерживаются по замыслу: EmberSpark проверяет в фоновом режиме вместо сторонних push-сервисов, поэтому платёжные данные не передаются. Немного расходует батарею.';
 
   @override
   String get settingsNotifyPermissionDenied =>
-      'Allow notifications for EmberSpark in system settings to use this.';
+      'Разрешите уведомления для EmberSpark в настройках системы, чтобы использовать это.';
 
   @override
-  String get settingsNotifyHelp => 'Get instant notifications (advanced)';
+  String get settingsNotifyHelp => 'Мгновенные уведомления (для опытных)';
 
   @override
-  String get settingsNotifyTest => 'Send test notification';
+  String get settingsNotifyTest => 'Отправить тестовое уведомление';
 
   @override
-  String get settingsNotifySound => 'Notification sound';
+  String get settingsNotifySound => 'Звук уведомления';
 
   @override
-  String get notifySoundCoins => 'Coins';
+  String get notifySoundCoins => 'Монеты';
 
   @override
   String get notifySoundWoosh => 'Fire Woosh';
 
   @override
-  String get notifySoundDefault => 'Device default';
+  String get notifySoundDefault => 'По умолчанию для устройства';
 
   @override
-  String get notifySoundPreview => 'Play sound';
+  String get notifySoundPreview => 'Воспроизвести звук';
 
   @override
-  String get notifyReceivedTitle => 'Payment received';
+  String get notifyReceivedTitle => 'Платёж получен';
 
   @override
   String notifyReceivedBody(String walletLabel, String amount) {
-    return '$walletLabel: received $amount sats';
+    return '$walletLabel: получено $amount sats';
   }
 
   @override
-  String get notifyChannelName => 'Received payments';
+  String get notifyChannelName => 'Полученные платежи';
 
   @override
   String get notifyChannelDescription =>
-      'Notifies you when a wallet receives sats while the app is closed.';
+      'Уведомляет, когда кошелёк получает sats, пока приложение закрыто.';
 
   @override
-  String get notifyHelpTitle => 'Instant notifications';
+  String get notifyHelpTitle => 'Мгновенные уведомления';
 
   @override
   String get notifyHelpIntro =>
-      'The built-in option checks your balance about every 15 minutes while the app is closed, so a notification can be delayed. For instant alerts without draining the battery, you can connect your own LNbits server to a self-hosted ntfy push service.';
+      'Встроенный вариант проверяет баланс примерно каждые 15 минут, пока приложение закрыто, поэтому уведомление может задержаться. Для мгновенных оповещений без разрядки батареи можно подключить ваш собственный сервер LNbits к самостоятельно размещённому push-сервису ntfy.';
 
   @override
-  String get notifyHelpHowTitle => 'How it works';
+  String get notifyHelpHowTitle => 'Как это работает';
 
   @override
   String get notifyHelpHowBody =>
-      'ntfy is a free, open-source push service you can self-host or use at ntfy.sh. Your LNbits server sends a short message to a private ntfy topic the moment a payment arrives, and the ntfy app on your phone shows it instantly. No Google services and no background polling from EmberSpark.';
+      'ntfy является бесплатным push-сервисом с открытым исходным кодом; его можно разместить самостоятельно или использовать на ntfy.sh. Ваш сервер LNbits отправляет короткое сообщение в приватную тему ntfy в момент поступления платежа, и приложение ntfy на телефоне сразу его показывает. Никаких сервисов Google и никакого фонового опроса со стороны EmberSpark.';
 
   @override
-  String get notifyHelpStepsTitle => 'Set it up';
+  String get notifyHelpStepsTitle => 'Настройка';
 
   @override
   String get notifyHelpStepsBody =>
-      '1. Install the ntfy app and subscribe to a private topic. Pick a long, hard-to-guess name.\n2. In LNbits, set the invoice webhook to your ntfy topic URL when you create invoices, or run a small script that watches your wallet\'s payment stream and posts to the topic on every receive.\n3. Send yourself a test payment to confirm the notification arrives.';
+      '1. Установите приложение ntfy и подпишитесь на приватную тему. Выберите длинное, трудно угадываемое имя.\n2. В LNbits при создании счетов укажите webhook счёта на URL вашей темы ntfy или запустите небольшой скрипт, который следит за потоком платежей вашего кошелька и публикует в тему при каждом получении.\n3. Отправьте себе тестовый платёж, чтобы убедиться, что уведомление приходит.';
 
   @override
   String get notifyHelpCoverageNote =>
-      'Note: a per-invoice webhook only fires for invoices this app creates with a webhook attached. Payments to a static Lightning Address, LNURL-pay link, or Bolt Card are created on the server, so covering those needs the small watcher script rather than a per-invoice webhook.';
+      'Примечание: webhook на счёт срабатывает только для счетов, которые это приложение создаёт с прикреплённым webhook. Платежи на статический Lightning Address, ссылку LNURL-pay или Bolt Card создаются на сервере, поэтому для их охвата нужен небольшой скрипт-наблюдатель, а не webhook на счёт.';
 
   @override
-  String get notifyHelpExampleLabel => 'Example ntfy topic URL';
+  String get notifyHelpExampleLabel => 'Пример URL темы ntfy';
 
   @override
-  String get notifyHelpCopied => 'Copied to clipboard';
+  String get notifyHelpCopied => 'Скопировано в буфер обмена';
 
   @override
-  String get notifyHelpOpenNtfy => 'Open ntfy.sh';
+  String get notifyHelpOpenNtfy => 'Открыть ntfy.sh';
 
   @override
   String get notifyHelpPrivacyNote =>
-      'On the public ntfy.sh, topics have no access control, so anyone who knows the topic name can read its messages, including the amount and memo. Use a long, random topic name, and for real privacy use a reserved topic (ntfy Pro) or self-host ntfy with authentication.';
+      'На публичном ntfy.sh у тем нет контроля доступа, поэтому любой, кто знает имя темы, может читать её сообщения, включая сумму и заметку. Используйте длинное случайное имя темы, а для настоящей приватности используйте зарезервированную тему (ntfy Pro) или разместите ntfy самостоятельно с аутентификацией.';
 
   @override
   String get aboutTitle => 'О приложении';

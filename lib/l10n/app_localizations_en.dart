@@ -495,7 +495,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyValueNow => 'Value now';
 
   @override
-  String get historyValueThen => 'Value at the time';
+  String get historyValueThen => 'Value at transaction date';
 
   @override
   String get historyFeeLabel => 'Fee';
