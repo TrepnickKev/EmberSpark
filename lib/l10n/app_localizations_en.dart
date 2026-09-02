@@ -930,6 +930,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed =>
+      'This withdraw voucher has already been used.';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'The Lightning service reported an error: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'Pay BOLT12 offer';
 
   @override

@@ -939,6 +939,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed =>
+      'Dieser Auszahlungs-Gutschein wurde bereits eingelöst.';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'Der Lightning-Dienst hat einen Fehler gemeldet: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12-Angebot bezahlen';
 
   @override

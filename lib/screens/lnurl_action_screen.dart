@@ -38,6 +38,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   // True when we stopped a read-only wallet from paying. The resolved URL /
   // Copy URL block is then irrelevant (not a server problem), so it is hidden.
   bool readOnlyBlocked = false;
+  // True when the resolve failed because the withdraw voucher was already used.
+  // Shown as a friendly icon + message instead of the raw error text.
+  bool _alreadyUsed = false;
   bool busy = true;
   // The current wallet's avatar + name: the sender for a pay-from-contact
   // (shown in PaymentRouteHeader).
@@ -279,6 +282,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
+        _alreadyUsed = e is LnurlServiceErrorException && e.alreadyUsed;
         error = friendlyError(AppLocalizations.of(context)!, e);
         busy = false;
       });
@@ -439,6 +443,31 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   }
 
   Widget _buildError(AppLocalizations l10n) {
+    // An already-used withdraw voucher is not really an error the user can act
+    // on, so show a calm icon + message instead of red text and a URL to copy.
+    if (_alreadyUsed) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                size: 56,
+                color: Theme.of(context).disabledColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.lnurlWithdrawAlreadyUsed,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

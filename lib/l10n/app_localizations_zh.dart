@@ -900,6 +900,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed => '此提现凭证已被使用。';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'Lightning 服务报告了一个错误：$reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => '支付 BOLT12 offer';
 
   @override

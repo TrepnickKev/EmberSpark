@@ -1748,6 +1748,18 @@ abstract class AppLocalizations {
   /// **'LNURL-auth failed: {reason}'**
   String lnurlAuthErrorGeneric(String reason);
 
+  /// No description provided for @lnurlWithdrawAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This withdraw voucher has already been used.'**
+  String get lnurlWithdrawAlreadyUsed;
+
+  /// No description provided for @lnurlServiceError.
+  ///
+  /// In en, this message translates to:
+  /// **'The Lightning service reported an error: {reason}'**
+  String lnurlServiceError(String reason);
+
   /// No description provided for @bolt12TitlePayOffer.
   ///
   /// In en, this message translates to:

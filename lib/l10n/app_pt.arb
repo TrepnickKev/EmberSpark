@@ -288,6 +288,8 @@
   "lnurlAuthErrorInvalidSignature": "O site rejeitou a assinatura de autenticação. Tente novamente.",
   "lnurlAuthErrorLinkingKeyMismatch": "O site não reconhece esta chave de autenticação. Isso geralmente significa que você se autenticou antes com uma semente de carteira diferente.",
   "lnurlAuthErrorGeneric": "LNURL-auth falhou: {reason}",
+  "lnurlWithdrawAlreadyUsed": "Este vale de saque já foi utilizado.",
+  "lnurlServiceError": "O serviço Lightning relatou um erro: {reason}",
 
   "bolt12TitlePayOffer": "Pagar oferta BOLT12",
   "bolt12TitlePayInvoice": "Pagar fatura BOLT12",

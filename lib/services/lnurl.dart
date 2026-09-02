@@ -193,8 +193,20 @@ Future<LnurlInfo> fetchLnurl(String url) async {
   } catch (_) {
     throw const NotAnLnurlServiceException();
   }
-  if (data['status'] == 'ERROR') {
-    throw Exception('LNURL error: ${data['reason']}');
+  return parseLnurlResponse(data);
+}
+
+/// Parses an already-decoded LNURL JSON body into [LnurlInfo]. Pure (no I/O) so
+/// it is unit-testable. Throws [LnurlServiceErrorException] when the body is a
+/// service error (either shape, see [lnurlErrorReason]) and [FormatException]
+/// for an unknown/absent tag.
+LnurlInfo parseLnurlResponse(Map<String, dynamic> data) {
+  final reason = lnurlErrorReason(data);
+  if (reason != null) {
+    throw LnurlServiceErrorException(
+      reason,
+      alreadyUsed: isAlreadyUsedReason(reason),
+    );
   }
   final tag = data['tag'] as String?;
   switch (tag) {
@@ -219,6 +231,42 @@ Future<LnurlInfo> fetchLnurl(String url) async {
   }
 }
 
+/// Detects an LNURL error body in either the LUD-06 standard
+/// `{"status":"ERROR","reason":...}` shape or the non-standard `{"error":...}`
+/// shape some services use (e.g. satsback.com). Returns the human-readable
+/// reason, or null when the body is not an error.
+String? lnurlErrorReason(Map<String, dynamic> data) {
+  final isStatusError = (data['status'] as String?)?.toUpperCase() == 'ERROR';
+  final err = data['error'];
+  if (isStatusError || err != null) {
+    final reason = data['reason'] ?? err;
+    return reason is String ? reason : (reason?.toString() ?? '');
+  }
+  return null;
+}
+
+/// True when [reason] indicates a withdraw voucher that has already been
+/// redeemed / spent (so there is nothing left to claim).
+bool isAlreadyUsedReason(String reason) {
+  final r = reason.toLowerCase();
+  return r.contains('already') ||
+      r.contains('used') ||
+      r.contains('redeem') ||
+      r.contains('claim') ||
+      r.contains('spent');
+}
+
+/// Thrown when an LNURL endpoint returns a service error (e.g. an already-used
+/// withdraw voucher). [reason] is the server's message; [alreadyUsed] flags the
+/// "voucher already redeemed" case so callers can show a friendlier state.
+class LnurlServiceErrorException implements Exception {
+  const LnurlServiceErrorException(this.reason, {this.alreadyUsed = false});
+  final String reason;
+  final bool alreadyUsed;
+  @override
+  String toString() => 'LnurlServiceErrorException: $reason';
+}
+
 /// Asks the LNURL-pay endpoint for a BOLT11 invoice for [amountMsat].
 /// Optionally attaches a LUD-12 [comment] (must fit `info.commentAllowed`).
 Future<String> requestPayInvoice(
@@ -236,8 +284,9 @@ Future<String> requestPayInvoice(
       .get(Uri.parse(url), headers: browserLikeHeaders)
       .timeout(const Duration(seconds: 30));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
-  if (res.statusCode != 200 || data['status'] == 'ERROR') {
-    throw Exception('LNURL-pay error: ${data['reason'] ?? res.body}');
+  final reason = lnurlErrorReason(data);
+  if (res.statusCode != 200 || reason != null) {
+    throw Exception('LNURL-pay error: ${reason ?? res.body}');
   }
   return data['pr'] as String;
 }
@@ -257,8 +306,12 @@ Future<void> submitWithdrawInvoice(
     throw Exception('LNURL-withdraw failed (${res.statusCode}): ${res.body}');
   }
   final data = jsonDecode(res.body) as Map<String, dynamic>;
-  if (data['status'] == 'ERROR') {
-    throw Exception('LNURL-withdraw error: ${data['reason']}');
+  final reason = lnurlErrorReason(data);
+  if (reason != null) {
+    throw LnurlServiceErrorException(
+      reason,
+      alreadyUsed: isAlreadyUsedReason(reason),
+    );
   }
 }
 

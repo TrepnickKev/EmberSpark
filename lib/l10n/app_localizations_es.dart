@@ -940,6 +940,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed =>
+      'Este vale de retiro ya se ha utilizado.';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'El servicio Lightning informó un error: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'Pagar oferta BOLT12';
 
   @override

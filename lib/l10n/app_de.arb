@@ -296,6 +296,8 @@
   "lnurlAuthErrorInvalidSignature": "Die Seite hat die Authentifizierungssignatur abgelehnt. Bitte erneut versuchen.",
   "lnurlAuthErrorLinkingKeyMismatch": "Die Seite erkennt diesen Authentifizierungsschlüssel nicht. Das passiert meist, wenn du dich zuvor mit einem anderen Wallet-Seed authentifiziert hast.",
   "lnurlAuthErrorGeneric": "LNURL-Auth fehlgeschlagen: {reason}",
+  "lnurlWithdrawAlreadyUsed": "Dieser Auszahlungs-Gutschein wurde bereits eingelöst.",
+  "lnurlServiceError": "Der Lightning-Dienst hat einen Fehler gemeldet: {reason}",
 
   "bolt12TitlePayOffer": "BOLT12-Angebot bezahlen",
   "bolt12TitlePayInvoice": "BOLT12-Rechnung bezahlen",

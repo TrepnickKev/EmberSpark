@@ -932,6 +932,14 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed => 'Bu çekim kuponu zaten kullanılmış.';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'Lightning hizmeti bir hata bildirdi: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12 teklifini öde';
 
   @override

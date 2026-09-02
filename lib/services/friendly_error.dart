@@ -1,6 +1,6 @@
 import '../l10n/app_localizations.dart';
 import 'lnbits_service.dart' show SelfPaymentException, ReadOnlyWalletException;
-import 'lnurl.dart' show NotAnLnurlServiceException;
+import 'lnurl.dart' show NotAnLnurlServiceException, LnurlServiceErrorException;
 
 /// Maps a thrown exception to a short user-readable message. Tries to
 /// recognise the most common failure modes (TLS, network, common HTTP
@@ -17,6 +17,12 @@ String friendlyError(AppLocalizations l10n, Object e) {
   // A scanned link that isn't actually an LNURL service (returned HTML, etc.).
   if (e is NotAnLnurlServiceException) {
     return l10n.errorNotLnurl;
+  }
+  // The LNURL service returned an error (e.g. an already-used withdraw voucher).
+  if (e is LnurlServiceErrorException) {
+    return e.alreadyUsed
+        ? l10n.lnurlWithdrawAlreadyUsed
+        : l10n.lnurlServiceError(e.reason);
   }
 
   final s = e.toString();

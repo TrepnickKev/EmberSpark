@@ -934,6 +934,15 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get lnurlWithdrawAlreadyUsed =>
+      'Этот ваучер на вывод уже был использован.';
+
+  @override
+  String lnurlServiceError(String reason) {
+    return 'Служба Lightning сообщила об ошибке: $reason';
+  }
+
+  @override
   String get bolt12TitlePayOffer => 'Оплатить оффер BOLT12';
 
   @override

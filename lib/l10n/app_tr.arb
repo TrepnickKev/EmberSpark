@@ -288,6 +288,8 @@
   "lnurlAuthErrorInvalidSignature": "Site kimlik doğrulama imzasını reddetti. Lütfen tekrar dene.",
   "lnurlAuthErrorLinkingKeyMismatch": "Site bu kimlik doğrulama anahtarını tanımıyor. Bu genellikle daha önce farklı bir cüzdan tohumuyla kimlik doğruladığın anlamına gelir.",
   "lnurlAuthErrorGeneric": "LNURL-auth başarısız: {reason}",
+  "lnurlWithdrawAlreadyUsed": "Bu çekim kuponu zaten kullanılmış.",
+  "lnurlServiceError": "Lightning hizmeti bir hata bildirdi: {reason}",
 
   "bolt12TitlePayOffer": "BOLT12 teklifini öde",
   "bolt12TitlePayInvoice": "BOLT12 faturasını öde",
