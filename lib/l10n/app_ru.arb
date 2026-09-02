@@ -197,6 +197,7 @@
   "lnurlGetAndPay": "Отправить",
   "lnurlWithdraw": "Вывести",
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
+  "withdrawChooseWallet": "Выберите кошелёк для получения",
   "lnurlWithdrawing": "Вывод {amount} sats…",
   "lnurlCommentLabel": "Заметка (необязательно)",
   "lnurlCommentHelp": "Не более {max} символов",

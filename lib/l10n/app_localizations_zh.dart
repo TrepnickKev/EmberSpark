@@ -610,6 +610,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lnurlWithdrawDefaultMemo => 'LNURL-withdraw';
 
   @override
+  String get withdrawChooseWallet => '选择目标钱包';
+
+  @override
   String lnurlWithdrawing(int amount) {
     return '正在提取 $amount sats…';
   }

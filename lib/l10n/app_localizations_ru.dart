@@ -625,6 +625,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lnurlWithdrawDefaultMemo => 'LNURL-withdraw';
 
   @override
+  String get withdrawChooseWallet => 'Выберите кошелёк для получения';
+
+  @override
   String lnurlWithdrawing(int amount) {
     return 'Вывод $amount sats…';
   }

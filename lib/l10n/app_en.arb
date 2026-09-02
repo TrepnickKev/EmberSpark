@@ -220,6 +220,7 @@
   "lnurlGetAndPay": "Send",
   "lnurlWithdraw": "Withdraw",
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
+  "withdrawChooseWallet": "Choose target wallet",
   "lnurlWithdrawing": "Withdrawing {amount} sats…",
   "@lnurlWithdrawing": { "placeholders": { "amount": { "type": "int" } } },
   "lnurlCommentLabel": "Memo (optional)",

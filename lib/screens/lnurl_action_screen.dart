@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:random_avatar/random_avatar.dart';
 import '../l10n/app_localizations.dart';
 import '../services/avatar_seed.dart';
 import '../services/contact_service.dart' show Contact;
 import '../services/friendly_error.dart';
+import '../services/http_client_factory.dart';
+import '../services/lnbits_service.dart';
 import '../services/wallet_backend.dart';
 import '../services/lnurl.dart';
 import '../services/lnurl_auth.dart';
@@ -11,6 +14,7 @@ import '../services/payment_feedback.dart';
 import '../services/price_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/payment_route_header.dart';
+import '../widgets/stacked_action_button.dart' show bitcoinOrange;
 import 'send_screen.dart';
 
 /// Resolves a scanned LNURL or Lightning address and runs the appropriate
@@ -35,7 +39,17 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
   // Copy URL block is then irrelevant (not a server problem), so it is hidden.
   bool readOnlyBlocked = false;
   bool busy = true;
+  // The current wallet's avatar + name: the sender for a pay-from-contact
+  // (shown in PaymentRouteHeader).
   ({String seed, String name})? senderInfo;
+
+  // Withdraw target selection: every saved wallet can receive a withdraw, so
+  // the target is switchable by swiping its avatar (like the home carousel).
+  // Defaults to the active wallet.
+  List<WalletAccount> _wallets = const [];
+  Map<String, String> _walletSeeds = {};
+  WalletAccount? _target;
+  PageController? _targetPage;
 
   Map<String, double>? rates;
   String displayCurrency = 'USD';
@@ -51,9 +65,8 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     amountCtrl.addListener(_onAmountChanged);
     _resolve();
     _loadRates();
-    if (widget.fromContact != null) {
-      _loadSenderInfo();
-    }
+    _loadSenderInfo();
+    _loadWithdrawTargets();
   }
 
   Future<void> _loadSenderInfo() async {
@@ -63,11 +76,145 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     }
   }
 
+  /// Loads every saved wallet (for the withdraw target switcher) and its avatar
+  /// seed, defaulting the target to the active wallet.
+  Future<void> _loadWithdrawTargets() async {
+    final wallets = await listWallets();
+    final current = await getCurrentWallet();
+    final seeds = await Future.wait(wallets.map(avatarSeedForAccount));
+    if (!mounted) return;
+    var index = wallets.indexWhere((w) => w.id == current?.id);
+    if (index < 0) index = 0;
+    setState(() {
+      _wallets = wallets;
+      _walletSeeds = {
+        for (var i = 0; i < wallets.length; i++) wallets[i].id: seeds[i],
+      };
+      _target = wallets.isNotEmpty ? wallets[index] : null;
+      if (wallets.length > 1) {
+        _targetPage?.dispose();
+        _targetPage = PageController(initialPage: index);
+      }
+    });
+  }
+
+  /// The wallet that receives the withdraw. Swipe the avatar to switch (same
+  /// gesture as home) or tap it to open the chooser. A single wallet shows a
+  /// static, non-interactive avatar.
+  Widget _buildTargetSwitcher() {
+    final target = _target;
+    if (target == null) return const SizedBox.shrink();
+    final multi = _wallets.length > 1 && _targetPage != null;
+    final avatar = !multi
+        ? RandomAvatar(
+            _walletSeeds[target.id] ?? target.id,
+            height: 88,
+            width: 88,
+          )
+        : NotificationListener<ScrollNotification>(
+            onNotification: (_) => true,
+            child: SizedBox(
+              width: 88,
+              height: 88,
+              child: PageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _targetPage,
+                onPageChanged: (i) => setState(() => _target = _wallets[i]),
+                itemCount: _wallets.length,
+                itemBuilder: (_, i) => RandomAvatar(
+                  _walletSeeds[_wallets[i].id] ?? _wallets[i].id,
+                  height: 88,
+                  width: 88,
+                ),
+              ),
+            ),
+          );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: GestureDetector(
+        // Tap opens the chooser; a vertical drag still swipes the carousel
+        // (tap and drag are distinct gestures).
+        onTap: multi ? _pickTarget : null,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            avatar,
+            const SizedBox(height: 6),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    target.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                if (multi)
+                  const Icon(Icons.expand_more, size: 16, color: Colors.grey),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Bottom-sheet wallet chooser (alternative to swiping) for the withdraw
+  /// target. Keeps the swipe carousel in sync on pick.
+  Future<void> _pickTarget() async {
+    final l10n = AppLocalizations.of(context)!;
+    final chosen = await showModalBottomSheet<WalletAccount>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                l10n.withdrawChooseWallet,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            for (final w in _wallets)
+              ListTile(
+                leading: RandomAvatar(
+                  _walletSeeds[w.id] ?? w.id,
+                  height: 40,
+                  width: 40,
+                ),
+                title: Text(w.label),
+                trailing: w.id == _target?.id
+                    ? const Icon(Icons.check, color: bitcoinOrange)
+                    : null,
+                onTap: () => Navigator.pop(context, w),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null || !mounted) return;
+    setState(() => _target = chosen);
+    final idx = _wallets.indexWhere((x) => x.id == chosen.id);
+    if (idx >= 0 && (_targetPage?.hasClients ?? false)) {
+      _targetPage!.jumpToPage(idx);
+    }
+  }
+
   @override
   void dispose() {
     amountCtrl.removeListener(_onAmountChanged);
     amountCtrl.dispose();
     commentCtrl.dispose();
+    _targetPage?.dispose();
     super.dispose();
   }
 
@@ -229,7 +376,17 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
       error = null;
     });
     try {
-      final WalletBackend svc = await loadWalletBackend();
+      // Create the invoice on the CHOSEN target wallet's server so the funds
+      // land there (its invoice/read key can create invoices).
+      final t = _target;
+      final WalletBackend svc = t == null
+          ? await loadWalletBackend()
+          : LNbitsService(
+              baseUrl: t.url,
+              adminKey: t.adminKey,
+              readOnly: t.readOnly,
+              client: await getHttpClient(),
+            );
       final bolt11 = await svc.createInvoice(
         amountSats: sats,
         memo: i.description.isEmpty
@@ -237,6 +394,12 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             : i.description,
       );
       await submitWithdrawInvoice(i, bolt11);
+      if (!mounted) return;
+      // Switch the active wallet to the target so Home reflects the funds.
+      if (t != null) {
+        final current = await getCurrentWallet();
+        if (current?.id != t.id) await setCurrentWalletId(t.id);
+      }
       if (!mounted) return;
       signalPaymentSuccess();
       Navigator.popUntil(context, (r) => r.isFirst);
@@ -419,10 +582,15 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
         (minWithdrawableMsat ~/ 1000, maxWithdrawableMsat ~/ 1000),
       LnurlAuthInfo() => (0, 0),
     };
+    // A fixed-amount withdraw (min == max) is prefilled and must not be edited.
+    final fixed = i is LnurlWithdrawInfo && minSats == maxSats;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Withdraw: show the wallet the funds land in; swipe the avatar to
+          // switch it (same gesture as home), so a withdraw is visually clear.
+          if (i is LnurlWithdrawInfo && _target != null) _buildTargetSwitcher(),
           if (i is LnurlPayInfo &&
               widget.fromContact != null &&
               senderInfo != null)
@@ -455,6 +623,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
               Expanded(
                 child: TextField(
                   controller: amountCtrl,
+                  readOnly: fixed,
                   keyboardType: currency == 'sats'
                       ? TextInputType.number
                       : const TextInputType.numberWithOptions(decimal: true),
@@ -474,10 +643,12 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
                   for (final c in supportedCurrencies)
                     DropdownMenuItem(value: c, child: Text(c)),
                 ],
-                onChanged: (next) {
-                  if (next == null) return;
-                  setState(() => currency = next);
-                },
+                onChanged: fixed
+                    ? null
+                    : (next) {
+                        if (next == null) return;
+                        setState(() => currency = next);
+                      },
               ),
             ],
           ),

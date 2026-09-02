@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/bolt11.dart';
 import '../services/friendly_error.dart';
+import '../services/lightning_router.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
@@ -198,6 +199,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  Future<void> _pasteAndRoute() async {
+    final l10n = AppLocalizations.of(context)!;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (!mounted) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.clipboardEmpty)));
+      return;
+    }
+    await routeLightningCode(Navigator.of(context), text);
   }
 
   Future<void> _copy() async {
@@ -404,6 +419,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      // Paste a lightning code (e.g. an LNURL-withdraw voucher)
+                      // and route it, since a withdraw is a receive.
+                      StackedActionButton(
+                        icon: Icons.content_paste,
+                        label: l10n.commonPaste,
+                        onPressed: _pasteAndRoute,
+                      ),
                       StackedActionButton(
                         icon: Icons.copy,
                         label: l10n.commonCopy,
@@ -542,6 +564,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            // Paste a lightning code (e.g. an LNURL-withdraw voucher) and route
+            // it, since a withdraw is a receive.
+            StackedActionButton(
+              icon: Icons.content_paste,
+              label: l10n.commonPaste,
+              onPressed: _pasteAndRoute,
+            ),
             StackedActionButton(
               icon: Icons.copy,
               label: l10n.commonCopy,

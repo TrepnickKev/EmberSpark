@@ -197,6 +197,7 @@
   "lnurlGetAndPay": "Gönder",
   "lnurlWithdraw": "Çek",
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
+  "withdrawChooseWallet": "Hedef cüzdanı seç",
   "lnurlWithdrawing": "{amount} sats çekiliyor…",
   "lnurlCommentLabel": "Not (isteğe bağlı)",
   "lnurlCommentHelp": "En fazla {max} karakter",

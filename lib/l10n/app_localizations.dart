@@ -1220,6 +1220,12 @@ abstract class AppLocalizations {
   /// **'LNURL-withdraw'**
   String get lnurlWithdrawDefaultMemo;
 
+  /// No description provided for @withdrawChooseWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose target wallet'**
+  String get withdrawChooseWallet;
+
   /// No description provided for @lnurlWithdrawing.
   ///
   /// In en, this message translates to:

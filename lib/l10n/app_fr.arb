@@ -197,6 +197,7 @@
   "lnurlGetAndPay": "Envoyer",
   "lnurlWithdraw": "Retirer",
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
+  "withdrawChooseWallet": "Choisir le portefeuille cible",
   "lnurlWithdrawing": "Retrait de {amount} sats…",
   "lnurlCommentLabel": "Note (facultatif)",
   "lnurlCommentHelp": "Max {max} caractères",

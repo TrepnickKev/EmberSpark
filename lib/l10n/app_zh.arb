@@ -197,6 +197,7 @@
   "lnurlGetAndPay": "发送",
   "lnurlWithdraw": "提取",
   "lnurlWithdrawDefaultMemo": "LNURL-withdraw",
+  "withdrawChooseWallet": "选择目标钱包",
   "lnurlWithdrawing": "正在提取 {amount} sats…",
   "lnurlCommentLabel": "备注（可选）",
   "lnurlCommentHelp": "最多 {max} 个字符",

@@ -622,6 +622,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lnurlWithdrawDefaultMemo => 'LNURL-withdraw';
 
   @override
+  String get withdrawChooseWallet => 'Choose target wallet';
+
+  @override
   String lnurlWithdrawing(int amount) {
     return 'Withdrawing $amount sats…';
   }

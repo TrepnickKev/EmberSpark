@@ -199,6 +199,7 @@
   "lnurlGetAndPay": "Senden",
   "lnurlWithdraw": "Abheben",
   "lnurlWithdrawDefaultMemo": "LNURL-Auszahlung",
+  "withdrawChooseWallet": "Ziel-Wallet wählen",
   "lnurlWithdrawing": "{amount} Sats werden abgehoben …",
   "lnurlCommentLabel": "Notiz (optional)",
   "lnurlCommentHelp": "Maximal {max} Zeichen",
