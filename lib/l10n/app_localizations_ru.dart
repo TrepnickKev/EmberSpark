@@ -943,6 +943,15 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get connectionStatusOk => 'Подключено';
+
+  @override
+  String get connectionStatusConnecting => 'Подключение';
+
+  @override
+  String get connectionStatusFailed => 'Нет соединения';
+
+  @override
   String get bolt12TitlePayOffer => 'Оплатить оффер BOLT12';
 
   @override

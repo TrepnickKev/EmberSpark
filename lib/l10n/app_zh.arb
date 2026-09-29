@@ -290,6 +290,9 @@
   "lnurlAuthErrorGeneric": "LNURL-auth 失败：{reason}",
   "lnurlWithdrawAlreadyUsed": "此提现凭证已被使用。",
   "lnurlServiceError": "Lightning 服务报告了一个错误：{reason}",
+  "connectionStatusOk": "已连接",
+  "connectionStatusConnecting": "连接中",
+  "connectionStatusFailed": "无连接",
 
   "bolt12TitlePayOffer": "支付 BOLT12 offer",
   "bolt12TitlePayInvoice": "支付 BOLT12 发票",

@@ -14,6 +14,7 @@ import '../services/payment_feedback.dart';
 import '../services/received_notify_service.dart';
 import '../services/unseen_incoming_service.dart';
 import '../services/wallet_account_service.dart';
+import '../widgets/avatar_status_ring.dart';
 import '../widgets/flipping_avatar.dart';
 import '../widgets/read_only_badge.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -41,6 +42,10 @@ class _HomeScreenState extends State<HomeScreen>
   int? balance;
   String? error;
   bool loading = false;
+  // Server-connection health shown as the glowing ring around the avatar.
+  // Green when the last probe reached the server, orange while a load/refresh
+  // is in flight, red when it failed.
+  ConnectionStatus _conn = ConnectionStatus.connecting;
   String fiatCurrency = 'USD';
   double? fiatRate;
   WalletAccount? currentWallet;
@@ -165,13 +170,16 @@ class _HomeScreenState extends State<HomeScreen>
         balance = b;
         _balanceWalletId = walletId;
         if (error != null) error = null;
+        _conn = ConnectionStatus.ok;
       });
       await _reconcileUnseen(b, walletId);
       // Keep the background poll's baseline current for the active wallet so it
       // doesn't re-notify (up to 15 min later) for a receive already shown here.
       if (walletId != null) await setLastNotifiedBalanceFor(walletId, b);
     } catch (_) {
-      // Stay quiet on poll errors so transient network blips don't spam.
+      // Stay quiet on poll errors (no snackbar / no error text) so transient
+      // network blips don't spam - but reflect the failure in the status ring.
+      if (mounted) setState(() => _conn = ConnectionStatus.failed);
     } finally {
       _polling = false;
     }
@@ -229,92 +237,40 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       loading = true;
       error = null;
+      _conn = ConnectionStatus.connecting;
     });
+    // The avatar, name and swipe carousel come purely from local storage, so
+    // load them first and independently of the server: an unreachable endpoint
+    // must not blank the avatar (the seed/identity are the offline cache).
+    WalletAccount? w;
+    try {
+      w = await _loadAvatarAndWallets(seq);
+    } catch (_) {
+      // Local read failed for some reason: keep whatever avatar is already up.
+      w = currentWallet;
+    }
+    if (!mounted || seq != _loadSeq) return;
+    // Network: balance + fiat only. A failure shows the error + red ring but
+    // leaves the avatar/carousel (set above) intact.
     try {
       final svc = await LNbitsService.fromStorage();
       final results = await Future.wait([
         svc.getBalanceSats(),
         getSelectedCurrency(),
         getBtcRates(),
-        getCurrentWallet(),
-        getMyLightningAddress(),
-        getMyBolt12Offer(),
-        getMyLnurlpLink(),
-        getMyDefaultContactKind(),
       ]);
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
       final b = results[0] as int;
       final cur = results[1] as String;
       final rates = results[2] as Map<String, double>?;
-      final w = results[3] as WalletAccount?;
-      final myLnAddress = results[4] as String?;
-      final myBolt12 = results[5] as String?;
-      final myLnurlp = results[6] as String?;
-      final defaultKind = results[7] as MyContactKind?;
-
-      final seed = avatarSeedForWallet(
-        lnAddress: myLnAddress,
-        bolt12: myBolt12,
-        lnurlp: myLnurlp,
-        fallbackSeed: fallbackAvatarSeedFor(w),
-        defaultKind: defaultKind,
-      );
-
-      // All wallets + their avatar seeds for the swipe-to-switch carousel.
-      final wallets = await listWallets();
-      final computedSeeds = await Future.wait(
-        wallets.map(avatarSeedForAccount),
-      );
-      final seeds = <String, String>{
-        for (var i = 0; i < wallets.length; i++)
-          wallets[i].id: computedSeeds[i],
-      };
-      final idx = wallets.indexWhere((x) => x.id == w?.id);
-      final walletIndex = idx < 0 ? 0 : idx;
-
-      // Discard a superseded load (a newer wallet switch started meanwhile) so
-      // it can't overwrite the active wallet's carousel/balance/name.
-      if (!mounted || seq != _loadSeq) return;
-      // Rebuild the carousel controller (at the active index) whenever the
-      // wallet SET changes — add/remove/reorder — so it always lands on the
-      // active wallet's avatar. The PageView is keyed by this signature so a
-      // fresh element honours the new controller's initialPage; the old
-      // controller is disposed after the frame (once its old PageView is gone)
-      // to avoid an attach conflict.
-      final walletSig = wallets.map((x) => x.id).join(',');
-      final sigChanged = walletSig != _walletSig;
-      if (wallets.length > 1 && (_avatarPage == null || sigChanged)) {
-        final old = _avatarPage;
-        _avatarPage = PageController(initialPage: walletIndex);
-        if (old != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
-        }
-      }
       setState(() {
         balance = b;
         _balanceWalletId = w?.id;
         fiatCurrency = cur;
         fiatRate = rates?[cur];
-        currentWallet = w;
-        avatarSeed = seed.isEmpty ? null : seed;
-        _defaultContactKind = defaultKind;
-        _wallets = wallets;
-        _walletSeeds = seeds;
-        _walletIndex = walletIndex;
-        _walletSig = walletSig;
+        error = null;
+        _conn = ConnectionStatus.ok;
       });
-      // Same wallet set but the active wallet changed elsewhere (e.g. picked on
-      // the Wallets screen): the keyed PageView is reused and keeps its old
-      // page, so nudge the existing controller onto the active wallet's avatar.
-      if (!sigChanged && wallets.length > 1) {
-        final controller = _avatarPage;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || controller == null || !controller.hasClients) return;
-          if (controller.page?.round() != walletIndex) {
-            controller.jumpToPage(walletIndex);
-          }
-        });
-      }
       await _reconcileUnseen(b, w?.id);
       // See _pollOnce: keep the background poll's baseline current for the
       // active wallet so it doesn't duplicate a receive already shown here.
@@ -323,15 +279,90 @@ class _HomeScreenState extends State<HomeScreen>
       if (!mounted || seq != _loadSeq) return;
       setState(() {
         error = friendlyError(AppLocalizations.of(context)!, e);
-        // Endpoint unreachable: show the placeholder avatar, not the previous
-        // wallet's (stale) one.
-        avatarSeed = null;
+        _conn = ConnectionStatus.failed;
       });
     } finally {
       // Only the latest load owns the loading flag, so a discarded stale load
       // can't clear it while the newest one is still fetching.
       if (mounted && seq == _loadSeq) setState(() => loading = false);
     }
+  }
+
+  /// Loads the current wallet, its avatar seed, and the swipe-carousel wallet
+  /// list + seeds - all from local storage, no server call - so they render
+  /// even when the endpoint is unreachable. Applies its state under the [seq]
+  /// guard and returns the current wallet.
+  Future<WalletAccount?> _loadAvatarAndWallets(int seq) async {
+    final results = await Future.wait([
+      getCurrentWallet(),
+      getMyLightningAddress(),
+      getMyBolt12Offer(),
+      getMyLnurlpLink(),
+      getMyDefaultContactKind(),
+    ]);
+    final w = results[0] as WalletAccount?;
+    final myLnAddress = results[1] as String?;
+    final myBolt12 = results[2] as String?;
+    final myLnurlp = results[3] as String?;
+    final defaultKind = results[4] as MyContactKind?;
+
+    final seed = avatarSeedForWallet(
+      lnAddress: myLnAddress,
+      bolt12: myBolt12,
+      lnurlp: myLnurlp,
+      fallbackSeed: fallbackAvatarSeedFor(w),
+      defaultKind: defaultKind,
+    );
+
+    // All wallets + their avatar seeds for the swipe-to-switch carousel.
+    final wallets = await listWallets();
+    final computedSeeds = await Future.wait(wallets.map(avatarSeedForAccount));
+    final seeds = <String, String>{
+      for (var i = 0; i < wallets.length; i++) wallets[i].id: computedSeeds[i],
+    };
+    final idx = wallets.indexWhere((x) => x.id == w?.id);
+    final walletIndex = idx < 0 ? 0 : idx;
+
+    // Discard a superseded load (a newer wallet switch started meanwhile) so it
+    // can't overwrite the active wallet's carousel/name.
+    if (!mounted || seq != _loadSeq) return w;
+    // Rebuild the carousel controller (at the active index) whenever the wallet
+    // SET changes - add/remove/reorder - so it always lands on the active
+    // wallet's avatar. The PageView is keyed by this signature so a fresh
+    // element honours the new controller's initialPage; the old controller is
+    // disposed after the frame (once its old PageView is gone) to avoid an
+    // attach conflict.
+    final walletSig = wallets.map((x) => x.id).join(',');
+    final sigChanged = walletSig != _walletSig;
+    if (wallets.length > 1 && (_avatarPage == null || sigChanged)) {
+      final old = _avatarPage;
+      _avatarPage = PageController(initialPage: walletIndex);
+      if (old != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
+      }
+    }
+    setState(() {
+      currentWallet = w;
+      avatarSeed = seed.isEmpty ? null : seed;
+      _defaultContactKind = defaultKind;
+      _wallets = wallets;
+      _walletSeeds = seeds;
+      _walletIndex = walletIndex;
+      _walletSig = walletSig;
+    });
+    // Same wallet set but the active wallet changed elsewhere (e.g. picked on
+    // the Wallets screen): the keyed PageView is reused and keeps its old page,
+    // so nudge the existing controller onto the active wallet's avatar.
+    if (!sigChanged && wallets.length > 1) {
+      final controller = _avatarPage;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || controller == null || !controller.hasClients) return;
+        if (controller.page?.round() != walletIndex) {
+          controller.jumpToPage(walletIndex);
+        }
+      });
+    }
+    return w;
   }
 
   Future<void> _onWalletPageChanged(int i) async {
@@ -355,6 +386,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// The 88x88 avatar: a vertical wallet carousel when there's more than one
   /// wallet (swipe up/down to switch), otherwise the single avatar.
+  String _connTooltip(AppLocalizations l10n) => switch (_conn) {
+    ConnectionStatus.ok => l10n.connectionStatusOk,
+    ConnectionStatus.connecting => l10n.connectionStatusConnecting,
+    ConnectionStatus.failed => l10n.connectionStatusFailed,
+  };
+
   Widget _buildAvatarSwitcher() {
     if (_wallets.length <= 1 || _avatarPage == null) {
       return _avatarBubble(
@@ -587,7 +624,11 @@ class _HomeScreenState extends State<HomeScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildAvatarSwitcher(),
+            AvatarStatusRing(
+              status: _conn,
+              tooltip: _connTooltip(l10n),
+              child: _buildAvatarSwitcher(),
+            ),
             if (currentWallet != null) ...[
               const SizedBox(height: 8),
               InkWell(

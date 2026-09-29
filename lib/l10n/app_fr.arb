@@ -290,6 +290,9 @@
   "lnurlAuthErrorGeneric": "Échec de LNURL-auth : {reason}",
   "lnurlWithdrawAlreadyUsed": "Ce bon de retrait a déjà été utilisé.",
   "lnurlServiceError": "Le service Lightning a signalé une erreur : {reason}",
+  "connectionStatusOk": "Connecté",
+  "connectionStatusConnecting": "Connexion",
+  "connectionStatusFailed": "Pas de connexion",
 
   "bolt12TitlePayOffer": "Payer une offre BOLT12",
   "bolt12TitlePayInvoice": "Payer une facture BOLT12",

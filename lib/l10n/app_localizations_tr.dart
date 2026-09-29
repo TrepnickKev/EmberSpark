@@ -940,6 +940,15 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get connectionStatusOk => 'Bağlandı';
+
+  @override
+  String get connectionStatusConnecting => 'Bağlanıyor';
+
+  @override
+  String get connectionStatusFailed => 'Bağlantı yok';
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12 teklifini öde';
 
   @override

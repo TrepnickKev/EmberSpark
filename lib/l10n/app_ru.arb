@@ -290,6 +290,9 @@
   "lnurlAuthErrorGeneric": "Ошибка LNURL-auth: {reason}",
   "lnurlWithdrawAlreadyUsed": "Этот ваучер на вывод уже был использован.",
   "lnurlServiceError": "Служба Lightning сообщила об ошибке: {reason}",
+  "connectionStatusOk": "Подключено",
+  "connectionStatusConnecting": "Подключение",
+  "connectionStatusFailed": "Нет соединения",
 
   "bolt12TitlePayOffer": "Оплатить оффер BOLT12",
   "bolt12TitlePayInvoice": "Оплатить счёт BOLT12",

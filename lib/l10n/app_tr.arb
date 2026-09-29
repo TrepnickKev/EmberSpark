@@ -290,6 +290,9 @@
   "lnurlAuthErrorGeneric": "LNURL-auth başarısız: {reason}",
   "lnurlWithdrawAlreadyUsed": "Bu çekim kuponu zaten kullanılmış.",
   "lnurlServiceError": "Lightning hizmeti bir hata bildirdi: {reason}",
+  "connectionStatusOk": "Bağlandı",
+  "connectionStatusConnecting": "Bağlanıyor",
+  "connectionStatusFailed": "Bağlantı yok",
 
   "bolt12TitlePayOffer": "BOLT12 teklifini öde",
   "bolt12TitlePayInvoice": "BOLT12 faturasını öde",

@@ -1760,6 +1760,24 @@ abstract class AppLocalizations {
   /// **'The Lightning service reported an error: {reason}'**
   String lnurlServiceError(String reason);
 
+  /// No description provided for @connectionStatusOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get connectionStatusOk;
+
+  /// No description provided for @connectionStatusConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting'**
+  String get connectionStatusConnecting;
+
+  /// No description provided for @connectionStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get connectionStatusFailed;
+
   /// No description provided for @bolt12TitlePayOffer.
   ///
   /// In en, this message translates to:

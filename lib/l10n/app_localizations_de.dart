@@ -948,6 +948,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get connectionStatusOk => 'Verbunden';
+
+  @override
+  String get connectionStatusConnecting => 'Verbinde';
+
+  @override
+  String get connectionStatusFailed => 'Keine Verbindung';
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12-Angebot bezahlen';
 
   @override

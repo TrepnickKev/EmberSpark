@@ -948,6 +948,15 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get connectionStatusOk => 'Connecté';
+
+  @override
+  String get connectionStatusConnecting => 'Connexion';
+
+  @override
+  String get connectionStatusFailed => 'Pas de connexion';
+
+  @override
   String get bolt12TitlePayOffer => 'Payer une offre BOLT12';
 
   @override

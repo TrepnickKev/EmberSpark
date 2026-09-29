@@ -908,6 +908,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get connectionStatusOk => '已连接';
+
+  @override
+  String get connectionStatusConnecting => '连接中';
+
+  @override
+  String get connectionStatusFailed => '无连接';
+
+  @override
   String get bolt12TitlePayOffer => '支付 BOLT12 offer';
 
   @override

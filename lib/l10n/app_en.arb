@@ -329,6 +329,9 @@
   "lnurlWithdrawAlreadyUsed": "This withdraw voucher has already been used.",
   "lnurlServiceError": "The Lightning service reported an error: {reason}",
   "@lnurlServiceError": { "placeholders": { "reason": { "type": "String" } } },
+  "connectionStatusOk": "Connected",
+  "connectionStatusConnecting": "Connecting",
+  "connectionStatusFailed": "No connection",
 
   "bolt12TitlePayOffer": "Pay BOLT12 offer",
   "bolt12TitlePayInvoice": "Pay BOLT12 invoice",
