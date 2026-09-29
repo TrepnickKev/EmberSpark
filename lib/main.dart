@@ -13,7 +13,7 @@ import 'services/nfc_coordinator.dart';
 import 'services/price_service.dart';
 import 'services/received_notify_service.dart';
 import 'services/wallet_account_service.dart';
-import 'widgets/stacked_action_button.dart' show bitcoinOrange;
+import 'widgets/stacked_action_button.dart' show bitcoinOrange, bitcoinOutline;
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -132,11 +132,49 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           navigatorKey: navigatorKey,
           navigatorObservers: [routeObserver],
           theme: ThemeData.dark(useMaterial3: true).copyWith(
+            // Thin translucent-orange outline on buttons and "windows" (cards,
+            // dialogs, sheets), matching satoshihabits.com. Text/icons keep the
+            // full-strength orange; TextButtons stay plain so inline dialog
+            // actions (Cancel/OK) are not each boxed.
             elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(foregroundColor: bitcoinOrange),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: bitcoinOrange,
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
+            ),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: bitcoinOrange,
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
+            ),
+            filledButtonTheme: FilledButtonThemeData(
+              style: FilledButton.styleFrom(
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: bitcoinOrange),
+            ),
+            cardTheme: CardThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
+            ),
+            dialogTheme: DialogThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
+            ),
+            bottomSheetTheme: BottomSheetThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                side: BorderSide(color: bitcoinOutline, width: 1),
+              ),
             ),
             switchTheme: SwitchThemeData(
               thumbColor: WidgetStateProperty.resolveWith(

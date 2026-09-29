@@ -396,7 +396,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   const SizedBox(height: 12),
                   Center(
                     child: Container(
-                      color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       padding: const EdgeInsets.all(12),
                       child: QrImageView(
                         data: invoice!,
@@ -526,73 +529,79 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     final value = _defaultValue;
     final kind = _defaultKind;
     if (value == null || kind == null) return const SizedBox.shrink();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          l10n.receiveReusableAddress,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          _kindTitle(l10n, kind),
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
-        ),
-        const SizedBox(height: 12),
-        Center(
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(12),
-            child: QrImageView(
-              data: 'lightning:$value',
-              size: 240,
-              backgroundColor: Colors.white,
-              embeddedImage: const AssetImage('images/Logo_icon.png'),
-              embeddedImageStyle: const QrEmbeddedImageStyle(
-                size: Size(48, 48),
+    // Same framed Card + rounded QR tile as the identity sections under
+    // "My contact", so the reusable address matches across screens.
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.receiveReusableAddress,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              _kindTitle(l10n, kind),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: QrImageView(
+                  data: 'lightning:$value',
+                  size: 240,
+                  backgroundColor: Colors.white,
+                  embeddedImage: const AssetImage('images/Logo_icon.png'),
+                  embeddedImageStyle: const QrEmbeddedImageStyle(
+                    size: Size(48, 48),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SelectableText(
-          value,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 11),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // Paste a lightning code (e.g. an LNURL-withdraw voucher) and route
-            // it, since a withdraw is a receive.
-            StackedActionButton(
-              icon: Icons.content_paste,
-              label: l10n.commonPaste,
-              onPressed: _pasteAndRoute,
+            const SizedBox(height: 12),
+            SelectableText(
+              value,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 11),
             ),
-            StackedActionButton(
-              icon: Icons.copy,
-              label: l10n.commonCopy,
-              onPressed: _copyIdentity,
-            ),
-            StackedActionButton(
-              icon: Icons.ios_share,
-              label: l10n.commonShare,
-              onPressed: _shareIdentity,
-            ),
-            StackedActionButton(
-              icon: Icons.nfc,
-              label: l10n.commonNfc,
-              onPressed: _armNfc,
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Paste a lightning code (e.g. an LNURL-withdraw voucher) and
+                // route it, since a withdraw is a receive.
+                StackedActionButton(
+                  icon: Icons.content_paste,
+                  label: l10n.commonPaste,
+                  onPressed: _pasteAndRoute,
+                ),
+                StackedActionButton(
+                  icon: Icons.copy,
+                  label: l10n.commonCopy,
+                  onPressed: _copyIdentity,
+                ),
+                StackedActionButton(
+                  icon: Icons.ios_share,
+                  label: l10n.commonShare,
+                  onPressed: _shareIdentity,
+                ),
+                StackedActionButton(
+                  icon: Icons.nfc,
+                  label: l10n.commonNfc,
+                  onPressed: _armNfc,
+                ),
+              ],
             ),
           ],
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Divider(),
-        ),
-      ],
+      ),
     );
   }
 

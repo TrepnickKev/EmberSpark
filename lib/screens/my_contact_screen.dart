@@ -495,6 +495,7 @@ class _MyContactScreenState extends State<MyContactScreen>
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: bitcoinOutline, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

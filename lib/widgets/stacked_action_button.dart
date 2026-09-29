@@ -5,6 +5,12 @@ import 'package:flutter/material.dart';
 /// the entire Material theme.
 const Color bitcoinOrange = Color(0xFFF7931A);
 
+/// Thin translucent-orange outline for buttons, cards, dialogs and sheets,
+/// mirroring satoshihabits.com's resting card/button border. Full [bitcoinOrange]
+/// stays for text, icons and active states. Not const because [Color.withValues]
+/// is not a const call.
+final Color bitcoinOutline = bitcoinOrange.withValues(alpha: 0.30);
+
 /// A circular outlined icon button with a label centred below it.
 /// Phoenix-Wallet-style action button — used in the Receive, Send, and QR
 /// scanner rows. Active state uses [bitcoinOrange]; disabled falls back to
