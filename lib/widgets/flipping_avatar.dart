@@ -41,6 +41,18 @@ class _FlippingAvatarState extends State<FlippingAvatar>
     widget.trigger.addListener(_onTrigger);
   }
 
+  // A carousel page keeps its State when it becomes (or stops being) the active
+  // wallet, while its trigger switches between the real flip and a no-op one;
+  // follow the new trigger so the shown avatar is the one that flips.
+  @override
+  void didUpdateWidget(covariant FlippingAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.trigger != widget.trigger) {
+      oldWidget.trigger.removeListener(_onTrigger);
+      widget.trigger.addListener(_onTrigger);
+    }
+  }
+
   @override
   void dispose() {
     widget.trigger.removeListener(_onTrigger);
