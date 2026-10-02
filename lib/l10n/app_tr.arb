@@ -215,6 +215,8 @@
   "settingsLockNeedSetup": "Önce telefonunda bir ekran kilidi veya biyometri ayarla.",
   "settingsTrustTls": "Doğrulanmamış HTTPS'e izin ver",
   "settingsTrustTlsSubtitle": "Kendinden imzalı ve zinciri eksik sertifikalara güven. Bazı amatör Lightning sunucuları ve .onion hizmetleri için gerekli. Yalnızca güvendiğin sunucular için etkinleştir.",
+  "settingsLegacyAvatars": "Klasik avatarlar",
+  "settingsLegacyAvatarsSubtitle": "Yeni Bitcoin avatarları yerine önceki avatar stilini kullan.",
   "settingsAbout": "Hakkında",
   "settingsNotifyReceived": "Alınan ödemeleri bana bildir",
   "settingsNotifyReceivedSubtitle": "Bildirimler tasarım gereği gecikir: EmberSpark üçüncü taraf push servisleri yerine arka planda kontrol eder, bu yüzden hiçbir ödeme verisi paylaşılmaz. Biraz pil kullanır.",

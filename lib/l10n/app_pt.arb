@@ -215,6 +215,8 @@
   "settingsLockNeedSetup": "Configure um bloqueio de tela ou biometria no seu telefone primeiro.",
   "settingsTrustTls": "Permitir HTTPS não verificado",
   "settingsTrustTlsSubtitle": "Confie em certificados autoassinados ou com cadeia incompleta. Necessário para alguns servidores Lightning caseiros e serviços .onion. Ative apenas para servidores em que você confia.",
+  "settingsLegacyAvatars": "Avatares clássicos",
+  "settingsLegacyAvatarsSubtitle": "Usar o estilo de avatar anterior em vez dos novos avatares Bitcoin.",
   "settingsAbout": "Sobre",
   "settingsNotifyReceived": "Avisar-me sobre pagamentos recebidos",
   "settingsNotifyReceivedSubtitle": "As notificações são atrasadas por design: o EmberSpark verifica em segundo plano em vez de usar serviços push de terceiros, por isso nenhum dado de pagamento é compartilhado. Consome um pouco de bateria.",

@@ -682,6 +682,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Trust self-signed and incomplete-chain certificates. Required for some hobbyist Lightning servers and .onion services. Only enable for servers you trust.';
 
   @override
+  String get settingsLegacyAvatars => 'Legacy avatars';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle =>
+      'Use the previous avatar style instead of the new Bitcoin avatars.';
+
+  @override
   String get settingsAbout => 'About';
 
   @override

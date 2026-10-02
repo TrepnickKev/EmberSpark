@@ -688,6 +688,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vertrauen in selbstsignierte oder unvollständige Zertifikatsketten. Nötig für manche Hobby-Lightning-Server und .onion-Adressen. Nur für Server aktivieren, denen du vertraust.';
 
   @override
+  String get settingsLegacyAvatars => 'Klassische Avatare';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle =>
+      'Den vorherigen Avatar-Stil statt der neuen Bitcoin-Avatare verwenden.';
+
+  @override
   String get settingsAbout => 'Über';
 
   @override

@@ -215,6 +215,8 @@
   "settingsLockNeedSetup": "请先在手机上设置屏幕锁定或生物识别。",
   "settingsTrustTls": "允许未验证的 HTTPS",
   "settingsTrustTlsSubtitle": "信任自签名和链不完整的证书。某些业余 Lightning 服务器和 .onion 服务需要此项。仅对你信任的服务器启用。",
+  "settingsLegacyAvatars": "经典头像",
+  "settingsLegacyAvatarsSubtitle": "使用以前的头像样式，而不是新的比特币头像。",
   "settingsAbout": "关于",
   "settingsNotifyReceived": "接收付款时通知我",
   "settingsNotifyReceivedSubtitle": "通知延迟是设计使然：EmberSpark 在后台检查，而不使用第三方推送服务，因此不会共享任何支付数据。会消耗少量电量。",

@@ -8,6 +8,7 @@ import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
 import '../services/price_service.dart';
+import '../services/avatar_prefs.dart';
 import '../services/avatar_seed.dart';
 import '../services/my_contact_service.dart';
 import '../services/payment_feedback.dart';
@@ -29,6 +30,11 @@ import 'receive_screen.dart';
 import 'send_to_screen.dart';
 import 'settings_screen.dart';
 import 'wallets_screen.dart';
+
+/// Home avatar diameter. The new Bitcoin avatars are shown 25% larger than the
+/// legacy multiavatar size (88 -> 110).
+const double kHomeAvatarSize = 110;
+const double kLegacyHomeAvatarSize = 88;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -392,11 +398,12 @@ class _HomeScreenState extends State<HomeScreen>
     ConnectionStatus.failed => l10n.connectionStatusFailed,
   };
 
-  Widget _buildAvatarSwitcher() {
+  Widget _buildAvatarSwitcher(double size) {
     if (_wallets.length <= 1 || _avatarPage == null) {
       return _avatarBubble(
         avatarSeed,
         _avatarFlip,
+        size: size,
         avatarKey: ValueKey('avatar-${currentWallet?.id}'),
       );
     }
@@ -407,8 +414,8 @@ class _HomeScreenState extends State<HomeScreen>
     return NotificationListener<ScrollNotification>(
       onNotification: (_) => true,
       child: SizedBox(
-        width: 88,
-        height: 88,
+        width: size,
+        height: size,
         child: PageView.builder(
           key: ValueKey(_walletSig),
           scrollDirection: Axis.vertical,
@@ -421,6 +428,7 @@ class _HomeScreenState extends State<HomeScreen>
             return _avatarBubble(
               (seed == null || seed.isEmpty) ? null : seed,
               i == _walletIndex ? _avatarFlip : _noFlip,
+              size: size,
               avatarKey: ValueKey('avatar-${w.id}'),
             );
           },
@@ -432,6 +440,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _avatarBubble(
     String? seed,
     ValueListenable<int> trigger, {
+    required double size,
     Key? avatarKey,
   }) {
     return Material(
@@ -441,11 +450,16 @@ class _HomeScreenState extends State<HomeScreen>
       child: InkWell(
         onTap: _openMyContact,
         child: SizedBox(
-          width: 88,
-          height: 88,
+          width: size,
+          height: size,
           child: seed == null
-              ? const Icon(Icons.person, size: 48, color: Colors.white)
-              : FlippingAvatar(key: avatarKey, seed: seed, trigger: trigger),
+              ? Icon(Icons.person, size: size * 0.55, color: Colors.white)
+              : FlippingAvatar(
+                  key: avatarKey,
+                  seed: seed,
+                  trigger: trigger,
+                  size: size,
+                ),
         ),
       ),
     );
@@ -627,7 +641,13 @@ class _HomeScreenState extends State<HomeScreen>
             AvatarStatusRing(
               status: _conn,
               tooltip: _connTooltip(l10n),
-              child: _buildAvatarSwitcher(),
+              // New avatars are 25% larger on Home; legacy keeps the old size.
+              child: ValueListenableBuilder<bool>(
+                valueListenable: useLegacyAvatars,
+                builder: (_, legacy, __) => _buildAvatarSwitcher(
+                  legacy ? kLegacyHomeAvatarSize : kHomeAvatarSize,
+                ),
+              ),
             ),
             if (currentWallet != null) ...[
               const SizedBox(height: 8),

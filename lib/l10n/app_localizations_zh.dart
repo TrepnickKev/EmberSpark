@@ -666,6 +666,12 @@ class AppLocalizationsZh extends AppLocalizations {
       '信任自签名和链不完整的证书。某些业余 Lightning 服务器和 .onion 服务需要此项。仅对你信任的服务器启用。';
 
   @override
+  String get settingsLegacyAvatars => '经典头像';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle => '使用以前的头像样式，而不是新的比特币头像。';
+
+  @override
   String get settingsAbout => '关于';
 
   @override

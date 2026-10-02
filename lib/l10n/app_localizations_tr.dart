@@ -683,6 +683,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kendinden imzalı ve zinciri eksik sertifikalara güven. Bazı amatör Lightning sunucuları ve .onion hizmetleri için gerekli. Yalnızca güvendiğin sunucular için etkinleştir.';
 
   @override
+  String get settingsLegacyAvatars => 'Klasik avatarlar';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle =>
+      'Yeni Bitcoin avatarları yerine önceki avatar stilini kullan.';
+
+  @override
   String get settingsAbout => 'Hakkında';
 
   @override

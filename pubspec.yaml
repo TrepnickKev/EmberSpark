@@ -27,6 +27,8 @@ dependencies:
   nfc_manager: ^4.0.2
   image_picker: ^1.1.2
   random_avatar: ^0.0.8
+  bitcoin_avatar:
+    path: packages/bitcoin_avatar
   flutter_file_dialog: ^3.0.2
   path_provider: ^2.1.5
   workmanager: ^0.9.0

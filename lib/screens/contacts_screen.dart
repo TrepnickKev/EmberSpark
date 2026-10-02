@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:random_avatar/random_avatar.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/avatar_seed.dart';
 import '../services/contact_service.dart';
 import '../services/lightning_router.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
+import '../widgets/wallet_avatar.dart';
 import 'qr_scan_screen.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -306,15 +306,7 @@ Widget contactAvatar(String destination, {double size = 40}) {
       ),
     );
   }
-  return SizedBox(
-    width: size,
-    height: size,
-    child: RandomAvatar(
-      seed,
-      height: size,
-      width: size,
-    ),
-  );
+  return WalletAvatar(seed, size: size);
 }
 
 class _ContactFormDialog extends StatefulWidget {

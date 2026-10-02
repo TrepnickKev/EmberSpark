@@ -686,6 +686,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Доверять самоподписанным сертификатам и с неполной цепочкой. Нужно для некоторых любительских серверов Lightning и сервисов .onion. Включай только для серверов, которым доверяешь.';
 
   @override
+  String get settingsLegacyAvatars => 'Классические аватары';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle =>
+      'Использовать прежний стиль аватаров вместо новых Bitcoin-аватаров.';
+
+  @override
   String get settingsAbout => 'О приложении';
 
   @override
