@@ -783,6 +783,11 @@ class _EditDialogState extends State<_EditDialog> {
     };
     final isSingleLine = widget.kind == MyContactKind.lnAddress;
     return Dialog(
+      // This dialog has a floating avatar that straddles the top edge. The
+      // themed orange outline is painted in the FOREGROUND (over children), so
+      // it would cut across the avatar and nothing behind it can cover it.
+      // Drop the outline for this dialog only; keep the same rounded corners.
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,

@@ -71,6 +71,15 @@ class _HomeScreenState extends State<HomeScreen>
   // and about to reload. _flipSeen tracks the last global success we've played.
   final ValueNotifier<int> _avatarFlip = ValueNotifier<int>(0);
   int _flipSeen = 0;
+  // A payment success waiting to be shown. The flip is queued until Home is
+  // actually visible (no route on top of it or still animating out) and any
+  // avatar/carousel refresh has applied, so it never plays under the outgoing
+  // page or on an avatar that is about to be replaced (e.g. a claim into
+  // another wallet).
+  bool _flipQueued = false;
+  int _avatarRefreshes = 0;
+  Animation<double>? _coverAnim;
+  AnimationStatusListener? _coverListener;
 
   Timer? _pollTimer;
   bool _polling = false;
@@ -114,12 +123,46 @@ class _HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
     if (paymentSuccessTrigger.value != _flipSeen) {
       _flipSeen = paymentSuccessTrigger.value;
-      _avatarFlip.value++;
+      _flipQueued = true;
+      _tryPlayQueuedFlip();
     }
+  }
+
+  /// Plays a queued coin-flip once it can actually be seen. didPopNext and the
+  /// awaited push in [_load] fire at the START of the pop transition, so the
+  /// flip used to run largely underneath the outgoing page. Wait until the
+  /// covering route has fully left (Home's secondary animation dismissed) and
+  /// no avatar refresh is pending, then flip on the next frame.
+  void _tryPlayQueuedFlip() {
+    if (!mounted || !_flipQueued || _avatarRefreshes > 0) return;
+    final cover = ModalRoute.of(context)?.secondaryAnimation;
+    if (cover != null && cover.status != AnimationStatus.dismissed) {
+      if (_coverListener != null) return; // already waiting for it
+      void onStatus(AnimationStatus status) {
+        if (status != AnimationStatus.dismissed) return;
+        cover.removeStatusListener(onStatus);
+        _coverAnim = null;
+        _coverListener = null;
+        _tryPlayQueuedFlip();
+      }
+
+      _coverAnim = cover;
+      _coverListener = onStatus;
+      cover.addStatusListener(onStatus);
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_flipQueued || _avatarRefreshes > 0) return;
+      _flipQueued = false;
+      _avatarFlip.value++;
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   @override
   void dispose() {
+    final coverListener = _coverListener;
+    if (coverListener != null) _coverAnim?.removeStatusListener(coverListener);
     WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
     _stopPolling();
@@ -291,8 +334,23 @@ class _HomeScreenState extends State<HomeScreen>
   /// Loads the current wallet, its avatar seed, and the swipe-carousel wallet
   /// list + seeds - all from local storage, no server call - so they render
   /// even when the endpoint is unreachable. Applies its state under the [seq]
-  /// guard and returns the current wallet.
+  /// guard and returns the current wallet. While it runs, a queued coin-flip
+  /// waits; it is retried after the frame that applies the refresh (and after
+  /// the carousel jump scheduled inside), so it lands on the avatar shown.
   Future<WalletAccount?> _loadAvatarAndWallets(int seq) async {
+    _avatarRefreshes++;
+    try {
+      return await _applyAvatarAndWallets(seq);
+    } finally {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _avatarRefreshes--;
+        _tryPlayQueuedFlip();
+      });
+      WidgetsBinding.instance.ensureVisualUpdate();
+    }
+  }
+
+  Future<WalletAccount?> _applyAvatarAndWallets(int seq) async {
     final results = await Future.wait([
       getCurrentWallet(),
       getMyLightningAddress(),
