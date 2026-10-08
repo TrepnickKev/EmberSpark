@@ -464,24 +464,29 @@ class _HomeScreenState extends State<HomeScreen>
     // making the top bar's colour depend on the selected wallet's page index.
     return NotificationListener<ScrollNotification>(
       onNotification: (_) => true,
-      child: SizedBox(
-        width: 88,
-        height: 88,
-        child: PageView.builder(
-          key: ValueKey(_walletSig),
-          scrollDirection: Axis.vertical,
-          controller: _avatarPage,
-          onPageChanged: _onWalletPageChanged,
-          itemCount: _wallets.length,
-          itemBuilder: (_, i) {
-            final w = _wallets[i];
-            final seed = _walletSeeds[w.id];
-            return _avatarBubble(
-              (seed == null || seed.isEmpty) ? null : seed,
-              i == _walletIndex ? _avatarFlip : _noFlip,
-              avatarKey: ValueKey('avatar-${w.id}'),
-            );
-          },
+      // Clip the carousel window itself to a fixed circle: mid-swipe the pages
+      // slide behind this round window instead of showing in the square box's
+      // corners outside the connection ring.
+      child: ClipOval(
+        child: SizedBox(
+          width: 88,
+          height: 88,
+          child: PageView.builder(
+            key: ValueKey(_walletSig),
+            scrollDirection: Axis.vertical,
+            controller: _avatarPage,
+            onPageChanged: _onWalletPageChanged,
+            itemCount: _wallets.length,
+            itemBuilder: (_, i) {
+              final w = _wallets[i];
+              final seed = _walletSeeds[w.id];
+              return _avatarBubble(
+                (seed == null || seed.isEmpty) ? null : seed,
+                i == _walletIndex ? _avatarFlip : _noFlip,
+                avatarKey: ValueKey('avatar-${w.id}'),
+              );
+            },
+          ),
         ),
       ),
     );
