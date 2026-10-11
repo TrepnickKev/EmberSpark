@@ -89,35 +89,38 @@ class _AvatarStatusRingState extends State<AvatarStatusRing>
       },
       child: widget.child,
     );
-    // In flight mode, overlay a small airplane badge on the ring's lower right.
-    final decorated = widget.status != ConnectionStatus.flightMode
-        ? ring
-        : Stack(
-            clipBehavior: Clip.none,
-            children: [
-              ring,
-              Positioned(
-                right: -2,
-                bottom: -2,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.surface,
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.airplanemode_active,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+    // Always the same Stack with the ring first, in every state: the badge is
+    // only added or removed after it. Swapping between a bare ring and a Stack
+    // would make Flutter rebuild the whole avatar subtree on each status change,
+    // resetting the wallet carousel (it snapped back to its initial page).
+    final decorated = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        ring,
+        // In flight mode, a small airplane badge on the ring's lower right.
+        if (widget.status == ConnectionStatus.flightMode)
+          Positioned(
+            right: -2,
+            bottom: -2,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color,
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.surface,
+                  width: 2,
                 ),
               ),
-            ],
-          );
+              child: const Icon(
+                Icons.airplanemode_active,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+      ],
+    );
     if (widget.tooltip == null) return decorated;
     return Tooltip(message: widget.tooltip!, child: decorated);
   }
