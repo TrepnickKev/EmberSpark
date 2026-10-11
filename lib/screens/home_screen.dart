@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../main.dart' show routeObserver;
 import '../l10n/app_localizations.dart';
+import '../services/flight_mode_service.dart';
 import '../services/friendly_error.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
@@ -84,6 +85,9 @@ class _HomeScreenState extends State<HomeScreen>
   Timer? _pollTimer;
   bool _polling = false;
   static const _pollInterval = Duration(seconds: 5);
+  // While flight mode is on the server is usually unreachable, so poll rarely
+  // (saves battery) but keep trying in case in-flight Wi-Fi reaches it.
+  static const _flightPollInterval = Duration(seconds: 30);
 
   // Guards against racing loads: a fast multi-wallet swipe fires _load() for
   // each page crossed. Only the newest load (highest seq) may apply its result,
@@ -98,9 +102,30 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _flipSeen = paymentSuccessTrigger.value;
+    flightMode.addListener(_onFlightModeChanged);
     _load();
     _startPolling();
   }
+
+  /// Flight mode toggled. ON: a failed connection shows the calm flight-mode
+  /// state and polling slows down. OFF: back to the normal rate and reload at
+  /// once instead of waiting for the next poll.
+  void _onFlightModeChanged() {
+    if (!mounted) return;
+    if (_pollTimer != null) _startPolling(); // keep the paused-in-background state
+    if (flightMode.value) {
+      if (_conn == ConnectionStatus.failed) {
+        setState(() => _conn = ConnectionStatus.flightMode);
+      }
+    } else {
+      _load();
+    }
+  }
+
+  /// The ring state for a failed probe: flight mode explains it calmly,
+  /// otherwise it is a real connection problem.
+  ConnectionStatus get _failedStatus =>
+      flightMode.value ? ConnectionStatus.flightMode : ConnectionStatus.failed;
 
   @override
   void didChangeDependencies() {
@@ -163,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen>
   void dispose() {
     final coverListener = _coverListener;
     if (coverListener != null) _coverAnim?.removeStatusListener(coverListener);
+    flightMode.removeListener(_onFlightModeChanged);
     WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
     _stopPolling();
@@ -184,7 +210,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _startPolling() {
     _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(_pollInterval, (_) => _pollOnce());
+    _pollTimer = Timer.periodic(
+      flightMode.value ? _flightPollInterval : _pollInterval,
+      (_) => _pollOnce(),
+    );
   }
 
   void _stopPolling() {
@@ -222,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen>
     } catch (_) {
       // Stay quiet on poll errors (no snackbar / no error text) so transient
       // network blips don't spam - but reflect the failure in the status ring.
-      if (mounted) setState(() => _conn = ConnectionStatus.failed);
+      if (mounted) setState(() => _conn = _failedStatus);
     } finally {
       _polling = false;
     }
@@ -322,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen>
       if (!mounted || seq != _loadSeq) return;
       setState(() {
         error = friendlyError(AppLocalizations.of(context)!, e);
-        _conn = ConnectionStatus.failed;
+        _conn = _failedStatus;
       });
     } finally {
       // Only the latest load owns the loading flag, so a discarded stale load
@@ -448,6 +477,7 @@ class _HomeScreenState extends State<HomeScreen>
     ConnectionStatus.ok => l10n.connectionStatusOk,
     ConnectionStatus.connecting => l10n.connectionStatusConnecting,
     ConnectionStatus.failed => l10n.connectionStatusFailed,
+    ConnectionStatus.flightMode => l10n.connectionStatusFlightMode,
   };
 
   Widget _buildAvatarSwitcher() {
@@ -741,6 +771,23 @@ class _HomeScreenState extends State<HomeScreen>
               child: Center(
                 child: loading
                     ? const CircularProgressIndicator()
+                    : _conn == ConnectionStatus.flightMode
+                        // Offline on purpose: a calm hint, not a red error.
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.airplanemode_active,
+                                size: 18,
+                                color: Colors.blueGrey.shade300,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n.connectionStatusFlightMode,
+                                style: TextStyle(color: Colors.blueGrey.shade300),
+                              ),
+                            ],
+                          )
                     : error != null
                         ? Text(
                             error!,

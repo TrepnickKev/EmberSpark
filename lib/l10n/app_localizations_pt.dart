@@ -958,6 +958,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get connectionStatusFailed => 'Sem conexão';
 
   @override
+  String get connectionStatusFlightMode => 'O modo avião está ativado';
+
+  @override
   String get bolt12TitlePayOffer => 'Pagar oferta BOLT12';
 
   @override

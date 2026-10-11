@@ -952,6 +952,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get connectionStatusFailed => 'Нет соединения';
 
   @override
+  String get connectionStatusFlightMode => 'Включён режим полёта';
+
+  @override
   String get bolt12TitlePayOffer => 'Оплатить оффер BOLT12';
 
   @override

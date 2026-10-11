@@ -293,6 +293,7 @@
   "connectionStatusOk": "Подключено",
   "connectionStatusConnecting": "Подключение",
   "connectionStatusFailed": "Нет соединения",
+  "connectionStatusFlightMode": "Включён режим полёта",
 
   "bolt12TitlePayOffer": "Оплатить оффер BOLT12",
   "bolt12TitlePayInvoice": "Оплатить счёт BOLT12",

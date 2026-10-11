@@ -957,6 +957,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connectionStatusFailed => 'Pas de connexion';
 
   @override
+  String get connectionStatusFlightMode => 'Le mode avion est activé';
+
+  @override
   String get bolt12TitlePayOffer => 'Payer une offre BOLT12';
 
   @override

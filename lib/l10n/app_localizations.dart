@@ -1778,6 +1778,12 @@ abstract class AppLocalizations {
   /// **'No connection'**
   String get connectionStatusFailed;
 
+  /// No description provided for @connectionStatusFlightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight mode is on'**
+  String get connectionStatusFlightMode;
+
   /// No description provided for @bolt12TitlePayOffer.
   ///
   /// In en, this message translates to:

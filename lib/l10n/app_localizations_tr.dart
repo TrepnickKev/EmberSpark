@@ -949,6 +949,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get connectionStatusFailed => 'Bağlantı yok';
 
   @override
+  String get connectionStatusFlightMode => 'Uçak modu açık';
+
+  @override
   String get bolt12TitlePayOffer => 'BOLT12 teklifini öde';
 
   @override
