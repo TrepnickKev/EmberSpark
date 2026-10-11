@@ -1,11 +1,11 @@
-import 'package:bitcoin_avatar/bitcoin_avatar.dart';
+import 'package:animal_avatar/animal_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 import '../services/avatar_prefs.dart';
 
 /// Renders a wallet/contact avatar from a deterministic [seed] string, using
-/// the new `bitcoin_avatar` emblems by default and the legacy `random_avatar`
+/// the new `animal_avatar` illustrations by default and the legacy `random_avatar`
 /// (multiavatar) style when [useLegacyAvatars] is on. Watching the notifier
 /// here means every avatar in the app switches renderer live when the Settings
 /// toggle flips. The new renderer self-clips to a circle; the legacy one keeps
@@ -26,7 +26,7 @@ class WalletAvatar extends StatelessWidget {
               height: size,
               child: RandomAvatar(seed, height: size, width: size),
             )
-          : BitcoinAvatar(seed, size: size),
+          : AnimalAvatar(seed, size: size),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Whether the wallet avatars use the previous `random_avatar` (multiavatar)
-/// style instead of the new `bitcoin_avatar` emblems. `false` = new avatars.
+/// style instead of the new `animal_avatar` illustrations. `false` = new avatars.
 /// A global [ValueNotifier] so every avatar site (Home, contacts, pay header,
 /// withdraw chooser) switches renderer live when the Settings toggle flips.
 /// Persisted to `use_legacy_avatars`; loaded once at app start.
