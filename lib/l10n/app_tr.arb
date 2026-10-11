@@ -295,6 +295,7 @@
   "connectionStatusOk": "Bağlandı",
   "connectionStatusConnecting": "Bağlanıyor",
   "connectionStatusFailed": "Bağlantı yok",
+  "connectionStatusFlightMode": "Uçak modu açık",
 
   "bolt12TitlePayOffer": "BOLT12 teklifini öde",
   "bolt12TitlePayInvoice": "BOLT12 faturasını öde",

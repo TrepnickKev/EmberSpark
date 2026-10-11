@@ -295,6 +295,7 @@
   "connectionStatusOk": "已连接",
   "connectionStatusConnecting": "连接中",
   "connectionStatusFailed": "无连接",
+  "connectionStatusFlightMode": "飞行模式已开启",
 
   "bolt12TitlePayOffer": "支付 BOLT12 offer",
   "bolt12TitlePayInvoice": "支付 BOLT12 发票",

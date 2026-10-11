@@ -12,6 +12,10 @@ enum ConnectionStatus {
 
   /// The last probe failed - server unreachable or errored (red).
   failed,
+
+  /// The last probe failed while the device is in flight mode (calm blue-grey
+  /// with an airplane badge): the phone is offline on purpose, not the server.
+  flightMode,
 }
 
 /// A gently pulsing coloured glow ring drawn around [child] (the Home avatar),
@@ -57,6 +61,7 @@ class _AvatarStatusRingState extends State<AvatarStatusRing>
     ConnectionStatus.ok => const Color(0xFF2ECC71),
     ConnectionStatus.connecting => bitcoinOrange,
     ConnectionStatus.failed => Colors.redAccent,
+    ConnectionStatus.flightMode => Colors.blueGrey.shade300,
   };
 
   @override
@@ -85,7 +90,36 @@ class _AvatarStatusRingState extends State<AvatarStatusRing>
       },
       child: widget.child,
     );
-    if (widget.tooltip == null) return ring;
-    return Tooltip(message: widget.tooltip!, child: ring);
+    // In flight mode, overlay a small airplane badge on the ring's lower right.
+    final decorated = widget.status != ConnectionStatus.flightMode
+        ? ring
+        : Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ring,
+              Positioned(
+                right: -2,
+                bottom: -2,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: color,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.surface,
+                      width: 2,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.airplanemode_active,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          );
+    if (widget.tooltip == null) return decorated;
+    return Tooltip(message: widget.tooltip!, child: decorated);
   }
 }

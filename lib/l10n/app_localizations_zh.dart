@@ -923,6 +923,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connectionStatusFailed => '无连接';
 
   @override
+  String get connectionStatusFlightMode => '飞行模式已开启';
+
+  @override
   String get bolt12TitlePayOffer => '支付 BOLT12 offer';
 
   @override

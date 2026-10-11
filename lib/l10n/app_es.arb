@@ -295,6 +295,7 @@
   "connectionStatusOk": "Conectado",
   "connectionStatusConnecting": "Conectando",
   "connectionStatusFailed": "Sin conexión",
+  "connectionStatusFlightMode": "El modo avión está activado",
 
   "bolt12TitlePayOffer": "Pagar oferta BOLT12",
   "bolt12TitlePayInvoice": "Pagar factura BOLT12",

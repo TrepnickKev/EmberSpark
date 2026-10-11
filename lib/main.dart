@@ -7,6 +7,7 @@ import 'screens/lock_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/wallets_screen.dart';
 import 'services/avatar_prefs.dart';
+import 'services/flight_mode_service.dart';
 import 'services/language_service.dart';
 import 'services/lightning_router.dart';
 import 'services/lock_service.dart';
@@ -29,6 +30,7 @@ void main() async {
   await loadInitialLocale();
   await loadAmountDisplayMode();
   await loadUseLegacyAvatars();
+  startFlightModeWatch();
   await migrateLegacyStorageIfNeeded();
   // Opt-in received-payment notifications: register the WorkManager callback,
   // then re-schedule the periodic poll if the user has it enabled (survives
