@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/avatar_prefs.dart';
 import '../services/http_client_factory.dart';
 import '../services/language_service.dart';
 import '../services/lock_service.dart';
@@ -28,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? language;
   bool? notifyReceived;
   String? notifySound;
+  bool? legacyAvatars;
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       getSelectedLanguageCode(),
       isReceivedNotifyEnabled(),
       getNotifySound(),
+      getUseLegacyAvatars(),
     ]);
     if (!mounted) return;
     setState(() {
@@ -54,6 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       language = results[4] as String;
       notifyReceived = results[5] as bool;
       notifySound = results[6] as String;
+      legacyAvatars = results[7] as bool;
     });
   }
 
@@ -111,12 +115,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lang = language;
     final notify = notifyReceived;
     final sound = notifySound;
+    final legacy = legacyAvatars;
     if (tls == null ||
         cur == null ||
         lock == null ||
         lang == null ||
         notify == null ||
-        sound == null) {
+        sound == null ||
+        legacy == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -190,6 +196,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (next) async {
                 await setUnverifiedTlsAllowed(next);
                 if (mounted) setState(() => trustUnverified = next);
+              },
+            ),
+            const Divider(),
+            SwitchListTile(
+              title: _title(l10n.settingsLegacyAvatars),
+              subtitle: Text(l10n.settingsLegacyAvatarsSubtitle),
+              value: legacy,
+              onChanged: (next) async {
+                await setUseLegacyAvatars(next);
+                if (mounted) setState(() => legacyAvatars = next);
               },
             ),
             const Divider(),

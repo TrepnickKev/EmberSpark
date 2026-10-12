@@ -1322,6 +1322,18 @@ abstract class AppLocalizations {
   /// **'Trust self-signed and incomplete-chain certificates. Required for some hobbyist Lightning servers and .onion services. Only enable for servers you trust.'**
   String get settingsTrustTlsSubtitle;
 
+  /// No description provided for @settingsLegacyAvatars.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy avatars'**
+  String get settingsLegacyAvatars;
+
+  /// No description provided for @settingsLegacyAvatarsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the previous avatar style instead of the new Bitcoin avatars.'**
+  String get settingsLegacyAvatarsSubtitle;
+
   /// No description provided for @settingsAbout.
   ///
   /// In en, this message translates to:

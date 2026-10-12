@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:random_avatar/random_avatar.dart';
+
+import 'wallet_avatar.dart';
 
 /// Sender → recipient indicator shown at the top of the pay confirmation
 /// screens when the destination came from a contact pick. Both columns
@@ -63,7 +64,7 @@ class _AvatarColumn extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RandomAvatar(seed, height: 88, width: 88),
+        WalletAvatar(seed, size: 88),
         const SizedBox(height: 6),
         SizedBox(
           width: 88,

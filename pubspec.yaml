@@ -27,6 +27,10 @@ dependencies:
   nfc_manager: ^4.0.2
   image_picker: ^1.1.2
   random_avatar: ^0.0.8
+  animal_avatar:
+    git:
+      url: https://github.com/TrepnickKev/Animal-Avatar-Generator.git
+      ref: v0.2.6
   flutter_file_dialog: ^3.0.2
   path_provider: ^2.1.5
   workmanager: ^0.9.0

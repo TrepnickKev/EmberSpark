@@ -217,6 +217,8 @@
   "settingsLockNeedSetup": "Richte zuerst eine Bildschirmsperre oder Biometrie auf deinem Gerät ein.",
   "settingsTrustTls": "Unverifizierte HTTPS-Verbindungen erlauben",
   "settingsTrustTlsSubtitle": "Vertrauen in selbstsignierte oder unvollständige Zertifikatsketten. Nötig für manche Hobby-Lightning-Server und .onion-Adressen. Nur für Server aktivieren, denen du vertraust.",
+  "settingsLegacyAvatars": "Klassische Avatare",
+  "settingsLegacyAvatarsSubtitle": "Den vorherigen Avatar-Stil statt der neuen Bitcoin-Avatare verwenden.",
   "settingsAbout": "Über",
   "settingsNotifyReceived": "Über eingehende Zahlungen benachrichtigen",
   "settingsNotifyReceivedSubtitle": "Benachrichtigungen sind designbedingt verzögert. EmberSpark prüft im Hintergrund, statt Push-Dienste von Drittanbietern zu nutzen, sodass keine Zahlungsdaten weitergegeben werden. Verbraucht etwas Akku.",

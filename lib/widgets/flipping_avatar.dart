@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:random_avatar/random_avatar.dart';
+
+import 'wallet_avatar.dart';
 
 /// The home-screen profile avatar, with a coin-flip success animation.
 ///
@@ -87,11 +88,7 @@ class _FlippingAvatarState extends State<FlippingAvatar>
                   transform: Matrix4.identity()..rotateY(math.pi),
                   child: _checkmark(),
                 )
-              : RandomAvatar(
-                  widget.seed,
-                  height: widget.size,
-                  width: widget.size,
-                ),
+              : WalletAvatar(widget.seed, size: widget.size),
         );
       },
     );

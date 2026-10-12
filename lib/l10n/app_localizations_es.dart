@@ -688,6 +688,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Confía en certificados autofirmados o con cadena incompleta. Necesario para algunos servidores Lightning caseros y servicios .onion. Actívalo solo para servidores en los que confíes.';
 
   @override
+  String get settingsLegacyAvatars => 'Avatares clásicos';
+
+  @override
+  String get settingsLegacyAvatarsSubtitle =>
+      'Usar el estilo de avatar anterior en lugar de los nuevos avatares Bitcoin.';
+
+  @override
   String get settingsAbout => 'Acerca de';
 
   @override

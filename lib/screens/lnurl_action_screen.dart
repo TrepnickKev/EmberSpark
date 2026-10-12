@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:random_avatar/random_avatar.dart';
 import '../l10n/app_localizations.dart';
 import '../services/avatar_seed.dart';
 import '../services/contact_service.dart' show Contact;
@@ -15,6 +14,7 @@ import '../services/price_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/payment_route_header.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
+import '../widgets/wallet_avatar.dart';
 import 'send_screen.dart';
 
 /// Resolves a scanned LNURL or Lightning address and runs the appropriate
@@ -109,11 +109,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
     if (target == null) return const SizedBox.shrink();
     final multi = _wallets.length > 1 && _targetPage != null;
     final avatar = !multi
-        ? RandomAvatar(
-            _walletSeeds[target.id] ?? target.id,
-            height: 88,
-            width: 88,
-          )
+        ? WalletAvatar(_walletSeeds[target.id] ?? target.id, size: 88)
         : NotificationListener<ScrollNotification>(
             onNotification: (_) => true,
             child: SizedBox(
@@ -124,10 +120,9 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
                 controller: _targetPage,
                 onPageChanged: (i) => setState(() => _target = _wallets[i]),
                 itemCount: _wallets.length,
-                itemBuilder: (_, i) => RandomAvatar(
+                itemBuilder: (_, i) => WalletAvatar(
                   _walletSeeds[_wallets[i].id] ?? _wallets[i].id,
-                  height: 88,
-                  width: 88,
+                  size: 88,
                 ),
               ),
             ),
@@ -189,11 +184,7 @@ class _LnurlActionScreenState extends State<LnurlActionScreen> {
             ),
             for (final w in _wallets)
               ListTile(
-                leading: RandomAvatar(
-                  _walletSeeds[w.id] ?? w.id,
-                  height: 40,
-                  width: 40,
-                ),
+                leading: WalletAvatar(_walletSeeds[w.id] ?? w.id, size: 40),
                 title: Text(w.label),
                 trailing: w.id == _target?.id
                     ? const Icon(Icons.check, color: bitcoinOrange)

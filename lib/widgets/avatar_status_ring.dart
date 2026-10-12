@@ -71,8 +71,9 @@ class _AvatarStatusRingState extends State<AvatarStatusRing>
       animation: _pulse,
       builder: (context, child) {
         final t = _pulse.value;
+        // No padding: the ring sits flush against the avatar (Container still
+        // insets the child by the border width, so the ring never covers it).
         return Container(
-          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 2.5),
