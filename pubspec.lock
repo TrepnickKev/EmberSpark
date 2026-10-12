@@ -5,11 +5,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v0.2.4"
-      resolved-ref: "47f98fa774da82a4c392b3a066f97fc26ce2aa0d"
+      ref: "v0.2.5"
+      resolved-ref: a506125e1d3b36b8ff5b98ffc0c2bdad5d857d63
       url: "https://github.com/TrepnickKev/Animal-Avatar-Generator.git"
     source: git
-    version: "0.2.4"
+    version: "0.2.5"
   app_links:
     dependency: "direct main"
     description:
