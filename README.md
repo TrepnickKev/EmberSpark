@@ -125,6 +125,12 @@ EmberSpark is built and maintained in spare time. If it makes your sats
 easier to manage, the on-chain BTC donate address is shown inside the app at
 **Settings → About**. Every bit keeps the project alive. Thank you.
 
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
+first. Before your first pull request is merged, you sign the
+[Contributor License Agreement](CLA.md) once, directly on GitHub.
+
 ## License
 
 Copyright (C) 2026 Trepnick Solutions
