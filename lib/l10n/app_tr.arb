@@ -150,6 +150,7 @@
   "historyEmpty": "Henüz işlem yok",
   "historySearchHint": "Ödemelerde ara",
   "historyNoResults": "Eşleşen ödeme yok",
+  "historyOfflineCached": "Çevrimdışı. Kaydedilmiş işlemler gösteriliyor ({date}).",
   "historyPaymentDefault": "Lightning ödemesi",
   "historyPending": "beklemede",
   "historyFee": "ücret {amount}",

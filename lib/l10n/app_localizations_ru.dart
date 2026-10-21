@@ -466,6 +466,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyNoResults => 'Нет подходящих платежей';
 
   @override
+  String historyOfflineCached(String date) {
+    return 'Нет подключения. Показаны сохранённые транзакции ($date).';
+  }
+
+  @override
   String get historyPaymentDefault => 'Платёж Lightning';
 
   @override

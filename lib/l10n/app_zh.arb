@@ -150,6 +150,7 @@
   "historyEmpty": "还没有交易",
   "historySearchHint": "搜索支付",
   "historyNoResults": "没有匹配的支付",
+  "historyOfflineCached": "离线。显示已保存的交易（{date}）。",
   "historyPaymentDefault": "Lightning 支付",
   "historyPending": "待处理",
   "historyFee": "手续费 {amount}",

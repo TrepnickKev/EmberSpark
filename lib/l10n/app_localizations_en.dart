@@ -463,6 +463,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyNoResults => 'No matching payments';
 
   @override
+  String historyOfflineCached(String date) {
+    return 'Offline. Showing saved transactions ($date).';
+  }
+
+  @override
   String get historyPaymentDefault => 'Lightning payment';
 
   @override

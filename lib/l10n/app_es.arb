@@ -150,6 +150,7 @@
   "historyEmpty": "Aún no hay transacciones",
   "historySearchHint": "Buscar pagos",
   "historyNoResults": "No hay pagos coincidentes",
+  "historyOfflineCached": "Sin conexión. Se muestran las transacciones guardadas ({date}).",
   "historyPaymentDefault": "Pago Lightning",
   "historyPending": "pendiente",
   "historyFee": "comisión {amount}",

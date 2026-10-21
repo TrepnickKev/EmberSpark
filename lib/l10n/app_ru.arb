@@ -150,6 +150,7 @@
   "historyEmpty": "Пока нет транзакций",
   "historySearchHint": "Поиск платежей",
   "historyNoResults": "Нет подходящих платежей",
+  "historyOfflineCached": "Нет подключения. Показаны сохранённые транзакции ({date}).",
   "historyPaymentDefault": "Платёж Lightning",
   "historyPending": "в ожидании",
   "historyFee": "комиссия {amount}",

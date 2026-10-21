@@ -54,9 +54,13 @@ Future<void> setSelectedCurrency(String currency) async {
   await storage.write(key: _currencyKey, value: currency);
 }
 
+// Last successfully fetched rates, persisted so fiat values still show offline
+// (also after a restart). Stale by nature; only used when the fetch fails.
+const _lastRatesKey = 'btc_rates_last_v1';
+
 /// Fetches BTC prices for all supported currencies from mempool.space.
-/// Cached for 5 minutes; on network error returns the last cached map (or
-/// null if there is none).
+/// Cached for 5 minutes; on network error returns the last cached map, then
+/// the last persisted one (or null if there is none).
 Future<Map<String, double>?> getBtcRates() async {
   final cached = _cache;
   if (cached != null &&
@@ -71,7 +75,9 @@ Future<Map<String, double>?> getBtcRates() async {
           headers: browserLikeHeaders,
         )
         .timeout(const Duration(seconds: 10));
-    if (res.statusCode != 200) return cached?.rates;
+    if (res.statusCode != 200) {
+      return cached?.rates ?? await _loadPersistedRates();
+    }
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     final rates = <String, double>{};
     for (final c in supportedCurrencies) {
@@ -79,17 +85,81 @@ Future<Map<String, double>?> getBtcRates() async {
       if (v is num) rates[c] = v.toDouble();
     }
     _cache = _RateCache(rates, DateTime.now());
+    await _persistRates(rates);
     return rates;
   } catch (_) {
-    return cached?.rates;
+    return cached?.rates ?? await _loadPersistedRates();
+  }
+}
+
+Future<void> _persistRates(Map<String, double> rates) async {
+  try {
+    const storage = FlutterSecureStorage();
+    await storage.write(
+      key: _lastRatesKey,
+      value: jsonEncode({
+        'fetchedAt': DateTime.now().toUtc().toIso8601String(),
+        'rates': rates,
+      }),
+    );
+  } catch (_) {}
+}
+
+Future<Map<String, double>?> _loadPersistedRates() async {
+  try {
+    const storage = FlutterSecureStorage();
+    final raw = await storage.read(key: _lastRatesKey);
+    if (raw == null) return null;
+    final rates = (jsonDecode(raw) as Map)['rates'] as Map;
+    return {
+      for (final e in rates.entries)
+        if (e.value is num) e.key as String: (e.value as num).toDouble(),
+    };
+  } catch (_) {
+    return null;
   }
 }
 
 // Historical BTC prices for the transaction history. Keyed by currency + UTC
 // day: a past day's price does not change, so this dedupes same-day payments
-// and repeat history opens within a session. In-memory only (refetched next
-// launch), which is fine for a price cache.
+// and repeat history opens. Persisted (loaded lazily once, written back after
+// a batch adds new days) so the offline history still shows fiat values.
 final _histCache = <String, double>{};
+const _histPricesKey = 'btc_hist_prices_v1';
+const _histMaxEntries = 3000;
+bool _histDirty = false;
+// Shared so parallel lookups all wait for the same single storage read.
+Future<void>? _histLoad;
+
+Future<void> _ensureHistLoaded() => _histLoad ??= _loadHist();
+
+Future<void> _loadHist() async {
+  try {
+    const storage = FlutterSecureStorage();
+    final raw = await storage.read(key: _histPricesKey);
+    if (raw == null) return;
+    final saved = jsonDecode(raw) as Map;
+    for (final e in saved.entries) {
+      if (e.value is num) {
+        _histCache.putIfAbsent(e.key as String, () => (e.value as num).toDouble());
+      }
+    }
+  } catch (_) {}
+}
+
+Future<void> _persistHist() async {
+  if (!_histDirty) return;
+  _histDirty = false;
+  // Insertion order = oldest first (loaded entries, then new fetches), so drop
+  // from the front to stay within the cap.
+  while (_histCache.length > _histMaxEntries) {
+    _histCache.remove(_histCache.keys.first);
+  }
+  try {
+    const storage = FlutterSecureStorage();
+    await storage.write(key: _histPricesKey, value: jsonEncode(_histCache));
+  } catch (_) {}
+}
 
 String btcHistKey(String currency, DateTime t) {
   final u = t.toUtc();
@@ -100,6 +170,7 @@ String btcHistKey(String currency, DateTime t) {
 /// endpoint. Cached per currency+day. Returns null on any failure so callers
 /// fall back to the current rate.
 Future<double?> getBtcRateAt(String currency, DateTime time) async {
+  await _ensureHistLoaded();
   final key = btcHistKey(currency, time);
   final cached = _histCache[key];
   if (cached != null) return cached;
@@ -123,6 +194,7 @@ Future<double?> getBtcRateAt(String currency, DateTime time) async {
     final v = first is Map ? first[currency] : null;
     if (v is num) {
       _histCache[key] = v.toDouble();
+      _histDirty = true;
       return v.toDouble();
     }
     return null;
@@ -152,6 +224,7 @@ Future<Map<String, double>> getBtcRatesAt(
       if (r != null) result[e.key] = r;
     }));
   }
+  await _persistHist();
   return result;
 }
 

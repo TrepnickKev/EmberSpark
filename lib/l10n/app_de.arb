@@ -152,6 +152,7 @@
   "historyEmpty": "Noch keine Transaktionen",
   "historySearchHint": "Zahlungen durchsuchen",
   "historyNoResults": "Keine passenden Zahlungen",
+  "historyOfflineCached": "Offline. Gespeicherte Transaktionen ({date}).",
   "historyPaymentDefault": "Lightning-Zahlung",
   "historyPending": "ausstehend",
   "historyFee": "Gebühr {amount}",

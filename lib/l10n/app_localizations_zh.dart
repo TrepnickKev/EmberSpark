@@ -452,6 +452,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyNoResults => '没有匹配的支付';
 
   @override
+  String historyOfflineCached(String date) {
+    return '离线。显示已保存的交易（$date）。';
+  }
+
+  @override
   String get historyPaymentDefault => 'Lightning 支付';
 
   @override

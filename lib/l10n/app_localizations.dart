@@ -950,6 +950,12 @@ abstract class AppLocalizations {
   /// **'No matching payments'**
   String get historyNoResults;
 
+  /// No description provided for @historyOfflineCached.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing saved transactions ({date}).'**
+  String historyOfflineCached(String date);
+
   /// No description provided for @historyPaymentDefault.
   ///
   /// In en, this message translates to:

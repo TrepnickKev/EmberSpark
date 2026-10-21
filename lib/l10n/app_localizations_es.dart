@@ -468,6 +468,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get historyNoResults => 'No hay pagos coincidentes';
 
   @override
+  String historyOfflineCached(String date) {
+    return 'Sin conexión. Se muestran las transacciones guardadas ($date).';
+  }
+
+  @override
   String get historyPaymentDefault => 'Pago Lightning';
 
   @override

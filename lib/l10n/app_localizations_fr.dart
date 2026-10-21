@@ -469,6 +469,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get historyNoResults => 'Aucun paiement correspondant';
 
   @override
+  String historyOfflineCached(String date) {
+    return 'Hors ligne. Transactions enregistrées affichées ($date).';
+  }
+
+  @override
   String get historyPaymentDefault => 'Paiement Lightning';
 
   @override

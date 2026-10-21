@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../services/friendly_error.dart';
+import '../services/payment_cache.dart';
 import '../services/payment_search.dart';
+import '../services/wallet_account_service.dart';
 import '../services/wallet_backend.dart';
 import '../services/price_service.dart';
 
@@ -24,6 +28,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   // Historical BTC price per currency+day (btcHistKey), so each row shows its
   // value at the transaction's date. Filled after the list first renders.
   Map<String, double> _histRates = {};
+  // When the shown list comes from the offline cache: when it was saved.
+  // Null once a live load succeeded.
+  DateTime? _cachedAt;
 
   bool _searching = false;
   final TextEditingController _searchCtrl = TextEditingController();
@@ -54,31 +61,52 @@ class _HistoryScreenState extends State<HistoryScreen> {
       loading = true;
       error = null;
     });
+    final wallet = await getCurrentWallet();
+    final cur = await getSelectedCurrency();
+    if (!mounted) return;
+    setState(() => fiatCurrency = cur);
+    // Fiat rates load alongside the list. getBtcRates never throws and falls
+    // back to the last persisted rates when offline.
+    final ratesDone = getBtcRates().then((rates) {
+      if (mounted) setState(() => fiatRate = rates?[cur]);
+    });
+    // Show the offline copy right away when nothing is on screen yet, so the
+    // history also opens in flight mode or when the server is down.
+    if (payments == null && wallet != null) {
+      final cached = await loadCachedPayments(wallet.id);
+      if (mounted && cached != null) {
+        setState(() {
+          payments = cached.payments;
+          _cachedAt = cached.savedAt;
+        });
+        unawaited(_warmHistRates(cur, cached.payments));
+      }
+    }
     try {
       final WalletBackend svc = await loadWalletBackend();
-      final results = await Future.wait([
-        svc.listPayments(),
-        getSelectedCurrency(),
-        getBtcRates(),
-      ]);
+      final list = await svc.listPayments();
       if (!mounted) return;
-      final list = results[0] as List<Payment>;
-      final cur = results[1] as String;
-      final rates = results[2] as Map<String, double>?;
       setState(() {
         payments = list;
-        fiatCurrency = cur;
-        fiatRate = rates?[cur];
+        _cachedAt = null;
       });
-      // Warm historical prices in the background so rows show the value at each
-      // transaction's date; the list already rendered (current-rate fallback).
-      final hist = await getBtcRatesAt(cur, list.map((p) => p.time));
-      if (mounted && hist.isNotEmpty) setState(() => _histRates = hist);
+      if (wallet != null) await saveCachedPayments(wallet.id, list);
+      // Warm historical prices so rows show the value at each transaction's
+      // date; the list already rendered (current-rate fallback).
+      await _warmHistRates(cur, list);
     } catch (e) {
       if (!mounted) return;
       setState(() => error = friendlyError(AppLocalizations.of(context)!, e));
     } finally {
+      await ratesDone;
       if (mounted) setState(() => loading = false);
+    }
+  }
+
+  Future<void> _warmHistRates(String cur, List<Payment> list) async {
+    final hist = await getBtcRatesAt(cur, list.map((p) => p.time));
+    if (mounted && hist.isNotEmpty) {
+      setState(() => _histRates = {..._histRates, ...hist});
     }
   }
 
@@ -173,14 +201,47 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       );
     }
+    // Offline with a cached list: a calm note on top instead of an error.
+    final cachedAt = _cachedAt;
+    final offline = cachedAt != null && error != null;
+    final head = offline ? 1 : 0;
     return ListView.separated(
-      itemCount: list.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (_, i) => _PaymentTile(
-        payment: list[i],
-        fiatCurrency: fiatCurrency,
-        fiatRate: fiatRate,
-        histRate: _histRates[btcHistKey(fiatCurrency, list[i].time)],
+      itemCount: list.length + head,
+      separatorBuilder: (_, i) => offline && i == 0
+          ? const SizedBox.shrink()
+          : const Divider(height: 1),
+      itemBuilder: (_, i) {
+        if (offline && i == 0) return _offlineBanner(l10n, cachedAt);
+        final p = list[i - head];
+        return _PaymentTile(
+          payment: p,
+          fiatCurrency: fiatCurrency,
+          fiatRate: fiatRate,
+          histRate: _histRates[btcHistKey(fiatCurrency, p.time)],
+        );
+      },
+    );
+  }
+
+  Widget _offlineBanner(AppLocalizations l10n, DateTime savedAt) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off, size: 18, color: Colors.grey),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.historyOfflineCached(_formatTime(context, l10n, savedAt)),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+        ],
       ),
     );
   }

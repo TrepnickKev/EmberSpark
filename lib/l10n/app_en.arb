@@ -162,6 +162,8 @@
   "historyEmpty": "No transactions yet",
   "historySearchHint": "Search payments",
   "historyNoResults": "No matching payments",
+  "historyOfflineCached": "Offline. Showing saved transactions ({date}).",
+  "@historyOfflineCached": { "placeholders": { "date": { "type": "String" } } },
   "historyPaymentDefault": "Lightning payment",
   "historyPending": "pending",
   "historyFee": "fee {amount}",

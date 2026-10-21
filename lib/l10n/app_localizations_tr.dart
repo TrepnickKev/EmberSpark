@@ -463,6 +463,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get historyNoResults => 'Eşleşen ödeme yok';
 
   @override
+  String historyOfflineCached(String date) {
+    return 'Çevrimdışı. Kaydedilmiş işlemler gösteriliyor ($date).';
+  }
+
+  @override
   String get historyPaymentDefault => 'Lightning ödemesi';
 
   @override

@@ -553,6 +553,19 @@ class Payment {
     );
   }
 
+  /// Serialises this payment in the LNbits shape [Payment.fromJson] reads, so
+  /// the offline history cache round-trips through the same parser.
+  Map<String, dynamic> toCacheJson() => {
+    'amount': amountSats * 1000,
+    'fee': feeSats * 1000,
+    'memo': memo,
+    if (comment.isNotEmpty) 'extra': {'comment': comment},
+    'bolt11': bolt11,
+    'time': time.toUtc().toIso8601String(),
+    'pending': pending,
+    'payment_hash': paymentHash,
+  };
+
   static int _toInt(dynamic v) {
     if (v is int) return v;
     if (v is num) return v.toInt();
