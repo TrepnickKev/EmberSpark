@@ -74,14 +74,20 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
+      # Without key.properties Gradle falls back to the debug key, and Android
+      # refuses to update an installed app signed with a different key. So a
+      # missing secret must fail the build instead of being skipped.
       - name: Set up release signing
         env:
           KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-        if: ${{ env.KEYSTORE_B64 != '' }}
         run: |
+          if [[ -z "$KEYSTORE_B64" || -z "$STORE_PASSWORD" || -z "$KEY_PASSWORD" || -z "$KEY_ALIAS" ]]; then
+            echo "::error::Release signing secrets are missing; a debug-signed APK can't update installed apps"
+            exit 1
+          fi
           echo "$KEYSTORE_B64" | base64 -d > android/app/release.keystore
           cat > android/key.properties <<EOF
           storeFile=release.keystore
@@ -117,6 +123,12 @@ jobs:
           cd build/app/outputs/bundle/release
           mv app-release.aab "EmberSpark-v${{ inputs.version }}.aab"
           ls -lh
+
+      - name: Warn if the Play upload is skipped
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        if: ${{ env.PLAY_JSON == '' }}
+        run: echo "::warning::PLAY_SERVICE_ACCOUNT_JSON is not set; the AAB is not uploaded to Google Play"
 
       - name: Upload AAB to Google Play (internal track)
         env:
