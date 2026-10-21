@@ -1,9 +1,8 @@
 name: Build & release Android APKs + AAB
 
 # Manual only. Click "Run workflow" in the Actions tab, fill in the version.
-# APKs are published as a GitHub Release on the PUBLIC TrepnickKev/EmberSpark
-# repo (cross-repo write authenticated via a short-lived GitHub App
-# installation token) for sideloaders. The AAB is uploaded straight to the
+# APKs are published as a GitHub Release in this repository (built-in
+# GITHUB_TOKEN, see `permissions`) for sideloaders. The AAB is uploaded straight to the
 # Google Play internal-testing track via a service account (secret
 # PLAY_SERVICE_ACCOUNT_JSON), so it is not stored as an Actions artifact. If
 # that secret is unset the upload step is skipped.
@@ -26,6 +25,9 @@ jobs:
     name: Build & publish v${{ inputs.version }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Lets the built-in GITHUB_TOKEN create the GitHub Release (tag + APKs).
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -118,20 +120,9 @@ jobs:
           tracks: internal
           status: completed
 
-      - name: Generate App installation token
-        id: app_token
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.RELEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          owner: TrepnickKev
-          repositories: EmberSpark
-
-      - name: Publish release in PUBLIC repo
+      - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
-          repository: TrepnickKev/EmberSpark
-          token: ${{ steps.app_token.outputs.token }}
           tag_name: v${{ inputs.version }}
           name: EmberSpark v${{ inputs.version }}
           generate_release_notes: true
