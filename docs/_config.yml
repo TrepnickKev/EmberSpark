@@ -1,0 +1,21 @@
+# GitHub Pages / Jekyll config.
+#
+# This file exists primarily to keep Pages from calling the GitHub API at
+# build time via jekyll-github-metadata. That call fails on this repo with
+# "The GitHub API credentials you provided aren't valid", taking the
+# auto-generated pages-build-deployment workflow down with it. Hard-coding
+# the repository info below means the plugin never has to ask the API.
+
+title: EmberSpark
+repository: TrepnickKev/EmberSpark
+url: https://trepnickkev.github.io/EmberSpark
+
+# Render every markdown file at /<basename> without trailing slash, so
+# docs/privacy.md serves at https://.../EmberSpark/privacy automatically.
+# The front-matter "permalink: /privacy" in privacy.md is redundant under
+# this rule but harmless; leave it for clarity.
+permalink: /:basename
+
+# Declare the github object as already-populated so jekyll-github-metadata
+# treats it as resolved and skips the API call.
+github: [metadata]
