@@ -51,6 +51,13 @@ class _AboutScreenState extends State<AboutScreen> {
     );
   }
 
+  Future<void> _openLicense() async {
+    await launchUrl(
+      Uri.parse('https://github.com/TrepnickKev/EmberSpark/blob/main/LICENSE'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
   Future<void> _copyBtc(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     await Clipboard.setData(const ClipboardData(text: AboutScreen._btcAddress));
@@ -104,6 +111,28 @@ class _AboutScreenState extends State<AboutScreen> {
                   Text(
                     l10n.aboutCopyright,
                     style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  // AGPL "appropriate legal notice": license + no warranty,
+                  // tappable to read the full license text.
+                  InkWell(
+                    borderRadius: BorderRadius.circular(4),
+                    onTap: _openLicense,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      child: Text(
+                        l10n.aboutLicenseNotice,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.grey,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -316,7 +345,8 @@ class _AboutScreenState extends State<AboutScreen> {
           context: context,
           applicationName: 'EmberSpark',
           applicationVersion: info?.current,
-          applicationLegalese: l10n.aboutCopyright,
+          applicationLegalese:
+              '${l10n.aboutCopyright}\n${l10n.aboutLicenseNotice}',
           applicationIcon: Padding(
             padding: const EdgeInsets.all(8),
             child: Image.asset('images/Logo_icon.png', width: 64),

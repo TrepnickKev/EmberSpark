@@ -247,6 +247,7 @@
   "aboutTitle": "Hakkında",
   "aboutTagline": "LNbits için hafif bir Lightning cüzdanı",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "GNU AGPL v3 altında özgür yazılım, hiçbir garanti olmadan.",
   "aboutVersionLabel": "Sürüm",
   "aboutCheckAgain": "Tekrar kontrol et",
   "aboutCheckingForUpdates": "Güncellemeler kontrol ediliyor…",

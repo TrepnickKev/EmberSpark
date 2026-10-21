@@ -247,6 +247,7 @@
   "aboutTitle": "Sobre",
   "aboutTagline": "Uma carteira Lightning leve para o LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "Software livre sob a GNU AGPL v3, sem qualquer garantia.",
   "aboutVersionLabel": "Versão",
   "aboutCheckAgain": "Verificar novamente",
   "aboutCheckingForUpdates": "Verificando atualizações…",

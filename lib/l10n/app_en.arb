@@ -282,6 +282,7 @@
   "aboutTitle": "About",
   "aboutTagline": "A lightweight Lightning wallet for LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "Free software under the GNU AGPL v3, without any warranty.",
   "aboutVersionLabel": "Version",
   "aboutCheckAgain": "Check again",
   "aboutCheckingForUpdates": "Checking for updates…",

@@ -787,6 +787,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get aboutCopyright => '© 2026 Trepnick Solutions';
 
   @override
+  String get aboutLicenseNotice =>
+      'GNU AGPL v3 altında özgür yazılım, hiçbir garanti olmadan.';
+
+  @override
   String get aboutVersionLabel => 'Sürüm';
 
   @override

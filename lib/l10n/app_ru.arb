@@ -247,6 +247,7 @@
   "aboutTitle": "О приложении",
   "aboutTagline": "Лёгкий кошелёк Lightning для LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "Свободное ПО по лицензии GNU AGPL v3, без каких-либо гарантий.",
   "aboutVersionLabel": "Версия",
   "aboutCheckAgain": "Проверить снова",
   "aboutCheckingForUpdates": "Проверка обновлений…",

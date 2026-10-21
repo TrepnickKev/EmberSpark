@@ -768,6 +768,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutCopyright => '© 2026 Trepnick Solutions';
 
   @override
+  String get aboutLicenseNotice => '基于 GNU AGPL v3 的自由软件，不提供任何担保。';
+
+  @override
   String get aboutVersionLabel => '版本';
 
   @override

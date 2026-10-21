@@ -793,6 +793,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutCopyright => '© 2026 Trepnick Solutions';
 
   @override
+  String get aboutLicenseNotice =>
+      'Software libre bajo la GNU AGPL v3, sin ninguna garantía.';
+
+  @override
   String get aboutVersionLabel => 'Versión';
 
   @override

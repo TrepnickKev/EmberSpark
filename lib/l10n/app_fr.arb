@@ -247,6 +247,7 @@
   "aboutTitle": "À propos",
   "aboutTagline": "Un portefeuille Lightning léger pour LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "Logiciel libre sous GNU AGPL v3, sans aucune garantie.",
   "aboutVersionLabel": "Version",
   "aboutCheckAgain": "Vérifier à nouveau",
   "aboutCheckingForUpdates": "Recherche de mises à jour…",
