@@ -127,8 +127,22 @@ easier to manage, the on-chain BTC donate address is shown inside the app at
 
 ## License
 
-All rights reserved by **Trepnick Solutions** until a `LICENSE` file is
-added to this repo.
+Copyright (C) 2026 Trepnick Solutions
+
+EmberSpark is free software: you can redistribute and/or modify it under the
+terms of the [GNU Affero General Public License v3](LICENSE) (AGPL-3.0). It
+comes **without any warranty**. The source code will be published in this
+repository; until then, the [releases](https://github.com/TrepnickKev/EmberSpark/releases)
+contain the built app.
+
+If you distribute a modified version, or let people use one over a network,
+you must publish its complete source code under the same license. Third-party
+packages keep their own licenses (listed on the in-app Licenses page).
+
+## Trademark
+
+The EmberSpark name and logo are not covered by the license. Forks and
+modified versions must use a different name and logo.
 
 ---
 
