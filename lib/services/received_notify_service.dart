@@ -206,7 +206,7 @@ Future<void> runReceivedNotifyPoll() async {
 Future<FlutterLocalNotificationsPlugin> _initPlugin() async {
   final plugin = FlutterLocalNotificationsPlugin();
   await plugin.initialize(
-    const InitializationSettings(
+    settings: const InitializationSettings(
       android: AndroidInitializationSettings(_notifyIcon),
     ),
   );
@@ -226,9 +226,11 @@ Future<String> _ensureSoundChannel(
   final android = plugin.resolvePlatformSpecificImplementation<
       AndroidFlutterLocalNotificationsPlugin>();
   if (android == null) return sound;
-  await android.deleteNotificationChannel(_legacyChannelId);
+  await android.deleteNotificationChannel(channelId: _legacyChannelId);
   for (final s in _allSounds) {
-    if (s != sound) await android.deleteNotificationChannel(_channelIdFor(s));
+    if (s != sound) {
+      await android.deleteNotificationChannel(channelId: _channelIdFor(s));
+    }
   }
   await android.createNotificationChannel(
     AndroidNotificationChannel(
@@ -287,10 +289,10 @@ Future<void> showTestNotification() async {
   final l10n = await _isolateL10n();
   final sound = await _ensureSoundChannel(plugin, l10n);
   await plugin.show(
-    _taskUniqueName.hashCode,
-    l10n.notifyReceivedTitle,
-    l10n.notifyReceivedBody('EmberSpark', formatThousands(1000)),
-    _details(l10n, sound),
+    id: _taskUniqueName.hashCode,
+    title: l10n.notifyReceivedTitle,
+    body: l10n.notifyReceivedBody('EmberSpark', formatThousands(1000)),
+    notificationDetails: _details(l10n, sound),
   );
 }
 
@@ -304,10 +306,10 @@ Future<void> _showReceived(
   await plugin.show(
     // Stable per-wallet id so a later notification for the same wallet replaces
     // the previous one rather than stacking.
-    w.id.hashCode,
-    l10n.notifyReceivedTitle,
-    l10n.notifyReceivedBody(w.label, formatThousands(deltaSats)),
-    _details(l10n, sound),
+    id: w.id.hashCode,
+    title: l10n.notifyReceivedTitle,
+    body: l10n.notifyReceivedBody(w.label, formatThousands(deltaSats)),
+    notificationDetails: _details(l10n, sound),
   );
 }
 
