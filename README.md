@@ -150,6 +150,12 @@ images/                              # source artwork (Logo.png, Logo_icon.png)
 - **LNURL-auth** uses a simplified HMAC derivation, not BIP-32, so your identity doesn't roam to other LNURL-auth wallets. The linking key is derived from the wallet's admin key, so it is stable across reinstalls and matches on any device that uses the same wallet. Changing the admin key or logging in under a different wallet produces a different identity (sites will see a new user).
 - The **invoice key alone** is enough for receive + history; the **admin key** is required only for send. If you only paste the invoice key, paying will fail with a 401 until you add the admin key.
 
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
+first. Before your first pull request is merged, you sign the
+[Contributor License Agreement](CLA.md) once, directly on GitHub.
+
 ## License
 
 Copyright (C) 2026 Trepnick Solutions
