@@ -149,3 +149,20 @@ images/                              # source artwork (Logo.png, Logo_icon.png)
 - **No cloud backup or device-to-device transfer.** LNbits API credentials are intentionally excluded from Android Auto Backup so they cannot leak to Google Drive. Set up your connection again on a new device the same way you did the first time.
 - **LNURL-auth** uses a simplified HMAC derivation, not BIP-32, so your identity doesn't roam to other LNURL-auth wallets. The linking key is derived from the wallet's admin key, so it is stable across reinstalls and matches on any device that uses the same wallet. Changing the admin key or logging in under a different wallet produces a different identity (sites will see a new user).
 - The **invoice key alone** is enough for receive + history; the **admin key** is required only for send. If you only paste the invoice key, paying will fail with a 401 until you add the admin key.
+
+## License
+
+Copyright (C) 2026 Trepnick Solutions
+
+EmberSpark is free software: you can redistribute and/or modify it under the
+terms of the [GNU Affero General Public License v3](LICENSE) (AGPL-3.0). It
+comes **without any warranty**.
+
+If you distribute a modified version, or let people use one over a network,
+you must publish its complete source code under the same license. Third-party
+packages keep their own licenses (listed on the in-app Licenses page).
+
+## Trademark
+
+The EmberSpark name and logo are not covered by the license. Forks and
+modified versions must use a different name and logo.

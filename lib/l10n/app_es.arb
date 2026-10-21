@@ -247,6 +247,7 @@
   "aboutTitle": "Acerca de",
   "aboutTagline": "Una billetera Lightning ligera para LNbits",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "Software libre bajo la GNU AGPL v3, sin ninguna garantía.",
   "aboutVersionLabel": "Versión",
   "aboutCheckAgain": "Comprobar de nuevo",
   "aboutCheckingForUpdates": "Buscando actualizaciones…",

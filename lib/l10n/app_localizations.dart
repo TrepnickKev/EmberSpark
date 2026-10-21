@@ -1508,6 +1508,12 @@ abstract class AppLocalizations {
   /// **'© 2026 Trepnick Solutions'**
   String get aboutCopyright;
 
+  /// No description provided for @aboutLicenseNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Free software under the GNU AGPL v3, without any warranty.'**
+  String get aboutLicenseNotice;
+
   /// No description provided for @aboutVersionLabel.
   ///
   /// In en, this message translates to:

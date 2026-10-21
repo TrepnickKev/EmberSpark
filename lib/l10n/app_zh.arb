@@ -247,6 +247,7 @@
   "aboutTitle": "关于",
   "aboutTagline": "面向 LNbits 的轻量级 Lightning 钱包",
   "aboutCopyright": "© 2026 Trepnick Solutions",
+  "aboutLicenseNotice": "基于 GNU AGPL v3 的自由软件，不提供任何担保。",
   "aboutVersionLabel": "版本",
   "aboutCheckAgain": "再次检查",
   "aboutCheckingForUpdates": "正在检查更新…",

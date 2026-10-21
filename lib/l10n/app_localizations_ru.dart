@@ -790,6 +790,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutCopyright => '© 2026 Trepnick Solutions';
 
   @override
+  String get aboutLicenseNotice =>
+      'Свободное ПО по лицензии GNU AGPL v3, без каких-либо гарантий.';
+
+  @override
   String get aboutVersionLabel => 'Версия';
 
   @override
