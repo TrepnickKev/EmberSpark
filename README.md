@@ -73,7 +73,7 @@ uninstall first and set up your connections again.
 
 ## Requirements
 
-- **Android 6.0** (API 23) or newer
+- **Android 7.0** (API 24) or newer
 - A self-hosted **[LNbits](https://lnbits.com)** server with a real Lightning
   funding source (LND / CLN / Phoenixd / NWC). VoidWallet won't work. It
   can't move sats.

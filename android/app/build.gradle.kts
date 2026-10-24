@@ -38,8 +38,8 @@ android {
 
     defaultConfig {
         applicationId = "com.emberspark.wallet"
-        // flutter_zxing (QR scanner) requires at least API 23; pin so it never
-        // resolves below that regardless of Flutter's default.
+        // flutter_zxing (QR scanner) requires at least API 23. This only sets a
+        // floor: Flutter's default (currently 24) applies while it is higher.
         minSdk = maxOf(flutter.minSdkVersion, 23)
         // Pinned for Play Store rather than tracking Flutter's default, which
         // lags behind the deadline. Google Play requires targeting Android 16
