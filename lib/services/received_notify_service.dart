@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../l10n/app_localizations.dart';
@@ -25,6 +26,8 @@ import 'wallet_account_service.dart';
 const _notifyKey = 'notify_received';
 const _notifySoundKey = 'notify_sound';
 const _taskUniqueName = 'emberspark-balance-poll';
+// App build the poll was last scheduled by; a new build replaces the job.
+const _taskBuildKey = 'notify_task_build';
 const _legacyChannelId = 'received_payments';
 const _notifyIcon = 'ic_stat_notify';
 
@@ -124,16 +127,27 @@ Future<void> initReceivedNotify() async {
 }
 
 /// Schedules the periodic poll. `keep` so re-registering on each launch does
-/// not reset the 15-minute timer.
+/// not reset the 15-minute timer, except on the first launch of a new build:
+/// then `replace`, so a job enqueued by an older workmanager version can't
+/// linger after a plugin update.
 Future<void> enableReceivedNotifyTask() async {
   if (!_isAndroid) return;
+  const storage = FlutterSecureStorage();
+  final build = (await PackageInfo.fromPlatform()).buildNumber;
+  final isNewBuild = await storage.read(key: _taskBuildKey) != build;
   await Workmanager().registerPeriodicTask(
     _taskUniqueName,
     _taskUniqueName,
     frequency: const Duration(minutes: 15),
-    existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+    existingWorkPolicy: isNewBuild
+        ? ExistingPeriodicWorkPolicy.replace
+        : ExistingPeriodicWorkPolicy.keep,
     constraints: Constraints(networkType: NetworkType.connected),
   );
+  if (isNewBuild) {
+    _log('build $build: rescheduled the poll');
+    await storage.write(key: _taskBuildKey, value: build);
+  }
 }
 
 Future<void> disableReceivedNotifyTask() async {
