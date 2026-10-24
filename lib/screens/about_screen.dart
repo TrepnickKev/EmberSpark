@@ -202,9 +202,9 @@ class _AboutScreenState extends State<AboutScreen> {
         ],
       );
     }
-    if (i.managedByStore) {
+    if (i.store case final store?) {
       return Text(
-        l10n.aboutUpdatesViaStore,
+        l10n.aboutUpdatesViaStore(store),
         style: const TextStyle(color: Colors.grey),
       );
     }

@@ -16,10 +16,6 @@
 -keep class android.nfc.** { *; }
 -keep class io.flutter.plugins.nfc_manager.** { *; }
 
-# mobile_scanner / zxing — barcode format enumeration via reflection.
--keep class com.google.zxing.** { *; }
--keep class io.github.julian-arroyo.mobile_scanner.** { *; }
-
 # flutter_local_notifications — GSON (de)serialises notification/schedule models
 # reflectively; keep them and the plugin classes.
 -keep class com.dexterous.** { *; }

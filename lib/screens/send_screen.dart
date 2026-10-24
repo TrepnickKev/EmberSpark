@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/avatar_seed.dart';
 import '../services/bolt11.dart';
@@ -10,6 +9,7 @@ import '../services/friendly_error.dart';
 import '../services/payment_feedback.dart';
 import '../services/wallet_backend.dart';
 import '../services/nfc_coordinator.dart';
+import '../services/qr_image_decoder.dart';
 import '../services/price_service.dart';
 import '../widgets/payment_route_header.dart';
 import '../widgets/stacked_action_button.dart';
@@ -144,22 +144,13 @@ class _SendScreenState extends State<SendScreen> {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked == null) return;
-    final controller = MobileScannerController();
-    try {
-      final result = await controller.analyzeImage(picked.path);
-      final code = (result?.barcodes.isNotEmpty ?? false)
-          ? result!.barcodes.first.rawValue
-          : null;
-      if (code == null || code.isEmpty) {
-        if (!mounted) return;
-        messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
-        return;
-      }
-      if (!mounted) return;
-      await _handleIncomingCode(code);
-    } finally {
-      await controller.dispose();
+    final code = await decodeQrFromImage(picked.path);
+    if (!mounted) return;
+    if (code == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
+      return;
     }
+    await _handleIncomingCode(code);
   }
 
   Future<void> _scanQr() async {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:camera/camera.dart' show FlashMode;
+import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../services/nfc_coordinator.dart';
+import '../services/qr_image_decoder.dart';
 import '../widgets/stacked_action_button.dart';
 import 'bolt_card_charge_prompt.dart';
 
@@ -18,9 +20,9 @@ class QrScanScreen extends StatefulWidget {
 }
 
 class _QrScanScreenState extends State<QrScanScreen> {
-  final controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
-  );
+  CameraController? _camera;
+  bool _torchOn = false;
+  CameraLensDirection _lens = CameraLensDirection.back;
   bool _handled = false;
 
   // A tapped Bolt Card can only be charged, not paid to: inform, then charge.
@@ -36,17 +38,40 @@ class _QrScanScreenState extends State<QrScanScreen> {
   @override
   void dispose() {
     NfcCoordinator.instance.removeHandler(_nfcHandler);
-    controller.dispose();
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) {
+  void _onDetect(Code result) {
     if (_handled || !mounted) return;
-    final code = capture.barcodes.isEmpty
-        ? null
-        : capture.barcodes.first.rawValue;
+    final code = result.text;
     if (code == null || code.isEmpty) return;
     _finish(code);
+  }
+
+  // The reader owns its CameraController and replaces it on a lens switch, so
+  // keep the latest one for the torch button.
+  void _onControllerCreated(CameraController? controller, Exception? _) {
+    _camera = controller;
+    _torchOn = false;
+  }
+
+  Future<void> _toggleTorch() async {
+    final camera = _camera;
+    if (camera == null || !camera.value.isInitialized) return;
+    try {
+      await camera.setFlashMode(_torchOn ? FlashMode.off : FlashMode.torch);
+      _torchOn = !_torchOn;
+    } catch (_) {
+      // No flash on this camera (e.g. the front one).
+    }
+  }
+
+  void _switchCamera() {
+    setState(() {
+      _lens = _lens == CameraLensDirection.back
+          ? CameraLensDirection.front
+          : CameraLensDirection.back;
+    });
   }
 
   /// Pops the scanner exactly once with [result]. Guards against the camera
@@ -91,22 +116,13 @@ class _QrScanScreenState extends State<QrScanScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (picked == null) return;
-    final analyser = MobileScannerController();
-    try {
-      final result = await analyser.analyzeImage(picked.path);
-      final code = (result?.barcodes.isNotEmpty ?? false)
-          ? result!.barcodes.first.rawValue
-          : null;
-      if (code == null || code.isEmpty) {
-        if (!mounted) return;
-        messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
-        return;
-      }
-      if (!mounted) return;
-      _finish(code);
-    } finally {
-      await analyser.dispose();
+    final code = await decodeQrFromImage(picked.path);
+    if (!mounted) return;
+    if (code == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.imageNoQr)));
+      return;
     }
+    _finish(code);
   }
 
   @override
@@ -124,18 +140,32 @@ class _QrScanScreenState extends State<QrScanScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
-            onPressed: () => controller.toggleTorch(),
+            onPressed: _toggleTorch,
           ),
           IconButton(
             icon: const Icon(Icons.cameraswitch),
-            onPressed: () => controller.switchCamera(),
+            onPressed: _switchCamera,
           ),
         ],
       ),
       body: Stack(
         children: [
           Positioned.fill(
-            child: MobileScanner(controller: controller, onDetect: _onDetect),
+            child: ReaderWidget(
+              onScan: _onDetect,
+              onControllerCreated: _onControllerCreated,
+              codeFormat: Format.qrCode,
+              lensDirection: _lens,
+              tryHarder: true,
+              tryInverted: true,
+              // The app bar and bottom bar hold the controls.
+              showFlashlight: false,
+              showToggleCamera: false,
+              showGallery: false,
+              cropPercent: 0.8,
+              // Retry quickly while nothing is found; the first hit pops.
+              scanDelay: const Duration(milliseconds: 100),
+            ),
           ),
           Positioned(
             left: 0,

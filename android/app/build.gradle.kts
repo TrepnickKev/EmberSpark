@@ -38,9 +38,9 @@ android {
 
     defaultConfig {
         applicationId = "com.emberspark.wallet"
-        // flutter_local_notifications requires at least API 21; pin so it never
+        // flutter_zxing (QR scanner) requires at least API 23; pin so it never
         // resolves below that regardless of Flutter's default.
-        minSdk = maxOf(flutter.minSdkVersion, 21)
+        minSdk = maxOf(flutter.minSdkVersion, 23)
         // Pinned for Play Store rather than tracking Flutter's default, which
         // lags behind the deadline. Google Play requires targeting Android 16
         // (API 36) for app updates from 31 Aug 2026.
@@ -62,10 +62,12 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (hasReleaseSigning) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            // F-Droid sets ES_UNSIGNED_RELEASE=1: it needs an unsigned APK and
+            // signs it with its own key.
+            signingConfig = when {
+                System.getenv("ES_UNSIGNED_RELEASE") == "1" -> null
+                hasReleaseSigning -> signingConfigs.getByName("release")
+                else -> signingConfigs.getByName("debug")
             }
             isMinifyEnabled = true
             isShrinkResources = true

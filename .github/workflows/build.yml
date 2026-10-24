@@ -1,6 +1,8 @@
 name: Build & release Android APKs + AAB
 
-# Manual only. Click "Run workflow" in the Actions tab, fill in the version.
+# Manual only. Bump `version:` in pubspec.yaml (name+code), commit, then click
+# "Run workflow" in the Actions tab. The version comes from pubspec so the tag
+# matches the source, which F-Droid reads to build the same release.
 # APKs are published as a GitHub Release in this repository (built-in
 # GITHUB_TOKEN, see `permissions`) for sideloaders. The AAB is uploaded straight to the
 # Google Play internal-testing track via a service account (secret
@@ -8,11 +10,6 @@ name: Build & release Android APKs + AAB
 # that secret is unset the upload step is skipped.
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version (semver, e.g. 1.0.0 — no leading 'v')"
-        required: true
-        type: string
 
 env:
   # Forces remaining v2 JS actions (e.g. subosito/flutter-action@v2) onto
@@ -22,7 +19,7 @@ env:
 
 jobs:
   release:
-    name: Build & publish v${{ inputs.version }}
+    name: Build & publish
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Lets the built-in GITHUB_TOKEN create the GitHub Release (tag + APKs).
@@ -35,22 +32,28 @@ jobs:
         with:
           fetch-depth: 0  # full history so auto-generated release notes can diff
 
-      - name: Validate version
+      # pubspec `version: <name>+<code>`. Android refuses updates with a lower
+      # code, so it must only ever grow (1.1.1 was 104). Split APKs add
+      # 1000/2000/4000 per ABI on top, so keep the code below 1000.
+      - name: Read version from pubspec
         run: |
-          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Invalid version '${{ inputs.version }}' — must be semver like 1.2.3"
+          line=$(grep -m1 '^version:' pubspec.yaml | tr -d '[:space:]')
+          if [[ ! "$line" =~ ^version:([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)$ ]]; then
+            echo "::error::pubspec.yaml version must look like 'version: 1.2.3+105', got '$line'"
             exit 1
           fi
-
-      # Android version code = run number + 100. The run counter restarted at 1
-      # when the source moved into this repository, while the old repository had
-      # reached run 63 (v1.1.0 = code 63). Android refuses updates with a lower
-      # code, so the offset keeps new codes above it. It must only ever grow.
-      # Split APKs add 1000/2000/4000 per ABI on top, so keep this below 1000.
-      - name: Compute version code
-        run: |
-          echo "VERSION_CODE=$((GITHUB_RUN_NUMBER + 100))" >> "$GITHUB_ENV"
-          echo "Version code: $((GITHUB_RUN_NUMBER + 100))"
+          name=${BASH_REMATCH[1]}
+          code=${BASH_REMATCH[2]}
+          if (( code >= 1000 )); then
+            echo "::error::Version code $code must stay below 1000 (split APK offsets)"
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/v$name" >/dev/null; then
+            echo "::error::Tag v$name already exists; bump the version in pubspec.yaml"
+            exit 1
+          fi
+          echo "VERSION=$name" >> "$GITHUB_ENV"
+          echo "Version $name, code $code"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -100,28 +103,24 @@ jobs:
 
       - name: Build release APKs (split per ABI)
         run: |
-          flutter build apk --release --split-per-abi \
-            --build-name=${{ inputs.version }} \
-            --build-number=$VERSION_CODE
+          flutter build apk --release --split-per-abi
 
       - name: Rename APKs with version + brand
         run: |
           cd build/app/outputs/flutter-apk
-          mv app-arm64-v8a-release.apk   "EmberSpark-v${{ inputs.version }}-arm64-v8a.apk"
-          mv app-armeabi-v7a-release.apk "EmberSpark-v${{ inputs.version }}-armeabi-v7a.apk"
-          mv app-x86_64-release.apk      "EmberSpark-v${{ inputs.version }}-x86_64.apk"
+          mv app-arm64-v8a-release.apk   "EmberSpark-v${{ env.VERSION }}-arm64-v8a.apk"
+          mv app-armeabi-v7a-release.apk "EmberSpark-v${{ env.VERSION }}-armeabi-v7a.apk"
+          mv app-x86_64-release.apk      "EmberSpark-v${{ env.VERSION }}-x86_64.apk"
           ls -lh
 
       - name: Build release App Bundle (.aab for Play Store)
         run: |
-          flutter build appbundle --release \
-            --build-name=${{ inputs.version }} \
-            --build-number=$VERSION_CODE
+          flutter build appbundle --release
 
       - name: Rename AAB with version + brand
         run: |
           cd build/app/outputs/bundle/release
-          mv app-release.aab "EmberSpark-v${{ inputs.version }}.aab"
+          mv app-release.aab "EmberSpark-v${{ env.VERSION }}.aab"
           ls -lh
 
       - name: Warn if the Play upload is skipped
@@ -138,18 +137,18 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ env.PLAY_JSON }}
           packageName: com.emberspark.wallet
-          releaseFiles: build/app/outputs/bundle/release/EmberSpark-v${{ inputs.version }}.aab
+          releaseFiles: build/app/outputs/bundle/release/EmberSpark-v${{ env.VERSION }}.aab
           tracks: internal
           status: completed
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v${{ inputs.version }}
-          name: EmberSpark v${{ inputs.version }}
+          tag_name: v${{ env.VERSION }}
+          name: EmberSpark v${{ env.VERSION }}
           generate_release_notes: true
           files: |
-            build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-arm64-v8a.apk
-            build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-armeabi-v7a.apk
-            build/app/outputs/flutter-apk/EmberSpark-v${{ inputs.version }}-x86_64.apk
+            build/app/outputs/flutter-apk/EmberSpark-v${{ env.VERSION }}-arm64-v8a.apk
+            build/app/outputs/flutter-apk/EmberSpark-v${{ env.VERSION }}-armeabi-v7a.apk
+            build/app/outputs/flutter-apk/EmberSpark-v${{ env.VERSION }}-x86_64.apk
           fail_on_unmatched_files: true

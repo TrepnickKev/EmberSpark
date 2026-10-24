@@ -67,6 +67,10 @@ Grab the latest APK from
 3. Open EmberSpark, paste your LNbits URL and admin API key, or scan their
    QR codes from **LNbits → wallet → API Info**
 
+F-Droid signs its builds with its own key, so an F-Droid install can't be
+updated by a GitHub or Google Play APK, and the other way round. To switch,
+uninstall first and set up your connections again.
+
 ## Requirements
 
 - **Android 6.0** (API 23) or newer

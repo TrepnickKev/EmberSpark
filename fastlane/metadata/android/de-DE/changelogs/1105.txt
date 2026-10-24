@@ -1,0 +1,2 @@
+* Der QR-Scanner nutzt jetzt die quelloffene ZXing-Bibliothek statt Google ML Kit
+* Vorbereitung für F-Droid: keine Update-Prüfung in F-Droid-Builds

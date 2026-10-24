@@ -256,7 +256,7 @@
   "aboutUpdateAvailable": "Actualización disponible: v{version}",
   "aboutOpenRelease": "Abrir versión",
   "aboutCheckFailed": "No se pudo buscar actualizaciones",
-  "aboutUpdatesViaStore": "Las actualizaciones las gestiona Google Play",
+  "aboutUpdatesViaStore": "Las actualizaciones las gestiona {store}",
   "aboutSupportDevelopment": "Apoyar el desarrollo",
   "aboutSupportBody": "EmberSpark se crea y mantiene en el tiempo libre. Si te facilita gestionar tus sats, considera enviar unos BTC on-chain a la dirección de abajo. Cada aporte mantiene vivo el proyecto. ¡Gracias! Reportar errores o pedir funciones en GitHub es igual de bienvenido.",
   "aboutDonateMethods": "Donar vía Lightning / On-Chain",

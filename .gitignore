@@ -48,3 +48,6 @@ app.*.map.json
 # Provided by CI from GitHub Secrets, or by you locally.
 /android/key.properties
 /android/app/release.keystore
+key.properties
+*.keystore
+*.jks

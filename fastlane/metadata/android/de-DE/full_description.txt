@@ -1,0 +1,48 @@
+EmberSpark ist ein kleiner, quelloffener Android-Client für deinen eigenen, selbst gehosteten LNbits-Server. Die App ist selbst keine Wallet. EmberSpark funktioniert wie eine Fernbedienung, mit der du deinen LNbits-Server vom Handy aus wie eine Wallet benutzen kannst. Die App hält keine privaten Schlüssel und keine Seed-Phrase. Sie speichert nur den API-Key, den dir dein LNbits-Server gegeben hat, verschlüsselt im Android Keystore.
+
+EmberSpark hält nichts. Deine Sats liegen auf dem LNbits-Server, den du betreibst, auf Hardware, die du kontrollierst oder der du vertraust. Die App ist nur eine Bedienoberfläche. Es gibt keinen EmberSpark-Backend, keine zentralen Konten, keine Börse, keinen Token-Verkauf, kein On-Device-Mining. Private Schlüssel bleiben auf deinem LNbits-Server und erreichen die App nie.
+
+WAS SIE KANN
+
+* Mit deinem LNbits-Server verbinden und über ihn Bitcoin-Lightning-Zahlungen senden und empfangen.
+* BOLT11-Rechnungen, BOLT12-Angebote, LNURL-Pay-Links und Lightning-Adressen (user@host) bezahlen, über deinen Server geroutet.
+* Über BOLT11 mit einem vom LNbits-Server erzeugten QR-Code empfangen. Lightning-Adresse, BOLT12-Angebot oder LNURL-Pay-Link via QR, Kopie, Teilen oder NFC teilen.
+* LNURL-Pay-Links und BOLT12-Angebote automatisch auf deinem LNbits-Server erzeugen.
+* Über LNURL-Withdraw empfangen: Withdraw-Gutschein oder Bolt Card scannen oder antippen, um Sats zu ziehen.
+* Bei Websites mit LNURL-Auth anmelden, auf dem Gerät signiert. Kein Passwort, keine E-Mail.
+* QR-Codes scannen, Ziele einfügen, QR-Bilder aus der Galerie dekodieren oder Lightning-Daten von NFC-Tags lesen.
+* Auf jeden Betrag tippen, um zwischen Sats und deiner bevorzugten Fiat-Währung umzuschalten. Kurse über mempool.space.
+* Kontakte speichern, bearbeiten und löschen. Jeder Kontakt zeigt geräte- und nutzerübergreifend denselben erkennbaren Avatar.
+* Mehrere LNbits-Server-Verbindungen verwalten. Die aktive per Wischen über den Start-Avatar wechseln, neu anordnen und je eine eigene Kennung behalten.
+* Eine Verbindung mit reinem Invoice-Key (Lesezugriff) hinzufügen. Sie ist schreibgeschützt und kann empfangen, aber nicht senden.
+
+BOLT CARDS
+
+* Bolt Cards (NXP NTAG424) über die Boltcards-Erweiterung deines LNbits-Servers einrichten und verwalten.
+* Eine Karte hinzufügen, per NFC beschreiben, prüfen und zurücksetzen, alles in der App. Keine separate App zum Beschreiben nötig.
+* Eine beschriebene Bolt Card ans Handy halten, um ihre Sats auf deinen Server zu ziehen.
+
+PRIVATSPHÄRE
+
+* Keine Analytik, keine Werbung, keine Drittanbieter-SDKs.
+* Keine EmberSpark-Server. Die App spricht mit deinem LNbits-Server, mit mempool.space für Wechselkurse und mit GitHub für Update-Prüfungen (nicht im F-Droid-Build). Das ist die vollständige Liste.
+* Der API-Key für deinen LNbits-Server liegt im Android Keystore und verlässt das Gerät nicht.
+* Cloud-Backup und Geräte-zu-Geräte-Transfer sind bewusst deaktiviert. Gib auf einem neuen Gerät die LNbits-Server-URL und den API-Key wieder ein.
+* Optionaler biometrischer oder Geräte-PIN-Schutz beim App-Start.
+* Optionale Benachrichtigungen über empfangene Zahlungen, standardmäßig aus. Beim Aktivieren wird die Benachrichtigungsberechtigung angefragt und der Kontostand im Hintergrund geprüft.
+
+VORAUSSETZUNGEN
+
+* Ein selbst gehosteter LNbits-Server mit einem echten Lightning-Funding-Backend (LND, CLN, Phoenixd oder NWC).
+* Ein Admin- oder Invoice-API-Key aus deinem LNbits-Server. Den QR aus LNbits scannen oder einmal beim Setup einfügen.
+* Empfohlen: die LNURLp-Erweiterung auf deinem LNbits-Server für LNURL-Pay-Links und Lightning-Adressen. Optional, aber empfohlen.
+* Optional: die Boltcards-Erweiterung auf deinem LNbits-Server und ein Handy mit NFC für Bolt-Card-Funktionen.
+
+SPRACHEN
+
+Englisch, Deutsch, Spanisch, Französisch, Portugiesisch (Brasilien), Russisch, Türkisch und vereinfachtes Chinesisch.
+
+OPEN SOURCE
+
+Code, Issues und Feature-Wünsche auf GitHub:
+https://github.com/TrepnickKev/EmberSpark

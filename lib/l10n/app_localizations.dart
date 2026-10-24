@@ -1565,8 +1565,8 @@ abstract class AppLocalizations {
   /// No description provided for @aboutUpdatesViaStore.
   ///
   /// In en, this message translates to:
-  /// **'Updates are managed by Google Play'**
-  String get aboutUpdatesViaStore;
+  /// **'Updates are managed by {store}'**
+  String aboutUpdatesViaStore(String store);
 
   /// No description provided for @aboutSupportDevelopment.
   ///

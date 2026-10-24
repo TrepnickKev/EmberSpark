@@ -64,6 +64,17 @@ the `Build & publish` GitHub workflow (`.github/workflows/build.yml`), which sig
 with the project keystore from the repository secrets, uploads the AAB to Google
 Play and attaches the APKs to a GitHub release.
 
+### Releasing
+
+1. Bump `version:` in `pubspec.yaml`, e.g. `1.1.2+105` to `1.1.3+106`. The part
+   after `+` is the Android version code: it must only ever grow and stay below
+   1000 (split APKs add 1000/2000/4000 per ABI).
+2. Add `fastlane/metadata/android/<locale>/changelogs/<code>.txt` for the three
+   F-Droid codes (1000/2000/4000 + code, e.g. `1106.txt`, `2106.txt`, `4106.txt`).
+3. Commit on `main`, then run the `Build & publish` workflow on `main`. It reads
+   the version from `pubspec.yaml`, fails if the tag already exists, and creates
+   the tag `v<version>`. F-Droid picks up new tags and builds that commit.
+
 If the build gets into a strange state:
 
 ```sh
