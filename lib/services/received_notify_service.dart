@@ -109,6 +109,10 @@ Future<void> setLastNotifiedBalanceFor(String walletId, int sats) async {
   return (baseline: baseline, notify: false);
 }
 
+/// Background poll log line. debugPrint also reaches logcat in release builds
+/// (tag "flutter"); wallet ids only, never keys or labels.
+void _log(String message) => debugPrint('ReceivedNotify: $message');
+
 bool get _isAndroid =>
     !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
@@ -153,8 +157,10 @@ void receivedNotifyDispatcher() {
   Workmanager().executeTask((_, __) async {
     try {
       await runReceivedNotifyPoll();
-    } catch (_) {
-      // Never fail the Worker on our own errors — just try again next cycle.
+    } catch (e, st) {
+      // Never fail the Worker on our own errors, just try again next cycle.
+      // Logged so a broken poll shows up in logcat instead of failing silently.
+      _log('poll failed: $e\n$st');
     }
     return true;
   });
@@ -165,13 +171,17 @@ void receivedNotifyDispatcher() {
 /// increase, and advances that wallet's notified-balance baseline.
 Future<void> runReceivedNotifyPoll() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!await isReceivedNotifyEnabled()) return;
+  if (!await isReceivedNotifyEnabled()) {
+    _log('disabled, skipping');
+    return;
+  }
 
   final plugin = await _initPlugin();
   final l10n = await _isolateL10n();
   final sound = await _ensureSoundChannel(plugin, l10n);
 
   final wallets = await listWallets();
+  _log('polling ${wallets.length} wallet(s)');
   if (wallets.isEmpty) return;
 
   final client = await getHttpClient();
@@ -187,15 +197,18 @@ Future<void> runReceivedNotifyPoll() async {
         final balance = await svc.getBalanceSats();
         final baseline = await getLastNotifiedBalanceFor(w.id);
         final d = evaluateNotify(balance, baseline);
+        _log('wallet ${w.id}: balance $balance, baseline $baseline, '
+            'notify ${d.notify}');
         if (d.notify) {
           await _showReceived(plugin, l10n, w, balance - baseline!, sound);
         }
         if (d.baseline != baseline) {
           await setLastNotifiedBalanceFor(w.id, d.baseline);
         }
-      } catch (_) {
+      } catch (e) {
         // Per-wallet failure (unreachable server, timeout): skip and keep the
         // others going; the baseline is left untouched so it retries next time.
+        _log('wallet ${w.id} failed: $e');
       }
     }
   } finally {
