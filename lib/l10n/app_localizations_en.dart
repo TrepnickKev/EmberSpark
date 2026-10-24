@@ -818,7 +818,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutCheckFailed => 'Couldn\'t check for updates';
 
   @override
-  String get aboutUpdatesViaStore => 'Updates are managed by Google Play';
+  String aboutUpdatesViaStore(String store) {
+    return 'Updates are managed by $store';
+  }
 
   @override
   String get aboutSupportDevelopment => 'Support development';

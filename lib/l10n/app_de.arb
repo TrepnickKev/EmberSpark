@@ -264,7 +264,7 @@
   "aboutUpdateAvailable": "Update verfügbar: v{version}",
   "aboutOpenRelease": "Release öffnen",
   "aboutCheckFailed": "Update-Prüfung fehlgeschlagen",
-  "aboutUpdatesViaStore": "Updates werden von Google Play verwaltet",
+  "aboutUpdatesViaStore": "Updates werden von {store} verwaltet",
   "aboutSupportDevelopment": "Entwicklung unterstützen",
   "aboutSupportBody": "EmberSpark wird in der Freizeit entwickelt und gepflegt. Wenn dir die App hilft, deine Sats besser zu verwalten, kannst du gerne ein paar On-Chain-BTC an die Adresse unten schicken. Jedes bisschen hält das Projekt am Leben. Danke! Bug-Reports oder Feature-Wünsche auf GitHub sind genauso willkommen.",
   "aboutDonateMethods": "Spenden via Lightning / On-Chain",

@@ -256,7 +256,7 @@
   "aboutUpdateAvailable": "Доступно обновление: v{version}",
   "aboutOpenRelease": "Открыть релиз",
   "aboutCheckFailed": "Не удалось проверить обновления",
-  "aboutUpdatesViaStore": "Обновлениями управляет Google Play",
+  "aboutUpdatesViaStore": "Обновлениями управляет {store}",
   "aboutSupportDevelopment": "Поддержать разработку",
   "aboutSupportBody": "EmberSpark создаётся и поддерживается в свободное время. Если он упрощает управление твоими sats, отправь немного on-chain BTC на адрес ниже. Каждый вклад поддерживает проект. Спасибо! Сообщения об ошибках и предложения функций на GitHub так же приветствуются.",
   "aboutDonateMethods": "Поддержать через Lightning / On-Chain",

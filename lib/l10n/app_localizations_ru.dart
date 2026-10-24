@@ -822,7 +822,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutCheckFailed => 'Не удалось проверить обновления';
 
   @override
-  String get aboutUpdatesViaStore => 'Обновлениями управляет Google Play';
+  String aboutUpdatesViaStore(String store) {
+    return 'Обновлениями управляет $store';
+  }
 
   @override
   String get aboutSupportDevelopment => 'Поддержать разработку';

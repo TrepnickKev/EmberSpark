@@ -30,9 +30,10 @@ class VersionInfo {
   /// muted "Couldn't check for updates" rather than implying up-to-date.
   final bool checkFailed;
 
-  /// True when the app was installed from a managed store (Google Play), which
-  /// handles updates itself — the in-app GitHub-release check is skipped.
-  final bool managedByStore;
+  /// Name of the store that installed the app and handles its updates (Google
+  /// Play, F-Droid), or null for sideloads. When set, the in-app GitHub-release
+  /// check is skipped.
+  final String? store;
 
   const VersionInfo({
     required this.current,
@@ -40,8 +41,30 @@ class VersionInfo {
     required this.updateAvailable,
     required this.releaseUrl,
     required this.checkFailed,
-    this.managedByStore = false,
+    this.store,
   });
+}
+
+/// F-Droid builds pass `--dart-define=ES_UPDATE_CHECK=false`: F-Droid signs
+/// with its own key, so GitHub APKs can't update them.
+const _updateCheckEnabled =
+    bool.fromEnvironment('ES_UPDATE_CHECK', defaultValue: true);
+
+/// Installer package names of F-Droid and its common alternative clients.
+const _fdroidInstallers = {
+  'org.fdroid.fdroid',
+  'org.fdroid.basic',
+  'com.looker.droidify',
+  'com.machiav3lli.fdroid',
+};
+
+/// The store that manages updates for this install, or null for sideloads.
+String? _managingStore(String? installer) {
+  if (installer == 'com.android.vending') return 'Google Play';
+  if (!_updateCheckEnabled || _fdroidInstallers.contains(installer)) {
+    return 'F-Droid';
+  }
+  return null;
 }
 
 Future<String> getCurrentVersion() async {
@@ -56,18 +79,20 @@ Future<VersionInfo> checkForUpdate() async {
   final packageInfo = await PackageInfo.fromPlatform();
   final current = packageInfo.version;
 
-  // Installed from Google Play? Then Play handles updates — skip the in-app
-  // GitHub-release check entirely (and don't prompt sideload updates, which
-  // Play policy forbids). Sideloads (other installer, or null for adb/desktop)
-  // fall through to the GitHub check.
-  if (packageInfo.installerStore == 'com.android.vending') {
+  // Installed from Google Play or F-Droid? Then the store handles updates, so
+  // skip the in-app GitHub-release check entirely (Play policy forbids
+  // prompting sideload updates, and F-Droid installs carry F-Droid's key).
+  // Sideloads (other installer, or null for adb/desktop) fall through to the
+  // GitHub check.
+  final store = _managingStore(packageInfo.installerStore);
+  if (store != null) {
     return VersionInfo(
       current: current,
       latest: null,
       updateAvailable: false,
       releaseUrl: null,
       checkFailed: false,
-      managedByStore: true,
+      store: store,
     );
   }
 

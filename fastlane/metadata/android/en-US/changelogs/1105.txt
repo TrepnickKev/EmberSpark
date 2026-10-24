@@ -1,0 +1,2 @@
+* QR scanner now uses the open-source ZXing library instead of Google ML Kit
+* Prepared for F-Droid: no in-app update check in F-Droid builds
