@@ -1,0 +1,3 @@
+* Payment notifications restart reliably after an app update
+* Available again on devices without a camera, such as TVs and Chromebooks
+* No more microphone and storage permissions

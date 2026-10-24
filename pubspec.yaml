@@ -1,7 +1,7 @@
 name: ember_spark
 description: EmberSpark — Lightning wallet
 publish_to: 'none'
-version: 1.1.2+105
+version: 1.1.3+106
 
 environment:
   sdk: '^3.11.0'

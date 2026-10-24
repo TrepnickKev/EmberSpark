@@ -1,0 +1,3 @@
+* Zahlungsbenachrichtigungen starten nach einem App-Update zuverlässig neu
+* Wieder verfügbar auf Geräten ohne Kamera, etwa Fernsehern und Chromebooks
+* Keine Mikrofon- und Speicherberechtigung mehr
