@@ -1,0 +1,1 @@
+* APKs no longer contain Google's encrypted dependency list, as F-Droid requires

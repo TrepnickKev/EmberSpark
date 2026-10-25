@@ -1,0 +1,1 @@
+* APKs enthalten keine verschlüsselte Abhängigkeitsliste von Google mehr, wie F-Droid es verlangt

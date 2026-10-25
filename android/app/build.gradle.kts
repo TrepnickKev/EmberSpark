@@ -50,6 +50,13 @@ android {
         versionName = flutter.versionName
     }
 
+    // AGP adds a Google-encrypted dependency list to the APK signing block,
+    // which F-Droid rejects. Keep it for the Play bundle only.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = true
+    }
+
     signingConfigs {
         if (hasReleaseSigning) {
             create("release") {
