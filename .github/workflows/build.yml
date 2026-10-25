@@ -61,8 +61,17 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      # The submodule is checked out shallow and without tags, but Flutter
+      # reads its own version from the tag on its commit (else 0.0.0-unknown).
       - name: Set up Flutter
         run: |
+          commit=$(git -C .flutter rev-parse HEAD)
+          tag=$(git -C .flutter ls-remote --tags origin | awk -v c="$commit" '$1 == c { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2; exit }')
+          if [[ -z "$tag" ]]; then
+            echo "::error::No Flutter tag points at the .flutter submodule commit $commit"
+            exit 1
+          fi
+          git -C .flutter fetch --depth 1 origin "refs/tags/$tag:refs/tags/$tag"
           echo "$GITHUB_WORKSPACE/.flutter/bin" >> "$GITHUB_PATH"
           echo "PUB_CACHE=$GITHUB_WORKSPACE/.pub-cache" >> "$GITHUB_ENV"
           .flutter/bin/flutter config --no-analytics
