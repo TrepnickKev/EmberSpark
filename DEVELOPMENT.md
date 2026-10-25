@@ -6,9 +6,10 @@ QR scanner and NFC).
 
 ## Requirements
 
-- Flutter SDK 3.27 or newer (CI builds with Flutter 3.41.9, Dart 3.11)
+- Flutter SDK 3.27 or newer. Releases build with Flutter 3.41.9 (Dart 3.11),
+  pinned as the git submodule `.flutter`.
 - For Android builds: Android SDK (platform `android-36`, build-tools,
-  platform-tools) and JDK 17
+  platform-tools) and JDK 17 or newer (releases use JDK 21)
 - An LNbits server with a real Lightning funding source (LND, CLN, Phoenixd,
   NWC, ...) to test against. VoidWallet won't work, it can't move sats.
 
@@ -19,6 +20,10 @@ git clone https://github.com/TrepnickKev/EmberSpark.git
 cd EmberSpark
 flutter pub get
 ```
+
+Your own Flutter install is fine for development. To use the exact SDK the
+releases are built with, run `git submodule update --init` and call
+`.flutter/bin/flutter` instead of `flutter`.
 
 The wallet avatars come from the
 [animal_avatar](https://github.com/TrepnickKev/Animal-Avatar-Generator) package,
@@ -66,14 +71,18 @@ Play and attaches the APKs to a GitHub release.
 
 ### Releasing
 
-1. Bump `version:` in `pubspec.yaml`, e.g. `1.1.2+105` to `1.1.3+106`. The part
-   after `+` is the Android version code: it must only ever grow and stay below
-   1000 (split APKs add 1000/2000/4000 per ABI).
+1. Bump `version:` in `pubspec.yaml`, e.g. `1.1.4+500` to `1.1.5+501`. The part
+   after `+` is the Android version code and must only ever grow. The App Bundle
+   uses it as is; split APKs get code * 10 + 1 (armeabi-v7a), 2 (arm64-v8a) or
+   3 (x86_64).
 2. Add `fastlane/metadata/android/<locale>/changelogs/<code>.txt` for the three
-   F-Droid codes (1000/2000/4000 + code, e.g. `1106.txt`, `2106.txt`, `4106.txt`).
+   APK codes, e.g. `5011.txt`, `5012.txt`, `5013.txt`.
 3. Commit on `main`, then run the `Build & publish` workflow on `main`. It reads
    the version from `pubspec.yaml`, fails if the tag already exists, and creates
-   the tag `v<version>`. F-Droid picks up new tags and builds that commit.
+   the tag `v<version>`. F-Droid picks up new tags, rebuilds that commit and
+   checks that its APKs match the ones on the GitHub release.
+4. When updating Flutter, move the `.flutter` submodule to the new tag
+   (`git -C .flutter fetch --depth 1 origin tag <version>` and check it out).
 
 If the build gets into a strange state:
 

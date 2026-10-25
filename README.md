@@ -67,9 +67,10 @@ Grab the latest APK from
 3. Open EmberSpark, paste your LNbits URL and admin API key, or scan their
    QR codes from **LNbits → wallet → API Info**
 
-F-Droid signs its builds with its own key, so an F-Droid install can't be
-updated by a GitHub or Google Play APK, and the other way round. To switch,
-uninstall first and set up your connections again.
+The F-Droid build is reproducible: F-Droid rebuilds each release from source
+and ships it with the same signature as the GitHub APKs, so the two can update
+each other. Google Play installs are signed by Google; to switch between Play
+and the others, uninstall first and set up your connections again.
 
 ## Requirements
 
