@@ -1,0 +1,2 @@
+* F-Droid-Builds sind jetzt reproduzierbar und wie die GitHub-Releases signiert
+* Neues Versionsnummern-Schema für die gerätespezifischen APKs

@@ -1,0 +1,2 @@
+* F-Droid builds are now reproducible and signed like the GitHub releases
+* New version code scheme for the per-device APKs

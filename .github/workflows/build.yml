@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  # Forces remaining v2 JS actions (e.g. subosito/flutter-action@v2) onto
+  # Forces remaining older JS actions (e.g. r0adkll/upload-google-play@v1) onto
   # Node 24 ahead of GitHub's 2026-06-02 forced cutover. Major-bumped actions
   # below already run on Node 24 natively.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -31,10 +31,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0  # full history so auto-generated release notes can diff
+          submodules: true  # .flutter, the pinned Flutter SDK
 
       # pubspec `version: <name>+<code>`. Android refuses updates with a lower
-      # code, so it must only ever grow (1.1.1 was 104). Split APKs add
-      # 1000/2000/4000 per ABI on top, so keep the code below 1000.
+      # code, so it must only ever grow. Split APKs get code * 10 + ABI
+      # (1, 2, 3) from Gradle; the App Bundle keeps the plain code.
       - name: Read version from pubspec
         run: |
           line=$(grep -m1 '^version:' pubspec.yaml | tr -d '[:space:]')
@@ -44,10 +45,6 @@ jobs:
           fi
           name=${BASH_REMATCH[1]}
           code=${BASH_REMATCH[2]}
-          if (( code >= 1000 )); then
-            echo "::error::Version code $code must stay below 1000 (split APK offsets)"
-            exit 1
-          fi
           if git rev-parse -q --verify "refs/tags/v$name" >/dev/null; then
             echo "::error::Tag v$name already exists; bump the version in pubspec.yaml"
             exit 1
@@ -55,24 +52,26 @@ jobs:
           echo "VERSION=$name" >> "$GITHUB_ENV"
           echo "Version $name, code $code"
 
-      - name: Set up JDK 17
+      # F-Droid rebuilds the release and must get identical APKs (reproducible
+      # build), so match its build server: JDK 21, Flutter from the .flutter
+      # submodule and the pub cache inside the repo, at the same paths.
+      - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.41.9"
-          channel: stable
-          cache: true
+        run: |
+          echo "$GITHUB_WORKSPACE/.flutter/bin" >> "$GITHUB_PATH"
+          echo "PUB_CACHE=$GITHUB_WORKSPACE/.pub-cache" >> "$GITHUB_ENV"
+          .flutter/bin/flutter config --no-analytics
 
       - name: Flutter version
         run: flutter --version
 
       - name: Resolve dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Static analysis
         run: flutter analyze
