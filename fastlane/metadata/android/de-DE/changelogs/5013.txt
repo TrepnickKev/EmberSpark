@@ -1,0 +1,1 @@
+* Native Bibliotheken werden ohne Build-ID gebaut, damit F-Droid die GitHub-APKs exakt nachbauen kann

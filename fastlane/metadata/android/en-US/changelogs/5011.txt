@@ -1,0 +1,1 @@
+* Native libraries are built without a build ID, so F-Droid can reproduce the GitHub APKs exactly
