@@ -1,0 +1,1 @@
+* The pinned Flutter SDK is now cloned with its tags, so F-Droid reads its version without extra steps

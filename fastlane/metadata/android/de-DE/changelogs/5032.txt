@@ -1,0 +1,1 @@
+* Das fest eingebundene Flutter SDK wird jetzt mit seinen Tags geklont, damit F-Droid die Version ohne Zusatzschritte erkennt
