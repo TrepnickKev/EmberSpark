@@ -1325,7 +1325,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsTrustTlsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Trust self-signed and incomplete-chain certificates. Required for some hobbyist Lightning servers and .onion services. Only enable for servers you trust.'**
+  /// **'Trust self-signed and incomplete-chain certificates from your LNbits servers, as some hobbyist servers and .onion services need. Other servers, such as Lightning addresses, are always verified. Only enable for servers you trust.'**
   String get settingsTrustTlsSubtitle;
 
   /// No description provided for @settingsLegacyAvatars.

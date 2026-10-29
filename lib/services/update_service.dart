@@ -45,8 +45,9 @@ class VersionInfo {
   });
 }
 
-/// F-Droid builds pass `--dart-define=ES_UPDATE_CHECK=false`: F-Droid signs
-/// with its own key, so GitHub APKs can't update them.
+/// Custom builds can pass `--dart-define=ES_UPDATE_CHECK=false` to drop the
+/// GitHub check. F-Droid's build is the GitHub APK (reproducible), so it
+/// relies on the installer check in [_managingStore] instead.
 const _updateCheckEnabled =
     bool.fromEnvironment('ES_UPDATE_CHECK', defaultValue: true);
 

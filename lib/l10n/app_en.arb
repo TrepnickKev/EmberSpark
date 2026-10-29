@@ -245,7 +245,7 @@
   "settingsLockConfirmReason": "Confirm to enable app lock",
   "settingsLockNeedSetup": "Set up a screen lock or biometric on your phone first.",
   "settingsTrustTls": "Allow unverified HTTPS",
-  "settingsTrustTlsSubtitle": "Trust self-signed and incomplete-chain certificates. Required for some hobbyist Lightning servers and .onion services. Only enable for servers you trust.",
+  "settingsTrustTlsSubtitle": "Trust self-signed and incomplete-chain certificates from your LNbits servers, as some hobbyist servers and .onion services need. Other servers, such as Lightning addresses, are always verified. Only enable for servers you trust.",
   "settingsLegacyAvatars": "Legacy avatars",
   "settingsLegacyAvatarsSubtitle": "Use the previous avatar style instead of the new Bitcoin avatars.",
   "settingsAbout": "About",

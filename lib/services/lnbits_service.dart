@@ -52,7 +52,7 @@ class LNbitsService implements WalletBackend {
   /// error) so a real wallet is never wrongly flagged read-only.
   static Future<bool> canSendWith(String url, String key) async {
     try {
-      final client = await getHttpClient();
+      final client = await getHttpClient(server: url);
       final base = url.replaceFirst(RegExp(r'/+$'), '');
       final onion = Uri.parse(base).host.toLowerCase().endsWith('.onion');
       final res = await client

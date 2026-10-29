@@ -215,7 +215,7 @@
   "settingsLockConfirmReason": "确认以启用应用锁定",
   "settingsLockNeedSetup": "请先在手机上设置屏幕锁定或生物识别。",
   "settingsTrustTls": "允许未验证的 HTTPS",
-  "settingsTrustTlsSubtitle": "信任自签名和链不完整的证书。某些业余 Lightning 服务器和 .onion 服务需要此项。仅对你信任的服务器启用。",
+  "settingsTrustTlsSubtitle": "信任你的 LNbits 服务器的自签名和链不完整的证书，某些业余服务器和 .onion 服务需要此项。其他服务器（如 Lightning 地址）始终会被验证。仅对你信任的服务器启用。",
   "settingsLegacyAvatars": "经典头像",
   "settingsLegacyAvatarsSubtitle": "使用以前的头像样式，而不是新的比特币头像。",
   "settingsAbout": "关于",

@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final svc = LNbitsService(
         baseUrl: url,
         adminKey: adminKey,
-        client: await getHttpClient(),
+        client: await getHttpClient(server: url),
       );
       List<Map<String, dynamic>> links;
       try {

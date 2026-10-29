@@ -25,7 +25,7 @@ BOLT CARDS
 PRIVATSPHÄRE
 
 * Keine Analytik, keine Werbung, keine Drittanbieter-SDKs.
-* Keine EmberSpark-Server. Die App spricht mit deinem LNbits-Server, mit mempool.space für Wechselkurse und mit GitHub für Update-Prüfungen (nicht im F-Droid-Build). Das ist die vollständige Liste.
+* Keine EmberSpark-Server. Die App spricht mit deinem LNbits-Server, mit mempool.space für Wechselkurse und mit GitHub für Update-Prüfungen (entfällt, wenn F-Droid oder Google Play die App installiert hat). Das ist die vollständige Liste.
 * Der API-Key für deinen LNbits-Server liegt im Android Keystore und verlässt das Gerät nicht.
 * Cloud-Backup und Geräte-zu-Geräte-Transfer sind bewusst deaktiviert. Gib auf einem neuen Gerät die LNbits-Server-URL und den API-Key wieder ein.
 * Optionaler biometrischer oder Geräte-PIN-Schutz beim App-Start.

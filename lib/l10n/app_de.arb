@@ -217,7 +217,7 @@
   "settingsLockConfirmReason": "Bestätige, um die App-Sperre zu aktivieren",
   "settingsLockNeedSetup": "Richte zuerst eine Bildschirmsperre oder Biometrie auf deinem Gerät ein.",
   "settingsTrustTls": "Unverifizierte HTTPS-Verbindungen erlauben",
-  "settingsTrustTlsSubtitle": "Vertrauen in selbstsignierte oder unvollständige Zertifikatsketten. Nötig für manche Hobby-Lightning-Server und .onion-Adressen. Nur für Server aktivieren, denen du vertraust.",
+  "settingsTrustTlsSubtitle": "Selbstsignierten oder unvollständigen Zertifikatsketten deiner LNbits-Server vertrauen, wie es manche Hobby-Server und .onion-Adressen brauchen. Andere Server, etwa Lightning-Adressen, werden immer geprüft. Nur für Server aktivieren, denen du vertraust.",
   "settingsLegacyAvatars": "Klassische Avatare",
   "settingsLegacyAvatarsSubtitle": "Den vorherigen Avatar-Stil statt der neuen Bitcoin-Avatare verwenden.",
   "settingsAbout": "Über",
