@@ -668,7 +668,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      '信任自签名和链不完整的证书。某些业余 Lightning 服务器和 .onion 服务需要此项。仅对你信任的服务器启用。';
+      '信任你的 LNbits 服务器的自签名和链不完整的证书，某些业余服务器和 .onion 服务需要此项。其他服务器（如 Lightning 地址）始终会被验证。仅对你信任的服务器启用。';
 
   @override
   String get settingsLegacyAvatars => '经典头像';

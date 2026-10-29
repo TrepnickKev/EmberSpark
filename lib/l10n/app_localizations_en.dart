@@ -684,7 +684,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      'Trust self-signed and incomplete-chain certificates. Required for some hobbyist Lightning servers and .onion services. Only enable for servers you trust.';
+      'Trust self-signed and incomplete-chain certificates from your LNbits servers, as some hobbyist servers and .onion services need. Other servers, such as Lightning addresses, are always verified. Only enable for servers you trust.';
 
   @override
   String get settingsLegacyAvatars => 'Legacy avatars';

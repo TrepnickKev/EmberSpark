@@ -1,0 +1,1 @@
+* "Allow unverified HTTPS" now applies only to your LNbits servers; Lightning addresses, LNURL services and price lookups are always verified

@@ -690,7 +690,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      'Vertrauen in selbstsignierte oder unvollständige Zertifikatsketten. Nötig für manche Hobby-Lightning-Server und .onion-Adressen. Nur für Server aktivieren, denen du vertraust.';
+      'Selbstsignierten oder unvollständigen Zertifikatsketten deiner LNbits-Server vertrauen, wie es manche Hobby-Server und .onion-Adressen brauchen. Andere Server, etwa Lightning-Adressen, werden immer geprüft. Nur für Server aktivieren, denen du vertraust.';
 
   @override
   String get settingsLegacyAvatars => 'Klassische Avatare';

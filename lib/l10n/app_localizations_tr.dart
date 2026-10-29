@@ -685,7 +685,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      'Kendinden imzalı ve zinciri eksik sertifikalara güven. Bazı amatör Lightning sunucuları ve .onion hizmetleri için gerekli. Yalnızca güvendiğin sunucular için etkinleştir.';
+      'LNbits sunucularının kendinden imzalı ve zinciri eksik sertifikalarına güven; bazı amatör sunucular ve .onion hizmetleri bunu gerektirir. Lightning adresleri gibi diğer sunucular her zaman doğrulanır. Yalnızca güvendiğin sunucular için etkinleştir.';
 
   @override
   String get settingsLegacyAvatars => 'Klasik avatarlar';

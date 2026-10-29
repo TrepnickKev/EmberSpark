@@ -691,7 +691,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      'Fais confiance aux certificats auto-signés ou à chaîne incomplète. Nécessaire pour certains serveurs Lightning amateurs et services .onion. À activer uniquement pour les serveurs de confiance.';
+      'Fais confiance aux certificats auto-signés ou à chaîne incomplète de tes serveurs LNbits, comme l\'exigent certains serveurs amateurs et services .onion. Les autres serveurs, comme les adresses Lightning, sont toujours vérifiés. À activer uniquement pour les serveurs de confiance.';
 
   @override
   String get settingsLegacyAvatars => 'Avatars classiques';

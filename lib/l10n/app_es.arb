@@ -215,7 +215,7 @@
   "settingsLockConfirmReason": "Confirma para activar el bloqueo de la app",
   "settingsLockNeedSetup": "Primero configura un bloqueo de pantalla o biometría en tu teléfono.",
   "settingsTrustTls": "Permitir HTTPS no verificado",
-  "settingsTrustTlsSubtitle": "Confía en certificados autofirmados o con cadena incompleta. Necesario para algunos servidores Lightning caseros y servicios .onion. Actívalo solo para servidores en los que confíes.",
+  "settingsTrustTlsSubtitle": "Confía en certificados autofirmados o con cadena incompleta de tus servidores LNbits, como necesitan algunos servidores caseros y servicios .onion. Los demás servidores, como las direcciones Lightning, siempre se verifican. Actívalo solo para servidores en los que confíes.",
   "settingsLegacyAvatars": "Avatares clásicos",
   "settingsLegacyAvatarsSubtitle": "Usar el estilo de avatar anterior en lugar de los nuevos avatares Bitcoin.",
   "settingsAbout": "Acerca de",

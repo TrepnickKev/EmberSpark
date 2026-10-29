@@ -1,0 +1,1 @@
+* „Unverifizierte HTTPS-Verbindungen erlauben“ gilt jetzt nur für deine LNbits-Server; Lightning-Adressen, LNURL-Dienste und Kursabfragen werden immer geprüft

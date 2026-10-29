@@ -690,7 +690,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsTrustTlsSubtitle =>
-      'Confía en certificados autofirmados o con cadena incompleta. Necesario para algunos servidores Lightning caseros y servicios .onion. Actívalo solo para servidores en los que confíes.';
+      'Confía en certificados autofirmados o con cadena incompleta de tus servidores LNbits, como necesitan algunos servidores caseros y servicios .onion. Los demás servidores, como las direcciones Lightning, siempre se verifican. Actívalo solo para servidores en los que confíes.';
 
   @override
   String get settingsLegacyAvatars => 'Avatares clásicos';

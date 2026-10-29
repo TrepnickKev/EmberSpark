@@ -215,7 +215,7 @@
   "settingsLockConfirmReason": "Uygulama kilidini etkinleştirmek için onayla",
   "settingsLockNeedSetup": "Önce telefonunda bir ekran kilidi veya biyometri ayarla.",
   "settingsTrustTls": "Doğrulanmamış HTTPS'e izin ver",
-  "settingsTrustTlsSubtitle": "Kendinden imzalı ve zinciri eksik sertifikalara güven. Bazı amatör Lightning sunucuları ve .onion hizmetleri için gerekli. Yalnızca güvendiğin sunucular için etkinleştir.",
+  "settingsTrustTlsSubtitle": "LNbits sunucularının kendinden imzalı ve zinciri eksik sertifikalarına güven; bazı amatör sunucular ve .onion hizmetleri bunu gerektirir. Lightning adresleri gibi diğer sunucular her zaman doğrulanır. Yalnızca güvendiğin sunucular için etkinleştir.",
   "settingsLegacyAvatars": "Klasik avatarlar",
   "settingsLegacyAvatarsSubtitle": "Yeni Bitcoin avatarları yerine önceki avatar stilini kullan.",
   "settingsAbout": "Hakkında",
