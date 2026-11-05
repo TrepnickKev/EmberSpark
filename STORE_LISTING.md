@@ -12,13 +12,21 @@ Conventions:
 
 ## English (en-US)
 
-### Short description (77 / 80)
+### App name (29 / 30)
+
+The app name carries the most search weight, so it names the two terms people search for. Keep it descriptive, no keyword lists.
 
 ```
-Bitcoin Lightning client for your own self-hosted LNbits server. Open source.
+EmberSpark - Lightning LNbits
 ```
 
-### Full description (~3740 / 4000)
+### Short description (75 / 80)
+
+```
+Bitcoin Lightning client for your own LNbits server. Send and receive sats.
+```
+
+### Full description (3765 / 4000)
 
 ```
 EmberSpark is a small, open-source Android client for your own self-hosted LNbits server, for sending and receiving Bitcoin over the Lightning Network. It is not a wallet on its own. EmberSpark works like a remote control that lets you use your LNbits server as a wallet from your phone, wherever you are. The app never holds private keys or seed phrases. It only stores the API key your LNbits server gave you, encrypted in the Android Keystore.
@@ -48,7 +56,7 @@ BOLT CARDS
 PRIVACY
 
 * No analytics, no ads, no third-party SDKs.
-* No EmberSpark servers. The app talks to your LNbits server, mempool.space for exchange rates, and GitHub for update checks. That is the full list.
+* No EmberSpark servers. The app talks to your LNbits server, the Lightning address and LNURL services you use, and mempool.space for exchange rates. That is the full list.
 * The API key for your LNbits server lives in the Android Keystore and never leaves the device.
 * Cloud backup and device-to-device transfer are deliberately disabled. Re-enter your LNbits server URL and API key on a new device.
 * Optional biometric or device-PIN lock on app launch.
@@ -75,13 +83,19 @@ https://github.com/TrepnickKev/EmberSpark
 
 ## Deutsch (de-DE)
 
-### Kurzbeschreibung (74 / 80)
+### App-Name (29 / 30)
 
 ```
-Bitcoin-Lightning-Bedienclient für deinen selbst gehosteten LNbits-Server.
+EmberSpark - Lightning LNbits
 ```
 
-### Vollständige Beschreibung (~3950 / 4000)
+### Kurzbeschreibung (77 / 80)
+
+```
+Bitcoin-Lightning-Client für deinen LNbits-Server. Sats senden und empfangen.
+```
+
+### Vollständige Beschreibung (3976 / 4000)
 
 ```
 EmberSpark ist ein kleiner, quelloffener Android-Client für deinen eigenen, selbst gehosteten LNbits-Server. Die App ist selbst keine Wallet. EmberSpark funktioniert wie eine Fernbedienung, mit der du deinen LNbits-Server vom Handy aus wie eine Wallet benutzen kannst. Die App hält keine privaten Schlüssel und keine Seed-Phrase. Sie speichert nur den API-Key, den dir dein LNbits-Server gegeben hat, verschlüsselt im Android Keystore.
@@ -111,7 +125,7 @@ BOLT CARDS
 PRIVATSPHÄRE
 
 * Keine Analytik, keine Werbung, keine Drittanbieter-SDKs.
-* Keine EmberSpark-Server. Die App spricht mit deinem LNbits-Server, mit mempool.space für Wechselkurse und mit GitHub für Update-Prüfungen. Das ist die vollständige Liste.
+* Keine EmberSpark-Server. Die App spricht mit deinem LNbits-Server, mit Lightning-Adressen und LNURL-Diensten, die du nutzt, und mit mempool.space für Wechselkurse. Das ist die vollständige Liste.
 * Der API-Key für deinen LNbits-Server liegt im Android Keystore und verlässt das Gerät nicht.
 * Cloud-Backup und Geräte-zu-Geräte-Transfer sind bewusst deaktiviert. Gib auf einem neuen Gerät die LNbits-Server-URL und den API-Key wieder ein.
 * Optionaler biometrischer oder Geräte-PIN-Schutz beim App-Start.
