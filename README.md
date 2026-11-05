@@ -15,8 +15,11 @@ receive, scan a QR, and move on.
 ## Features
 
 - Lightning **send & receive** through your LNbits wallet
-- **Multiple LNbits server connections** managed in one app, with a quick
-  switcher under the home menu and per-connection identifiers and label
+- **Multiple LNbits server connections** managed in one app. Switch by
+  swiping the home avatar up or down, reorder them, and keep a label and
+  identifiers per connection
+- **Read-only connections** with an invoice key: they can receive but not
+  send
 - **QR scanner** that auto-detects BOLT11, BOLT12, LNURL, or Lightning
   addresses and routes to the right flow
 - **BOLT12** support: pay offers (`lno1…`) and invoices (`lni1…`), or
@@ -31,6 +34,11 @@ receive, scan a QR, and move on.
   devices and saved contacts show the same avatar as the owner's home
   screen
 - **NFC** read and write for Lightning destinations
+- **Bolt Cards** (NXP NTAG424) through your LNbits server's Boltcards
+  extension: add, write, verify and reset a card in the app, and tap a card
+  to pull its sats into your wallet
+- Optional **received-payment notifications**, off by default. The app
+  checks your LNbits server in the background about every 15 minutes.
 - Acts as a **system handler for `lightning:` deep links**. Tap a Lightning
   link in any app and EmberSpark opens.
 - **Live transaction history**: incoming and outgoing payments surface
@@ -48,7 +56,9 @@ receive, scan a QR, and move on.
 - **Biometric or device-PIN lock** on app launch
 - API key stored in Android KeyStore via `flutter_secure_storage`
 - "Allow unverified HTTPS" toggle for self-signed certificates or `.onion`
-  LNbits servers
+  LNbits servers. It applies only to your LNbits servers.
+- **8 languages**: English, German, Spanish, French, Portuguese (Brazil),
+  Russian, Turkish and Simplified Chinese
 
 ## Install
 
@@ -88,14 +98,15 @@ to each to scan from LNbits' API Info panel.
 | Field | What to enter |
 |---|---|
 | **LNbits URL** | Base URL of your LNbits, e.g. `https://lnbits.example.com` or `http://abcd.onion`. The `https://` prefix is added automatically if missing. |
-| **Admin API key** | LNbits → wallet → **API Info → Admin key**. Full-access key, used for every operation. |
+| **Admin API key** | LNbits → wallet → **API Info → Admin key**. Full-access key, used for every operation. An **Invoice key** also works and gives a read-only connection that can receive but not send. |
 
 ### Settings → Allow unverified HTTPS
 
 Off by default. Turn on if your LNbits sits behind a self-signed certificate,
-an incomplete certificate chain, or a `.onion` address. Bypasses TLS
-validation for all outgoing requests, so only enable for servers you actually
-trust.
+an incomplete certificate chain, or a `.onion` address. Skips TLS validation
+only for your saved LNbits servers and the one you are adding. Every other
+server, such as Lightning address and LNURL services, mempool.space and
+GitHub, is always verified. Only enable for servers you actually trust.
 
 ## Troubleshooting
 
@@ -115,9 +126,12 @@ Bug reports, ideas, and feedback all go in the
 
 ## Caveats
 
-- **LNURL-auth identity is per install.** It uses a simplified HMAC
-  derivation rather than BIP-32, so a reinstall generates a new identity,
-  and sites you've authed against will see a new user.
+- **LNURL-auth identity is per LNbits connection.** It is derived from the
+  connection's admin key, with a separate key for every site, so it survives
+  a reinstall and is the same on any device that uses the same key. It uses
+  a simplified HMAC derivation rather than BIP-32, so other wallets show a
+  different identity for the same site, and a new admin key means a new
+  identity.
 - **Android only.** iOS / desktop builds aren't published here.
 - **No cloud backup or device-to-device transfer.** LNbits API credentials
   are intentionally excluded from Android Auto Backup so they cannot leak
