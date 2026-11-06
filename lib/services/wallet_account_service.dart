@@ -85,6 +85,10 @@ String myDefaultContactKindKey(String walletId) =>
 String lastSeenBalanceKey(String walletId) => 'last_seen_balance__$walletId';
 String paymentsCacheKey(String walletId) => 'payments_cache__$walletId';
 
+/// Per-wallet baseline the background received-payment poll compares against.
+String lastNotifiedBalanceKey(String walletId) =>
+    'last_notified_balance__$walletId';
+
 Future<List<WalletAccount>> listWallets() async {
   const storage = FlutterSecureStorage();
   final raw = await storage.read(key: _walletsKey);
@@ -218,6 +222,7 @@ Future<void> removeWallet(String id) async {
   await storage.delete(key: myLnurlpLinkKey(id));
   await storage.delete(key: myDefaultContactKindKey(id));
   await storage.delete(key: lastSeenBalanceKey(id));
+  await storage.delete(key: lastNotifiedBalanceKey(id));
   await storage.delete(key: paymentsCacheKey(id));
   final currentId = await getCurrentWalletId();
   if (currentId == id) {

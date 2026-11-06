@@ -56,10 +56,6 @@ AndroidNotificationSound? _rawSoundFor(String sound) => switch (sound) {
 /// without waiting for a WorkManager cycle. Keep false for production.
 const bool kNotifyDebug = false;
 
-/// Per-wallet baseline the background poll compares against.
-String lastNotifiedBalanceKey(String walletId) =>
-    'last_notified_balance__$walletId';
-
 Future<bool> isReceivedNotifyEnabled() async {
   const storage = FlutterSecureStorage();
   return (await storage.read(key: _notifyKey)) == '1';
