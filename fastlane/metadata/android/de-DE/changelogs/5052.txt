@@ -1,0 +1,1 @@
+* Falsche „Zahlung empfangen“-Benachrichtigung nach dem Hinzufügen oder Wechseln einer Verbindung behoben

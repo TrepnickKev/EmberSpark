@@ -6,6 +6,7 @@ import '../main.dart' show routeObserver;
 import '../l10n/app_localizations.dart';
 import '../services/flight_mode_service.dart';
 import '../services/friendly_error.dart';
+import '../services/http_client_factory.dart';
 import '../services/lnbits_service.dart';
 import '../services/lightning_router.dart';
 import '../services/price_service.dart';
@@ -231,10 +232,21 @@ class _HomeScreenState extends State<HomeScreen>
     if (loading || _polling || !mounted) return;
     _polling = true;
     try {
+      // Fetch for the wallet Home is showing, never whatever is active in
+      // storage: adding or switching a wallet changes storage before _load
+      // catches up, and the new wallet's balance would then be saved as the
+      // old wallet's baselines (a phantom "received" notification later).
       final walletId = currentWallet?.id;
-      final svc = await LNbitsService.fromStorage();
+      final w = await getCurrentWallet();
+      if (w == null || w.id != walletId) return;
+      final svc = LNbitsService(
+        baseUrl: w.url,
+        adminKey: w.adminKey,
+        readOnly: w.readOnly,
+        client: await getHttpClient(),
+      );
       final b = await svc.getBalanceSats();
-      if (!mounted) return;
+      if (!mounted || currentWallet?.id != walletId) return;
       final prev = balance;
       // Only treat a change as a payment when the previous balance belongs to
       // the same wallet; otherwise a wallet switch looks like a send/receive.
@@ -331,7 +343,16 @@ class _HomeScreenState extends State<HomeScreen>
     // Network: balance + fiat only. A failure shows the error + red ring but
     // leaves the avatar/carousel (set above) intact.
     try {
-      final svc = await LNbitsService.fromStorage();
+      // Same wallet as the avatar above, so the balance and its baselines
+      // can't come from different wallets.
+      final svc = w == null
+          ? await LNbitsService.fromStorage()
+          : LNbitsService(
+              baseUrl: w.url,
+              adminKey: w.adminKey,
+              readOnly: w.readOnly,
+              client: await getHttpClient(),
+            );
       final results = await Future.wait([
         svc.getBalanceSats(),
         getSelectedCurrency(),
