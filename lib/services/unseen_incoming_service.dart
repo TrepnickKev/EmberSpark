@@ -33,3 +33,18 @@ Future<void> setLastSeenBalanceFor(String walletId, int sats) async {
   const storage = FlutterSecureStorage();
   await storage.write(key: lastSeenBalanceKey(walletId), value: sats.toString());
 }
+
+/// Baseline for Home's ember sparks. Separate from the badge (which stays up
+/// until History is opened) and from the background notification (which the
+/// WorkManager poll advances), so sparks play once per receive, even when it
+/// was already notified.
+Future<int?> getLastSparkBalanceFor(String walletId) async {
+  const storage = FlutterSecureStorage();
+  final v = await storage.read(key: lastSparkBalanceKey(walletId));
+  return v == null ? null : int.tryParse(v);
+}
+
+Future<void> setLastSparkBalanceFor(String walletId, int sats) async {
+  const storage = FlutterSecureStorage();
+  await storage.write(key: lastSparkBalanceKey(walletId), value: sats.toString());
+}
