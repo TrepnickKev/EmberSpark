@@ -952,7 +952,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      '此 LNbits 服务器不支持 BOLT12。你的 Lightning 节点可能不理解 BOLT12，或未安装 LNbits BOLT12 扩展。';
+      '此 LNbits 服务器不支持 BOLT12。支付 Offer 需要 LNbits 1.7 或更高版本并搭配支持 BOLT12 的节点（Core Lightning、Phoenixd 或 Eclair），或安装 LNbits BOLT12 扩展。';
 
   @override
   String get myContactTitle => '我的联系方式';

@@ -994,7 +994,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      'BOLT12 wird von diesem LNbits-Server nicht unterstützt. Dein Lightning-Node versteht BOLT12 evtl. nicht, oder die LNbits-BOLT12-Erweiterung ist nicht installiert.';
+      'BOLT12 wird von diesem LNbits-Server nicht unterstützt. Zum Bezahlen von Offers braucht es LNbits 1.7 oder neuer mit einem BOLT12-fähigen Node (Core Lightning, Phoenixd oder Eclair) oder die LNbits-BOLT12-Erweiterung.';
 
   @override
   String get myContactTitle => 'Mein Kontakt';

@@ -304,7 +304,7 @@
   "bolt12AmountLabel": "Tutar (sats)",
   "bolt12MemoLabel": "Ödeyen notu (isteğe bağlı)",
   "bolt12RawStringLabel": "BOLT12 dizesi",
-  "bolt12NotSupported": "Bu LNbits sunucusu BOLT12'yi desteklemiyor. Lightning düğümün BOLT12'yi anlamıyor olabilir veya LNbits BOLT12 eklentisi yüklü değil.",
+  "bolt12NotSupported": "Bu LNbits sunucusu BOLT12'yi desteklemiyor. Teklif ödemek için BOLT12 destekli bir düğümle (Core Lightning, Phoenixd veya Eclair) LNbits 1.7 veya daha yenisi ya da LNbits BOLT12 eklentisi gerekir.",
 
   "myContactTitle": "Kişi bilgim",
   "myContactLnAddressSection": "Lightning Address",

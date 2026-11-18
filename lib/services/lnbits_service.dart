@@ -414,6 +414,48 @@ class LNbitsService implements WalletBackend {
     return createBolt12Offer();
   }
 
+  /// Pays a BOLT12 offer (`lno1…`). LNbits 1.7+ pays offers in core through
+  /// the regular payments endpoint (CLN, CLNRest, Phoenixd, Eclair and LNbits
+  /// funding sources), with [memo] sent as the payer note. A 4xx means core
+  /// never created a payment (older LNbits can't decode the offer, or the
+  /// funding source has no BOLT12), so it falls back to the BOLT12 community
+  /// extension; if that isn't installed either, the core error is thrown. A
+  /// 5xx or timeout is thrown as is, since the payment may be in flight.
+  Future<void> payBolt12Offer({
+    required String offer,
+    required int amountSats,
+    String? memo,
+  }) async {
+    if (readOnly) throw const ReadOnlyWalletException();
+    final res = await _client
+        .post(
+          _uri('/api/v1/payments'),
+          headers: _headers(adminKey),
+          body: jsonEncode({
+            'out': true,
+            'payment_request': offer,
+            'amount': amountSats,
+            'unit': 'sat',
+            if (memo != null && memo.isNotEmpty) 'memo': memo,
+          }),
+        )
+        .timeout(_payTimeout);
+    if (res.statusCode < 400) return;
+    final coreError = Exception('Payment failed (${res.statusCode}): ${res.body}');
+    if (res.statusCode >= 500) throw coreError;
+    final String invoice;
+    try {
+      invoice = await fetchBolt12Invoice(
+        offer: offer,
+        amountSats: amountSats,
+        memo: memo,
+      );
+    } on Bolt12NotSupported {
+      throw coreError;
+    }
+    await payInvoice(invoice);
+  }
+
   /// Asks the LNbits BOLT12 community extension to fetch a BOLT12 invoice
   /// (`lni1...`) from an offer (`lno1...`). Returns the invoice string on
   /// success; throws [Bolt12NotSupported] if the extension isn't installed

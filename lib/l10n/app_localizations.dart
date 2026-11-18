@@ -1841,7 +1841,7 @@ abstract class AppLocalizations {
   /// No description provided for @bolt12NotSupported.
   ///
   /// In en, this message translates to:
-  /// **'BOLT12 isn\'t supported by this LNbits server. Your Lightning node may not understand BOLT12, or the LNbits BOLT12 extension isn\'t installed.'**
+  /// **'BOLT12 isn\'t supported by this LNbits server. Paying offers needs LNbits 1.7 or newer with a BOLT12-capable node (Core Lightning, Phoenixd or Eclair), or the LNbits BOLT12 extension.'**
   String get bolt12NotSupported;
 
   /// No description provided for @myContactTitle.

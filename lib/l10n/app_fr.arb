@@ -304,7 +304,7 @@
   "bolt12AmountLabel": "Montant (sats)",
   "bolt12MemoLabel": "Note du payeur (facultatif)",
   "bolt12RawStringLabel": "Chaîne BOLT12",
-  "bolt12NotSupported": "BOLT12 n'est pas pris en charge par ce serveur LNbits. Ton nœud Lightning ne comprend peut-être pas BOLT12, ou l'extension BOLT12 de LNbits n'est pas installée.",
+  "bolt12NotSupported": "BOLT12 n'est pas pris en charge par ce serveur LNbits. Pour payer des offres, il faut LNbits 1.7 ou plus récent avec un nœud compatible BOLT12 (Core Lightning, Phoenixd ou Eclair), ou l'extension BOLT12 de LNbits.",
 
   "myContactTitle": "Mon contact",
   "myContactLnAddressSection": "Lightning Address",

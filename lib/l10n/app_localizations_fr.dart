@@ -993,7 +993,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      'BOLT12 n\'est pas pris en charge par ce serveur LNbits. Ton nœud Lightning ne comprend peut-être pas BOLT12, ou l\'extension BOLT12 de LNbits n\'est pas installée.';
+      'BOLT12 n\'est pas pris en charge par ce serveur LNbits. Pour payer des offres, il faut LNbits 1.7 ou plus récent avec un nœud compatible BOLT12 (Core Lightning, Phoenixd ou Eclair), ou l\'extension BOLT12 de LNbits.';
 
   @override
   String get myContactTitle => 'Mon contact';

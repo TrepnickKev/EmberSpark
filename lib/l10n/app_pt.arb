@@ -304,7 +304,7 @@
   "bolt12AmountLabel": "Valor (sats)",
   "bolt12MemoLabel": "Nota do pagador (opcional)",
   "bolt12RawStringLabel": "String BOLT12",
-  "bolt12NotSupported": "Este servidor LNbits não suporta BOLT12. Seu nó Lightning pode não entender BOLT12, ou a extensão BOLT12 do LNbits não está instalada.",
+  "bolt12NotSupported": "Este servidor LNbits não suporta BOLT12. Para pagar ofertas é preciso LNbits 1.7 ou mais recente com um nó compatível com BOLT12 (Core Lightning, Phoenixd ou Eclair), ou a extensão BOLT12 do LNbits.",
 
   "myContactTitle": "Meu contato",
   "myContactLnAddressSection": "Lightning Address",

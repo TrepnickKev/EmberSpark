@@ -989,7 +989,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      'Этот сервер LNbits не поддерживает BOLT12. Возможно, твой узел Lightning не понимает BOLT12, или расширение BOLT12 для LNbits не установлено.';
+      'Этот сервер LNbits не поддерживает BOLT12. Для оплаты офферов нужен LNbits 1.7 или новее с узлом, поддерживающим BOLT12 (Core Lightning, Phoenixd или Eclair), или расширение BOLT12 для LNbits.';
 
   @override
   String get myContactTitle => 'Мой контакт';
