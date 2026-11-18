@@ -329,7 +329,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sendToInputLabel => '地址或支付数据';
 
   @override
-  String get sendToInputHint => 'BOLT11、LNURL 或 user@host';
+  String get sendToInputHint => 'BOLT11、BOLT12、LNURL 或 user@host';
 
   @override
   String get sendToScanTitle => '扫描以发送';
@@ -1021,7 +1021,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get myContactBolt12ExtensionMissing =>
-      'LNbits 未安装 BOLT12 扩展，或你的 Lightning 节点不支持 BOLT12。';
+      'LNbits 从 1.7 起可以支付 BOLT12 Offer，但创建你自己的 Offer 需要 BOLT12 扩展。你也可以粘贴由你的 Lightning 节点生成的 Offer。';
 
   @override
   String get myContactAvatarPriority =>

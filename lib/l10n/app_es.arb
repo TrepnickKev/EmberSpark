@@ -109,7 +109,7 @@
 
   "sendToTitle": "Enviar a…",
   "sendToInputLabel": "Dirección o datos de pago",
-  "sendToInputHint": "BOLT11, LNURL o user@host",
+  "sendToInputHint": "BOLT11, BOLT12, LNURL o user@host",
   "sendToScanTitle": "Escanear para enviar",
   "sendToContacts": "Contactos",
   "sendToNoContacts": "Aún no hay contactos",
@@ -327,7 +327,7 @@
   "myContactLnurlpExtensionMissing": "LNbits no tiene instalada la extensión LNURL-pay.",
   "myContactReadOnlyNoGenerate": "Esta es una wallet de solo lectura, por lo que no puede crear un enlace en el servidor. Puedes pegar uno existente abajo.",
   "myContactLnAddressServerUpdated": "Lightning Address actualizada en el servidor.",
-  "myContactBolt12ExtensionMissing": "LNbits no tiene instalada una extensión BOLT12, o tu nodo Lightning no admite BOLT12.",
+  "myContactBolt12ExtensionMissing": "LNbits puede pagar ofertas BOLT12 desde la 1.7, pero crear tu propia oferta requiere la extensión BOLT12. También puedes pegar una oferta generada por tu nodo Lightning.",
   "myContactAvatarPriority": "Tu avatar de perfil se genera a partir de uno de estos identificadores. Toca una estrella para elegir cuál. Si no, usa la Lightning address, luego BOLT12 y luego LNURL.",
   "myContactSetDefault": "Establecer como identidad predeterminada",
   "myContactUnsetDefault": "Quitar como identidad predeterminada",

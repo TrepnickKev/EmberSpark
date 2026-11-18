@@ -343,7 +343,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sendToInputLabel => 'Endereço ou dados de pagamento';
 
   @override
-  String get sendToInputHint => 'BOLT11, LNURL ou user@host';
+  String get sendToInputHint => 'BOLT11, BOLT12, LNURL ou user@host';
 
   @override
   String get sendToScanTitle => 'Escanear para enviar';
@@ -1067,7 +1067,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get myContactBolt12ExtensionMissing =>
-      'O LNbits não tem uma extensão BOLT12 instalada, ou seu nó Lightning não suporta BOLT12.';
+      'O LNbits pode pagar ofertas BOLT12 desde a 1.7, mas criar sua própria oferta exige a extensão BOLT12. Você também pode colar uma oferta gerada pelo seu nó Lightning.';
 
   @override
   String get myContactAvatarPriority =>
