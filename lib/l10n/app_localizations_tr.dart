@@ -340,7 +340,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sendToInputLabel => 'Adres veya ödeme verisi';
 
   @override
-  String get sendToInputHint => 'BOLT11, LNURL veya user@host';
+  String get sendToInputHint => 'BOLT11, BOLT12, LNURL veya user@host';
 
   @override
   String get sendToScanTitle => 'Göndermek için tara';
@@ -985,7 +985,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      'Bu LNbits sunucusu BOLT12\'yi desteklemiyor. Lightning düğümün BOLT12\'yi anlamıyor olabilir veya LNbits BOLT12 eklentisi yüklü değil.';
+      'Bu LNbits sunucusu BOLT12\'yi desteklemiyor. Teklif ödemek için BOLT12 destekli bir düğümle (Core Lightning, Phoenixd veya Eclair) LNbits 1.7 veya daha yenisi ya da LNbits BOLT12 eklentisi gerekir.';
 
   @override
   String get myContactTitle => 'Kişi bilgim';
@@ -1060,7 +1060,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get myContactBolt12ExtensionMissing =>
-      'LNbits\'te BOLT12 eklentisi yüklü değil veya Lightning düğümün BOLT12\'yi desteklemiyor.';
+      'LNbits 1.7\'den itibaren BOLT12 tekliflerini ödeyebilir, ancak kendi teklifini oluşturmak için BOLT12 eklentisi gerekir. Lightning düğümünün oluşturduğu bir teklifi de yapıştırabilirsin.';
 
   @override
   String get myContactAvatarPriority =>

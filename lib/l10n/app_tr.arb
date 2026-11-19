@@ -109,7 +109,7 @@
 
   "sendToTitle": "Şuraya gönder…",
   "sendToInputLabel": "Adres veya ödeme verisi",
-  "sendToInputHint": "BOLT11, LNURL veya user@host",
+  "sendToInputHint": "BOLT11, BOLT12, LNURL veya user@host",
   "sendToScanTitle": "Göndermek için tara",
   "sendToContacts": "Kişiler",
   "sendToNoContacts": "Henüz kişi yok",
@@ -304,7 +304,7 @@
   "bolt12AmountLabel": "Tutar (sats)",
   "bolt12MemoLabel": "Ödeyen notu (isteğe bağlı)",
   "bolt12RawStringLabel": "BOLT12 dizesi",
-  "bolt12NotSupported": "Bu LNbits sunucusu BOLT12'yi desteklemiyor. Lightning düğümün BOLT12'yi anlamıyor olabilir veya LNbits BOLT12 eklentisi yüklü değil.",
+  "bolt12NotSupported": "Bu LNbits sunucusu BOLT12'yi desteklemiyor. Teklif ödemek için BOLT12 destekli bir düğümle (Core Lightning, Phoenixd veya Eclair) LNbits 1.7 veya daha yenisi ya da LNbits BOLT12 eklentisi gerekir.",
 
   "myContactTitle": "Kişi bilgim",
   "myContactLnAddressSection": "Lightning Address",
@@ -327,7 +327,7 @@
   "myContactLnurlpExtensionMissing": "LNbits'te LNURL-pay eklentisi yüklü değil.",
   "myContactReadOnlyNoGenerate": "Bu salt okunur bir cüzdandır, bu nedenle sunucuda bağlantı oluşturamaz. Aşağıya mevcut bir tanesini yine de yapıştırabilirsiniz.",
   "myContactLnAddressServerUpdated": "Lightning Address sunucuda güncellendi.",
-  "myContactBolt12ExtensionMissing": "LNbits'te BOLT12 eklentisi yüklü değil veya Lightning düğümün BOLT12'yi desteklemiyor.",
+  "myContactBolt12ExtensionMissing": "LNbits 1.7'den itibaren BOLT12 tekliflerini ödeyebilir, ancak kendi teklifini oluşturmak için BOLT12 eklentisi gerekir. Lightning düğümünün oluşturduğu bir teklifi de yapıştırabilirsin.",
   "myContactAvatarPriority": "Profil avatarın bu tanımlayıcılardan biriyle oluşturulur. Hangisi olacağını seçmek için bir yıldıza dokun. Aksi halde önce Lightning address, sonra BOLT12, sonra LNURL kullanılır.",
   "myContactSetDefault": "Varsayılan kimlik olarak ayarla",
   "myContactUnsetDefault": "Varsayılan kimlikten kaldır",

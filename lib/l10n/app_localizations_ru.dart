@@ -342,7 +342,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sendToInputLabel => 'Адрес или платёжные данные';
 
   @override
-  String get sendToInputHint => 'BOLT11, LNURL или user@host';
+  String get sendToInputHint => 'BOLT11, BOLT12, LNURL или user@host';
 
   @override
   String get sendToScanTitle => 'Сканировать для отправки';
@@ -989,7 +989,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get bolt12NotSupported =>
-      'Этот сервер LNbits не поддерживает BOLT12. Возможно, твой узел Lightning не понимает BOLT12, или расширение BOLT12 для LNbits не установлено.';
+      'Этот сервер LNbits не поддерживает BOLT12. Для оплаты офферов нужен LNbits 1.7 или новее с узлом, поддерживающим BOLT12 (Core Lightning, Phoenixd или Eclair), или расширение BOLT12 для LNbits.';
 
   @override
   String get myContactTitle => 'Мой контакт';
@@ -1062,7 +1062,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get myContactBolt12ExtensionMissing =>
-      'В LNbits не установлено расширение BOLT12, или твой узел Lightning не поддерживает BOLT12.';
+      'LNbits с версии 1.7 умеет оплачивать офферы BOLT12, но для создания своего оффера нужно расширение BOLT12. Также можно вставить оффер, созданный твоим узлом Lightning.';
 
   @override
   String get myContactAvatarPriority =>

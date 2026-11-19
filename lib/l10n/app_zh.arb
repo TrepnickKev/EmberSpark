@@ -109,7 +109,7 @@
 
   "sendToTitle": "发送至…",
   "sendToInputLabel": "地址或支付数据",
-  "sendToInputHint": "BOLT11、LNURL 或 user@host",
+  "sendToInputHint": "BOLT11、BOLT12、LNURL 或 user@host",
   "sendToScanTitle": "扫描以发送",
   "sendToContacts": "联系人",
   "sendToNoContacts": "还没有联系人",
@@ -304,7 +304,7 @@
   "bolt12AmountLabel": "金额（sats）",
   "bolt12MemoLabel": "付款人备注（可选）",
   "bolt12RawStringLabel": "BOLT12 字符串",
-  "bolt12NotSupported": "此 LNbits 服务器不支持 BOLT12。你的 Lightning 节点可能不理解 BOLT12，或未安装 LNbits BOLT12 扩展。",
+  "bolt12NotSupported": "此 LNbits 服务器不支持 BOLT12。支付 Offer 需要 LNbits 1.7 或更高版本并搭配支持 BOLT12 的节点（Core Lightning、Phoenixd 或 Eclair），或安装 LNbits BOLT12 扩展。",
 
   "myContactTitle": "我的联系方式",
   "myContactLnAddressSection": "Lightning Address",
@@ -327,7 +327,7 @@
   "myContactLnurlpExtensionMissing": "LNbits 未安装 LNURL-pay 扩展。",
   "myContactReadOnlyNoGenerate": "这是一个只读钱包，因此无法在服务器上创建链接。你仍可以在下方粘贴一个现有的。",
   "myContactLnAddressServerUpdated": "Lightning Address 已在服务器上更新。",
-  "myContactBolt12ExtensionMissing": "LNbits 未安装 BOLT12 扩展，或你的 Lightning 节点不支持 BOLT12。",
+  "myContactBolt12ExtensionMissing": "LNbits 从 1.7 起可以支付 BOLT12 Offer，但创建你自己的 Offer 需要 BOLT12 扩展。你也可以粘贴由你的 Lightning 节点生成的 Offer。",
   "myContactAvatarPriority": "你的个人头像由这些标识之一生成。点按星标选择使用哪一个。否则将依次使用 Lightning address、BOLT12、LNURL。",
   "myContactSetDefault": "设为默认身份",
   "myContactUnsetDefault": "取消默认身份",

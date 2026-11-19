@@ -8,9 +8,9 @@ import '../services/payment_feedback.dart';
 import '../widgets/payment_route_header.dart';
 
 /// Pay either a BOLT12 offer (`lno1…`) or a BOLT12 invoice (`lni1…`).
-/// For offers we ask LNbits' BOLT12 community extension to fetchinvoice
-/// (taking an amount + optional payer note) and then pay the returned
-/// invoice via the regular payments endpoint. For invoices we try the
+/// Offers (amount + optional payer note) are paid by LNbits core on 1.7+,
+/// falling back to the BOLT12 community extension's fetchinvoice on older
+/// servers (see [LNbitsService.payBolt12Offer]). For invoices we try the
 /// regular payments endpoint directly — CLN-backed LNbits accepts BOLT12
 /// invoices in the `bolt11` field; other backends fall through with a
 /// localized "not supported" message.
@@ -74,12 +74,11 @@ class _Bolt12ActionScreenState extends State<Bolt12ActionScreen> {
       if (widget.isOffer) {
         final amountSats = int.parse(amountCtrl.text.trim());
         final memo = memoCtrl.text.trim();
-        final invoice = await svc.fetchBolt12Invoice(
+        await svc.payBolt12Offer(
           offer: widget.code,
           amountSats: amountSats,
           memo: memo.isEmpty ? null : memo,
         );
-        await svc.payInvoice(invoice);
       } else {
         // lni1… — CLN-backed LNbits accepts BOLT12 invoices in the bolt11
         // field. Other backends throw, surfaced via _classifyError.
