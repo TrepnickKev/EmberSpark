@@ -1,0 +1,2 @@
+* BOLT12-Offers lassen sich jetzt mit LNbits 1.7 oder neuer bezahlen, auch ohne BOLT12-Erweiterung
+* Glühende Funken steigen auf dem Startbildschirm auf, wenn eine Zahlung eingeht

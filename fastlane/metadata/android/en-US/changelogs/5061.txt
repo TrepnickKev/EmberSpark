@@ -1,0 +1,2 @@
+* Paying BOLT12 offers now works with LNbits 1.7 or newer, without the BOLT12 extension
+* Glowing ember sparks rise on the home screen when a payment arrives
