@@ -18,6 +18,7 @@ import '../services/received_notify_service.dart';
 import '../services/unseen_incoming_service.dart';
 import '../services/wallet_account_service.dart';
 import '../widgets/avatar_status_ring.dart';
+import '../widgets/ember_sparks.dart';
 import '../widgets/flipping_avatar.dart';
 import '../widgets/read_only_badge.dart';
 import '../widgets/stacked_action_button.dart' show bitcoinOrange;
@@ -79,6 +80,8 @@ class _HomeScreenState extends State<HomeScreen>
   // and about to reload. _flipSeen tracks the last global success we've played.
   final ValueNotifier<int> _avatarFlip = ValueNotifier<int>(0);
   int _flipSeen = 0;
+  // Bumped once per received payment to play the ember sparks behind Home.
+  final ValueNotifier<int> _sparks = ValueNotifier<int>(0);
   // A payment success waiting to be shown. The flip is queued until Home is
   // actually visible (no route on top of it or still animating out) and any
   // avatar/carousel refresh has applied, so it never plays under the outgoing
@@ -202,6 +205,7 @@ class _HomeScreenState extends State<HomeScreen>
     _avatarPage?.dispose();
     _noFlip.dispose();
     _avatarFlip.dispose();
+    _sparks.dispose();
     super.dispose();
   }
 
@@ -263,6 +267,7 @@ class _HomeScreenState extends State<HomeScreen>
         _conn = ConnectionStatus.ok;
       });
       await _reconcileUnseen(b, walletId);
+      await _maybeSparkle(walletId, b);
       // Keep the background poll's baseline current for the active wallet so it
       // doesn't re-notify (up to 15 min later) for a receive already shown here.
       if (walletId != null) await setLastNotifiedBalanceFor(walletId, b);
@@ -288,6 +293,18 @@ class _HomeScreenState extends State<HomeScreen>
       await setLastSeenBalanceFor(walletId, r.baseline);
     }
     if (mounted) setState(() => _hasUnseenIncoming = r.unseen);
+  }
+
+  /// Plays the ember sparks once per received payment, whether it arrived
+  /// while Home is open or while the app was closed. Only evaluated while Home
+  /// is visible, so a receive behind another screen sparks on the way back.
+  Future<void> _maybeSparkle(String? walletId, int balance) async {
+    if (walletId == null || !mounted) return;
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+    final baseline = await getLastSparkBalanceFor(walletId);
+    final d = evaluateNotify(balance, baseline);
+    if (d.baseline != baseline) await setLastSparkBalanceFor(walletId, d.baseline);
+    if (d.notify && mounted) _sparks.value++;
   }
 
   void _showPaymentNotification(int delta) {
@@ -371,6 +388,7 @@ class _HomeScreenState extends State<HomeScreen>
         _conn = ConnectionStatus.ok;
       });
       await _reconcileUnseen(b, w?.id);
+      await _maybeSparkle(w?.id, b);
       // See _pollOnce: keep the background poll's baseline current for the
       // active wallet so it doesn't duplicate a receive already shown here.
       if (w != null) await setLastNotifiedBalanceFor(w.id, b);
@@ -747,7 +765,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
       ),
-      body: Padding(
+      body: _withSparks(Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -942,7 +960,15 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-      ),
+      )),
     );
   }
+
+  /// Puts the ember sparks behind [content], filling the whole body.
+  Widget _withSparks(Widget content) => Stack(
+        children: [
+          Positioned.fill(child: EmberSparks(trigger: _sparks)),
+          content,
+        ],
+      );
 }

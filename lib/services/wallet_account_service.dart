@@ -89,6 +89,9 @@ String paymentsCacheKey(String walletId) => 'payments_cache__$walletId';
 String lastNotifiedBalanceKey(String walletId) =>
     'last_notified_balance__$walletId';
 
+/// Per-wallet baseline for the ember sparks Home plays on a received payment.
+String lastSparkBalanceKey(String walletId) => 'last_spark_balance__$walletId';
+
 Future<List<WalletAccount>> listWallets() async {
   const storage = FlutterSecureStorage();
   final raw = await storage.read(key: _walletsKey);
@@ -223,6 +226,7 @@ Future<void> removeWallet(String id) async {
   await storage.delete(key: myDefaultContactKindKey(id));
   await storage.delete(key: lastSeenBalanceKey(id));
   await storage.delete(key: lastNotifiedBalanceKey(id));
+  await storage.delete(key: lastSparkBalanceKey(id));
   await storage.delete(key: paymentsCacheKey(id));
   final currentId = await getCurrentWalletId();
   if (currentId == id) {
